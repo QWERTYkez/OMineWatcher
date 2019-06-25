@@ -5,24 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OMineGuard"
         mc:Ignorable="d"
-        Title="OMineGuard" Height="450" Width="800" Closing="ClosingApp">
-    <DockPanel>
-        <TabControl>
-            <TabItem Header="Базовый вид">
-                <Grid x:Name="BaseGrid"></Grid>
-            </TabItem>
-            <TabItem Header="Детальный вид">
-                <Grid x:Name="DetalGrid"></Grid>
-            </TabItem>
-            <TabItem Header="Настройки ригов">
-                <Grid></Grid>
-            </TabItem>
-            <TabItem Header="Настройки пулов">
-                <Grid></Grid>
-            </TabItem>
-            <TabItem Header="Общие настройки">
-                <Grid></Grid>
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+        Title="OMineGuard" Height="450" Width="800" Closing="ClosingApp" Background="#FF686868">
+    <TabControl Background="#FF686868">
+        <TabItem Header="Базовый вид">
+            <Grid x:Name="BaseGrid"></Grid>
+        </TabItem>
+        <TabItem Header="Детальный вид">
+            <Grid x:Name="DetalGrid"></Grid>
+        </TabItem>
+        <TabItem Header="Настройки ригов">
+            <Grid x:Name="RigsSet"></Grid>
+        </TabItem>
+        <TabItem Header="Настройки пулов">
+            <Grid x:Name="PoolSet"></Grid>
+        </TabItem>
+        <TabItem Header="Общие настройки">
+            <Grid x:Name="BaseSet"></Grid>
+        </TabItem>
+    </TabControl>
 </Window>
