@@ -30,8 +30,7 @@ namespace OMineGuard
             BASESET = BaseSet;
 
             RigGPUs.ItemsSource = new List<String> {"", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
-            RigMiner.ItemsSource = new List<String> { "Bminer", "Claymore", "GMiner" };
-
+            RigMiner.ItemsSource = new List<Miners> { Miners.Bminer, Miners.Claymore, Miners.GMiner };
         }
 
         #region BASE
@@ -73,18 +72,7 @@ namespace OMineGuard
             }
             if (Profile.WorkersList[RigsList.SelectedIndex].Miner != null)
             {
-                if (Profile.WorkersList[RigsList.SelectedIndex].Miner == Miners.Bminer)
-                {
-                    RigMiner.SelectedItem = "Bminer";
-                }
-                else if (Profile.WorkersList[RigsList.SelectedIndex].Miner == Miners.Claymore)
-                {
-                    RigMiner.SelectedItem = "Claymore";
-                }
-                else if (Profile.WorkersList[RigsList.SelectedIndex].Miner == Miners.GMiner)
-                {
-                    RigMiner.SelectedItem = "GMiner";
-                }
+                RigMiner.SelectedItem = Profile.WorkersList[RigsList.SelectedIndex].Miner;
             }
             else
             {
@@ -126,6 +114,14 @@ namespace OMineGuard
                 catch (OverflowException)
                 { err = 6; }
             }
+            Miners? min = null;
+            if (RigMiner.SelectedIndex != -1)
+            {
+                min = (Miners)RigMiner.SelectedItem;
+            }
+            else { err = 7; }
+
+
             int? port = null;
             try
             { port = Convert.ToInt32(RigPort.Text); }
@@ -145,20 +141,7 @@ namespace OMineGuard
             { err = 1; }
             catch (FormatException)
             { err = 2; }
-            Miners? min = null;
-            if (RigMiner.Text == "Bminer")
-            {
-                min = Miners.Bminer;
-            }
-            else if (RigMiner.Text == "Claymore")
-            {
-                min = Miners.Claymore;
-            }
-            else if (RigMiner.Text == "GMiner")
-            {
-                min = Miners.GMiner;
-            }
-
+            
             if (RigName.Text == "")
             {
                 RigLog.Text = "Нужно ввести имя";
@@ -194,9 +177,13 @@ namespace OMineGuard
                 RigLog.Text = "Слишком большое значение хешрейта";
                 RigLog.Foreground = Brushes.Red;
             }
+            else if (err == 7)
+            {
+                RigLog.Text = "Выберите майнер";
+                RigLog.Foreground = Brushes.Red;
+            }
             else
             {
-                
                 Profile.WorkersList[ind].Name = RigName.Text;
                 Profile.WorkersList[ind].IP = ip;
                 Profile.WorkersList[ind].Port = port;
@@ -232,20 +219,9 @@ namespace OMineGuard
         }
         private void RigMiner_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((string)(RigMiner.SelectedItem) == "Bminer")
+            if (RigMiner.SelectedIndex != -1)
             {
-                RigHashrate.IsEnabled = true;
-                RigHashType.Text = "h/s";
-            }
-            else if ((string)(RigMiner.SelectedItem) == "Claymore")
-            {
-                RigHashrate.IsEnabled = true;
-                RigHashType.Text = "Mh/s";
-            }
-            else if ((string)(RigMiner.SelectedItem) == "GMiner")
-            {
-                RigHashrate.IsEnabled = true;
-                RigHashType.Text = "Sol/s";
+                RigHashType.Text = Worker.HashrateTypes[(Miners)RigMiner.SelectedItem];
             }
             else
             {

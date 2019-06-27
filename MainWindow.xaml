@@ -6,15 +6,71 @@
         xmlns:local="clr-namespace:OMineGuard"
         mc:Ignorable="d"
         Title="OMineGuard" Height="500" Width="800" Background="#FF686868">
+    <Window.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <TabControl Background="#FF686868">
         <TabItem Header="Базовый вид">
             <Grid x:Name="BaseGrid"></Grid>
         </TabItem>
-        
+
         <TabItem Header="Детальный вид">
             <Grid x:Name="DetalGrid"></Grid>
         </TabItem>
-        
+
         <TabItem Header="Настройки ригов">
             <Grid x:Name="RigsSet">
                 <Grid.ColumnDefinitions>
@@ -82,18 +138,18 @@
                                     <ColumnDefinition Width="150"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Слежение</TextBlock>
-                                <Button x:Name="RigWatching" Grid.Column="1" Margin="3" Background="Crimson" BorderBrush="Black" Click="RigWatching_Click" IsEnabled="False">Вкл/Выкл</Button>
+                                <Button x:Name="RigWatching" Grid.Column="1" Margin="3" Background="Crimson" BorderBrush="Black" Click="RigWatching_Click" IsEnabled="False" Style="{DynamicResource ButtonStyle1}">Вкл/Выкл</Button>
                                 <Button x:Name="RigSave" Grid.Column="2" Margin="3" FontWeight="Bold" Click="RigSave_Click">Сохранить конфиг</Button>
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid Grid.Row="1">
-                        
+
                     </Grid>
                 </Grid>
             </Grid>
         </TabItem>
-        
+
         <TabItem Header="Настройки пулов">
             <Grid x:Name="PoolSet">
                 <Grid.ColumnDefinitions>
@@ -121,7 +177,7 @@
                 </Grid>
             </Grid>
         </TabItem>
-        
+
         <TabItem Header="Общие настройки">
             <Grid x:Name="BaseSet"></Grid>
         </TabItem>

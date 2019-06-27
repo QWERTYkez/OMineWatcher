@@ -10,7 +10,5 @@ namespace OMineGuard
     {
         public static List<Worker> WorkersList = new List<Worker>();
 
-
-
     }
 }

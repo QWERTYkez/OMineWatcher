@@ -9,6 +9,13 @@ namespace OMineGuard
 {
     public class Worker
     {
+        public static Dictionary<Miners, string> HashrateTypes = new Dictionary<Miners, string>
+        {
+            {Miners.Bminer, "h/s" },
+            {Miners.Claymore, "Mh/s" },
+            {Miners.GMiner, "Sol/s" }
+        };
+
         public Worker() { }
         public Worker(string name)
         {
