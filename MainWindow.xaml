@@ -5,20 +5,123 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OMineGuard"
         mc:Ignorable="d"
-        Title="OMineGuard" Height="450" Width="800" Closing="ClosingApp" Background="#FF686868">
+        Title="OMineGuard" Height="500" Width="800" Background="#FF686868">
     <TabControl Background="#FF686868">
         <TabItem Header="Базовый вид">
             <Grid x:Name="BaseGrid"></Grid>
         </TabItem>
+        
         <TabItem Header="Детальный вид">
             <Grid x:Name="DetalGrid"></Grid>
         </TabItem>
+        
         <TabItem Header="Настройки ригов">
-            <Grid x:Name="RigsSet"></Grid>
+            <Grid x:Name="RigsSet">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListBox x:Name="RigsList" Grid.Row="0" Margin="7,5,3,5" Width="200" SelectionChanged="RigsList_SelectionChanged"/>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="MinusRig" Grid.Column="0" Margin="5,0,5,5" Content="-" Click="MinusRig_Click"/>
+                        <Button Grid.Column="1" Margin="5,0,5,5" Content="Вверх"/>
+                        <Button Grid.Column="2" Margin="5,0,5,5" Content="Вниз"/>
+                        <Button x:Name="PlusRig" Grid.Column="3" Margin="5,0,5,5" Content="+" Click="PlusRig_Click"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="200"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Имя</TextBlock>
+                            <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">IP</TextBlock>
+                            <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Порт</TextBlock>
+                            <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Майнер</TextBlock>
+                            <TextBlock Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Колич. GPU</TextBlock>
+                            <TextBlock Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Хешрейт</TextBlock>
+                            <TextBox x:Name="RigName" Grid.Column="1" Margin="3"></TextBox>
+                            <TextBox x:Name="RigIP" Grid.Row="1" Grid.Column="1" Margin="3"></TextBox>
+                            <TextBox x:Name="RigPort" Grid.Row="2" Grid.Column="1" Margin="3"></TextBox>
+                            <ComboBox x:Name="RigMiner" Grid.Row="3" Grid.Column="1" Margin="3" SelectionChanged="RigMiner_SelectionChanged"></ComboBox>
+                            <ComboBox x:Name="RigGPUs" Grid.Row="4" Grid.Column="1" Margin="3"></ComboBox>
+                            <TextBlock x:Name="RigHashType" Grid.Row="5" Grid.Column="1" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Foreground="#FF747474" >Mh/s</TextBlock>
+                            <TextBox x:Name="RigHashrate" Grid.Row="5" Grid.Column="1" Margin="3" IsEnabled="False"/>
+                            <TextBlock x:Name="RigLog" Grid.Row="6" Grid.ColumnSpan="2" Margin="3" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                            <Grid Grid.Row="7" Grid.ColumnSpan="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White">Слежение</TextBlock>
+                                <Button x:Name="RigWatching" Grid.Column="1" Margin="3" Background="Crimson" BorderBrush="Black" Click="RigWatching_Click" IsEnabled="False">Вкл/Выкл</Button>
+                                <Button x:Name="RigSave" Grid.Column="2" Margin="3" FontWeight="Bold" Click="RigSave_Click">Сохранить конфиг</Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        
+                    </Grid>
+                </Grid>
+            </Grid>
         </TabItem>
+        
         <TabItem Header="Настройки пулов">
-            <Grid x:Name="PoolSet"></Grid>
+            <Grid x:Name="PoolSet">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0" Margin="5" Width="200"/>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Margin="5,0,5,5" Content="-"/>
+                        <Button Grid.Column="1" Margin="5,0,5,5" Content="Вверх"/>
+                        <Button Grid.Column="2" Margin="5,0,5,5" Content="Вниз"/>
+                        <Button Grid.Column="3" Margin="5,0,5,5" Content="+"/>
+                    </Grid>
+                </Grid>
+            </Grid>
         </TabItem>
+        
         <TabItem Header="Общие настройки">
             <Grid x:Name="BaseSet"></Grid>
         </TabItem>
