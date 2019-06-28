@@ -23,7 +23,7 @@ namespace OMineGuard
         }
 
         public String Name { get; set; } = "Новый воркер";
-        public IPAddress IP { get; set; }
+        public string IP { get; set; }
         public int? Port { get; set; }
         public byte? GPUs { get; set; }
         public Miners? Miner { get; set; }
