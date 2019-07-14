@@ -7,7 +7,7 @@ using System.Net;
 
 namespace OMineGuard
 {
-    public class Worker
+    public struct Worker
     {
         public static Dictionary<Miners, string> HashrateTypes = new Dictionary<Miners, string>
         {
@@ -16,19 +16,13 @@ namespace OMineGuard
             {Miners.GMiner, "Sol/s" }
         };
 
-        public Worker() { }
-        public Worker(string name)
-        {
-            Name = name;
-        }
-
-        public String Name { get; set; } = "Новый воркер";
-        public string IP { get; set; }
-        public int? Port { get; set; }
-        public byte? GPUs { get; set; }
-        public Miners? Miner { get; set; }
-        public double? Hashrate { get; set; }
-        public bool? Waching { get; set; }
+        public String Name;
+        public string IP;
+        public int? Port;
+        public byte? GPUs;
+        public Miners? Miner;
+        public double? Hashrate;
+        public bool? Waching;
     }
 
     public enum Miners

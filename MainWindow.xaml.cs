@@ -123,7 +123,9 @@ namespace OMineGuard
         }
         private void PlusRig_Click(object sender, RoutedEventArgs e)
         {
-            PM.Profile.WorkersList.Add(new Worker());
+            Worker Wr = new Worker();
+            Wr.Name = "Новый воркер";
+            PM.Profile.WorkersList.Add(Wr);
             RigsList.ItemsSource = PM.Profile.WorkersList.Select(W => W.Name);
             RigsList.SelectedIndex = PM.Profile.WorkersList.Count - 1;
         }
@@ -208,12 +210,17 @@ namespace OMineGuard
             }
             else
             {
-                PM.Profile.WorkersList[ind].Name = RigName.Text;
-                PM.Profile.WorkersList[ind].IP = ip.ToString();
-                PM.Profile.WorkersList[ind].Port = port;
-                PM.Profile.WorkersList[ind].GPUs = GPUs;
-                PM.Profile.WorkersList[ind].Miner = min;
-                PM.Profile.WorkersList[ind].Hashrate = hashrate;
+                Worker Wr = PM.Profile.WorkersList[ind];
+
+                Wr.Name = RigName.Text;
+                Wr.IP = ip.ToString();
+                Wr.Port = port;
+                Wr.GPUs = GPUs;
+                Wr.Miner = min;
+                Wr.Hashrate = hashrate;
+
+                PM.Profile.WorkersList[ind] = Wr;
+
                 RigsList.ItemsSource = PM.Profile.WorkersList.Select(W => W.Name);
                 RigsList.SelectedIndex = ind;
 
@@ -293,12 +300,17 @@ namespace OMineGuard
             if (PM.Profile.WorkersList[RigsList.SelectedIndex].Waching == true)
             {
                 RigWatching.Background = Brushes.Crimson;
-                PM.Profile.WorkersList[RigsList.SelectedIndex].Waching = false;
+
+                Worker Wr = PM.Profile.WorkersList[RigsList.SelectedIndex];
+                Wr.Waching = false;
+                PM.Profile.WorkersList[RigsList.SelectedIndex] = Wr;
             }
             else
             {
                 RigWatching.Background = Brushes.Lime;
-                PM.Profile.WorkersList[RigsList.SelectedIndex].Waching = true;
+                Worker Wr = PM.Profile.WorkersList[RigsList.SelectedIndex];
+                Wr.Waching = true;
+                PM.Profile.WorkersList[RigsList.SelectedIndex] = Wr;
             }
             PM.SaveProfile();
         }
