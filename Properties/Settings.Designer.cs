@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OMineGuard.Properties
+namespace OMineWatcher.Properties
 {
 
 

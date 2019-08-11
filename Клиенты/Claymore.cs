@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OMineGuard
+namespace OMineWatcher
 {
     public static class Claymore
     {

@@ -14,9 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Net;
-using PM = OMineGuard.ProfileManager;
+using PM = OMineWatcher.ProfileManager;
 
-namespace OMineGuard
+namespace OMineWatcher
 {
     public partial class MainWindow : Window
     {

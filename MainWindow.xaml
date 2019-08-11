@@ -1,11 +1,11 @@
-﻿<Window x:Class="OMineGuard.MainWindow"
+﻿<Window x:Class="OMineWatcher.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:OMineGuard"
+        xmlns:local="clr-namespace:OMineWatcher"
         mc:Ignorable="d"
-        Title="OMineGuard" Height="500" Width="800" Background="#FF686868">
+        Title="OMineWatcher" Height="500" Width="800" Background="#FF686868">
     <Window.Resources>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">

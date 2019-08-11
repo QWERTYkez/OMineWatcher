@@ -1,7 +1,7 @@
-﻿<Application x:Class="OMineGuard.App"
+﻿<Application x:Class="OMineWatcher.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:OMineGuard"
+             xmlns:local="clr-namespace:OMineWatcher"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
