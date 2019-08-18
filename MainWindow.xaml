@@ -6,8 +6,138 @@
         xmlns:local="clr-namespace:OMineWatcher"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" x:Class="OMineWatcher.MainWindow"
         mc:Ignorable="d"
-        Title="OMineWatcher" Height="500" Width="900" Background="#FF16282C" MinWidth="857">
+        Title="OMineWatcher" Height="500" Width="900" Background="{DynamicResource Custom.Window.Background}" MinWidth="857">
     <Window.Resources>
+        <!--#region CustomBrushes-->
+        <!--#region Window-->
+        <RadialGradientBrush x:Key="Custom.Window.Background">
+            <GradientStop Color="#FF2A4E5F" Offset="0"/>
+            <GradientStop Color="#FF080B1E" Offset="1"/>
+            <GradientStop Color="#FF0F2438" Offset="0.635"/>
+        </RadialGradientBrush>
+        <!--#endregion-->
+        
+        <!--#region Listbox-->
+        <SolidColorBrush x:Key="Custom.ListBox.Foreground" Color="#FFDBFF00"/>
+        <SolidColorBrush x:Key="Custom.ListBox.BorderBrush" Color="#FFDBFF00"/>
+        <SolidColorBrush x:Key="Custom.ListBox.Background" Color="#4C495500"/>
+
+        <LinearGradientBrush x:Key="Custom.ListBoxItem.MouseOver.Background" StartPoint="0.5,0" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox">
+            <GradientStop Color="Transparent" Offset="0"/>
+            <GradientStop Color="#33DBFF00" Offset="0.5"/>
+            <GradientStop Color="Transparent" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="Custom.ListBoxItem.Selected.Background" Color="#19DBFF00"/>
+        <SolidColorBrush x:Key="Custom.ListBoxItem.Selected.BorderBrush" Color="#4CDBFF00"/>
+        <!--#endregion-->
+        <!--#region TextBox-->
+        <SolidColorBrush x:Key="Custom.TextBox.Foreground" Color="#FF77A8FF"/>
+        <SolidColorBrush x:Key="Custom.TextBox.Background" Color="#66001F54"/>
+        <!--#endregion-->
+        <!--#endregion-->
+        
+        <!--#region Стили и Шаблоны-->
+        <!--#region Listbox-->
+        <ControlTemplate x:Key="ContrastListBox" TargetType="{x:Type ListBox}">
+            <Grid>
+                <Border x:Name="Bx" BorderBrush="{StaticResource Custom.ListBox.BorderBrush}" BorderThickness="2" Background="Transparent" Padding="1" SnapsToDevicePixels="True">
+                    <Border.Effect>
+                        <BlurEffect Radius="10"/>
+                    </Border.Effect>
+                </Border>
+                <Border x:Name="Bd" BorderBrush="{StaticResource Custom.ListBox.BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="True">
+                    <ScrollViewer Focusable="False" Padding="{TemplateBinding Padding}">
+                        <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="true">
+                    <Setter Property="Foreground" Value="{StaticResource Custom.ListBox.Foreground}"/>
+                    <Setter Property="Background" Value="{StaticResource Custom.ListBox.Background}"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsGrouping" Value="True"/>
+                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="False"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
+                </MultiTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="ListBox">
+            <Setter Property="Template" Value="{DynamicResource ContrastListBox}"/>
+        </Style>
+        <SolidColorBrush x:Key="Item.MouseOver.Background" Color="#1F26A0DA"/>
+        <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#a826A0Da"/>
+        <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3DDADADA"/>
+        <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#FFDADADA"/>
+        <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3D26A0DA"/>
+        <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF26A0DA"/>
+        <Style TargetType="{x:Type ListBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Custom.ListBoxItem.MouseOver.Background}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Custom.ListBoxItem.Selected.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Custom.ListBoxItem.Selected.BorderBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--#endregion-->
+        <!--#region TextBox-->
+        <ControlTemplate x:Key="ContrastTextBox" TargetType="{x:Type TextBox}">
+            <Grid>
+                <Border x:Name="Bx" BorderBrush="{StaticResource Custom.TextBox.Foreground}" BorderThickness="2" Background="{StaticResource Custom.TextBox.Background}" SnapsToDevicePixels="True">
+                    <Border.Effect>
+                        <BlurEffect Radius="2"/>
+                    </Border.Effect>
+                </Border>
+                <Border x:Name="border" BorderBrush="{StaticResource Custom.TextBox.Foreground}" BorderThickness="1" SnapsToDevicePixels="True">
+                    <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="TextBoxBase.Foreground" Value="{StaticResource Custom.TextBox.Foreground}"/>
+                    <Setter Property="TextBoxBase.CaretBrush" Value="White"/>
+                    <Setter Property="TextBoxBase.SelectionBrush" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Template" Value="{StaticResource ContrastTextBox}"/>
+        </Style>
+        <!--#endregion-->
+        <!--#region ButtonStyle1-->
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>
@@ -62,7 +192,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--ContrastComboBox-->
+        <!--#endregion-->
+        <!--#region ComboBox-->
         <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#FF002363"/>
         <!--#????????-->
         <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#FF002363"/>
@@ -348,8 +479,8 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <!--ContrastComboBox///-->
-        <!--ContrastGroupBox-->
+        <!--#endregion-->
+        <!--#region GroupBox-->
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <Style TargetType="{x:Type GroupBox}">
             <Setter Property="BorderBrush" Value="#FF6DB6FF"/>
@@ -392,8 +523,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--ContrastGroupBox///-->
-        <!--ContrastButtonKey-->
+        <!--#endregion-->
+        <!--#region Button-->
         <ControlTemplate x:Key="ContrastButtonKey" TargetType="{x:Type ButtonBase}">
             <Border x:Name="border" BorderBrush="LightBlue" BorderThickness="{TemplateBinding BorderThickness}" Background="Indigo" SnapsToDevicePixels="True">
                 <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
@@ -410,9 +541,9 @@
                     </Setter>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="False">
-                    <Setter Property="Background" TargetName="border" Value="Indigo"/>
+                    <Setter Property="Background" TargetName="border" Value="#FF47268F"/>
                     <Setter Property="BorderBrush" TargetName="border" Value="LightBlue"/>
-                    <Setter Property="Foreground" Value="LightBlue"/>
+                    <Setter Property="Foreground" Value="#FFFDDCBD"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
                     <Setter Property="Background" TargetName="border" Value="Blue"/>
@@ -434,8 +565,8 @@
         <Style TargetType="Button">
             <Setter Property="Template" Value="{StaticResource ContrastButtonKey}"/>
         </Style>
-        <!--ContrastButtonKey///-->
-        <!--ContrastTabControl-->
+        <!--#endregion-->
+        <!--#region TabControl-->
         <SolidColorBrush x:Key="TabItem.Selected.Background" Color="Transparent"/>
         <SolidColorBrush x:Key="TabItem.Selected.Border" Color="LightBlue"/>
         <Style TargetType="{x:Type TabControl}">
@@ -502,8 +633,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--ContrastTabControl///-->
-        <!--ContrastTabItem-->
+        <!--#endregion-->
+        <!--#region TabItem-->
         <SolidColorBrush x:Key="TabItem.Static.Background" Color="#FF002363"/>
         <SolidColorBrush x:Key="TabItem.Static.Border" Color="LightBlue"/>
 
@@ -702,15 +833,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--ContrastTabItem///-->
-        <!--Кастомные стили-->
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Control.Foreground" Value="LightBlue"/>
-            <Setter Property="Control.BorderBrush" Value="#FF6DB6FF"/>
-            <Setter Property="Control.Background" Value="#FF002363"/>
-            <Setter Property="TextBoxBase.SelectionBrush" Value="White"/>
-
-        </Style>
+        <!--#endregion-->
+        <!--#region TextBlock-->
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="TextWrapping" Value="NoWrap"/>
             <Setter Property="TextTrimming" Value="None"/>
@@ -721,29 +845,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style TargetType="ListBox">
-            <Setter Property="Foreground" Value="LightBlue"/>
-            <Setter Property="BorderBrush" Value="LightBlue"/>
-            <Setter Property="Background" Value="MidnightBlue"/>
-        </Style>
-
+        <!--#endregion-->
+        <!--#region CheckBox-->
         <Style TargetType="CheckBox">
             <Setter Property="Background" Value="#FF70FFF2"/>
             <Setter Property="BorderBrush" Value="Blue"/>
         </Style>
-        <!--Кастомные стили///-->
+        <!--#endregion -->
+        <!--#endregion-->
     </Window.Resources>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
     <TabControl>
         <TabItem Header="Базовый вид">
             <Grid x:Name="BaseGrid"/>
@@ -776,9 +888,10 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Имя:"/></TextBlock>
-                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3">sdfsgdfgssdfg</TextBox>
                         <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="IP:"/></TextBlock>
-                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3">sdfsgdfgssdfg</TextBox>
+                        
                         <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Тип рига:"/></TextBlock>
                         <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
                         <Grid Grid.Row="3" Grid.ColumnSpan="3">
@@ -796,12 +909,17 @@
                             <Button Grid.Column="4" Content="Сохранить" Margin="3"/>
                         </Grid>
                         <ScrollViewer Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
-                            <Grid >
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="56"/>
                                 </Grid.ColumnDefinitions>
-                                <ListBox Grid.Column="0" Margin="3"/>
+                                <ListBox Grid.Column="0" Margin="3">
+                                    <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
+                                    <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
+                                    <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
+                                    <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
+                                </ListBox>
                                 <StackPanel Grid.Column="1" Margin="0,5,0,3">
                                     <Button x:Name="PrototypeWatchingButton" Height="20" Background="Crimson" BorderBrush="Black" IsEnabled="False" Visibility="Collapsed" Style="{DynamicResource ButtonStyle1}" Content="Вкл/Выкл"/>
                                 </StackPanel>
@@ -841,7 +959,7 @@
                                     </Border>
                                 </WrapPanel>
                                 <Grid HorizontalAlignment="Right">
-                                    
+
                                 </Grid>
                             </StackPanel>
                             <Grid Grid.Row="2">
@@ -905,13 +1023,13 @@
                                     <TextBlock Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Кошелек:"/></TextBlock>
                                     <TextBox Grid.Row="7" Grid.Column="1" Margin="2"/>
                                     <TextBlock Grid.Row="8" Grid.ColumnSpan="2" HorizontalAlignment="Center"><Run Text="Дополнительные парамаетры:"/></TextBlock>
-                                    <TextBox Grid.Row="9" Grid.ColumnSpan="2" Margin="2"/>
+                                    <TextBox Grid.Row="9" Grid.ColumnSpan="2" Margin="2">ghdfghdghdghdfghdghdghdghdghdghdghdgh</TextBox>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </TabItem>
                     <TabItem Header="Разгон (MSI Afterburner)">
-                        
+
                     </TabItem>
                     <TabItem Header="| - Лог - |">
 
