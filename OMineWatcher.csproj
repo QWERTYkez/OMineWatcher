@@ -109,5 +109,11 @@
   <ItemGroup>
     <Resource Include="Icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HiveOS.API\HiveOS.API.csproj">
+      <Project>{8c54101e-9d64-48fc-8707-52607f5ae56c}</Project>
+      <Name>HiveOS.API</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
