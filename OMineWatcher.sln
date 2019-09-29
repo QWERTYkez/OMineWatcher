@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMineWatcher", "OMineWatcher.csproj", "{47076832-5B9C-4E76-AC75-765C661FBA02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveOS.API", "..\HiveOS.API\HiveOS.API.csproj", "{8C54101E-9D64-48FC-8707-52607F5AE56C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveOS.API", "HiveOS.API\HiveOS.API.csproj", "{8C54101E-9D64-48FC-8707-52607F5AE56C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
