@@ -956,7 +956,7 @@
 
                         </TabItem>
                     </TabControl>
-                    <Button Grid.Column="1" Height="19" HorizontalAlignment="Right" VerticalAlignment="Top">Отключиться</Button>
+                    <Button Grid.Column="1" Height="19" HorizontalAlignment="Right" VerticalAlignment="Top">Подключиться</Button>
                     <!--Настройки ригов///-->
                 </Grid>
             </Grid>
