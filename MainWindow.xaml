@@ -85,6 +85,25 @@
         </LinearGradientBrush>
 
         <!--#endregion-->
+        <!--#region TabControl / TabItem-->
+        
+        <SolidColorBrush x:Key="TabControl.Background" Color="#19A7A7B2"/>
+        <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FF2E9B9E"/>
+        <SolidColorBrush x:Key="TabItem.Selected.Foreground" Color="#FF0D0E0E"/>
+
+        <SolidColorBrush x:Key="TabItem.Static.Background" Color="Transparent"/>
+        <SolidColorBrush x:Key="TabItem.Static.Border" Color="#FF2E9B9E"/>
+        <SolidColorBrush x:Key="TabItem.Static.Foreground" Color="#FF7CBABB"/>
+
+        <SolidColorBrush x:Key="TabItem.MouseOver.Background" Color="Transparent"/>
+        <SolidColorBrush x:Key="TabItem.MouseOver.Border" Color="Cyan"/>
+        <SolidColorBrush x:Key="TabItem.MouseOver.Foreground" Color="Cyan"/>
+
+        <SolidColorBrush x:Key="TabItem.Disabled.Background" Color="#FF323232"/>
+        <SolidColorBrush x:Key="TabItem.Disabled.Border" Color="#FF636363"/>
+        <SolidColorBrush x:Key="TabItem.Disabled.Foreground" Color="#FF636363"/>
+
+        <!--#endregion-->
         <!--#endregion-->
 
         <!--#region Стили и Шаблоны-->
@@ -461,14 +480,12 @@
         </Style>
         <!--#endregion-->
         <!--#region TabControl-->
-        <SolidColorBrush x:Key="TabItem.Selected.Background" Color="Transparent"/>
-        <SolidColorBrush x:Key="TabItem.Selected.Border" Color="LightBlue"/>
         <Style TargetType="{x:Type TabControl}">
             <Setter Property="Padding" Value="2"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{StaticResource TabItem.Selected.Background}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Border}"/>
+            <Setter Property="Background" Value="{StaticResource TabControl.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TabItem.Selected.Background}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="Yellow"/>
             <!--{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}-->
@@ -529,23 +546,9 @@
         </Style>
         <!--#endregion-->
         <!--#region TabItem-->
-        <SolidColorBrush x:Key="TabItem.Static.Background" Color="#FF002363"/>
-        <SolidColorBrush x:Key="TabItem.Static.Border" Color="LightBlue"/>
-
-        <SolidColorBrush x:Key="TabItem.MouseOver.Background" Color="#FF002363"/>
-        <SolidColorBrush x:Key="TabItem.MouseOver.Border" Color="#FF1DB3E4"/>
-
-        <SolidColorBrush x:Key="TabItem.Disabled.Background" Color="#F0F0F0"/>
-        <SolidColorBrush x:Key="TabItem.Disabled.Border" Color="#D9D9D9"/>
-
-        <SolidColorBrush x:Key="TabItem.Selected.Border2" Color="#ACACAC"/>
-        <!--#??????-->
-        <SolidColorBrush x:Key="TabItem.Selected.Background2" Color="#FFFFFF"/>
-        <!--#??????-->
-
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-            <Setter Property="Foreground" Value="LightBlue"/>
+            <Setter Property="Foreground" Value="{StaticResource TabItem.Static.Foreground}"/>
             <Setter Property="Background" Value="{StaticResource TabItem.Static.Background}"/>
             <Setter Property="BorderBrush" Value="{StaticResource TabItem.Static.Border}"/>
             <Setter Property="Margin" Value="0"/>
@@ -557,7 +560,7 @@
                     <ControlTemplate TargetType="{x:Type TabItem}">
                         <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
                             <Border x:Name="mainBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" Background="{TemplateBinding Background}" Margin="0">
-                                <Border x:Name="innerBorder" BorderBrush="{StaticResource TabItem.Selected.Border}" BorderThickness="1,1,1,0" Background="{StaticResource TabItem.Selected.Background}" Margin="-1" Opacity="0"/>
+                                <Border x:Name="innerBorder" BorderBrush="{StaticResource TabItem.Selected.Background}" BorderThickness="1,1,1,0" Background="{StaticResource TabControl.Background}" Margin="-1" Opacity="0"/>
                             </Border>
                             <ContentPresenter x:Name="contentPresenter" ContentSource="Header" Focusable="False" HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
                         </Grid>
@@ -569,6 +572,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,1,0,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,1,0,1"/>
                             </MultiDataTrigger>
@@ -579,6 +583,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,0,1,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,0,1,1"/>
                             </MultiDataTrigger>
@@ -589,6 +594,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="0,1,1,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="0,1,1,1"/>
                             </MultiDataTrigger>
@@ -599,6 +605,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.MouseOver.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.MouseOver.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,1,1,0"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,1,1,0"/>
                             </MultiDataTrigger>
@@ -610,6 +617,7 @@
                                 <Setter Property="Opacity" TargetName="contentPresenter" Value="0.56"/>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.Disabled.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,1,0,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,1,0,1"/>
                             </MultiDataTrigger>
@@ -621,6 +629,7 @@
                                 <Setter Property="Opacity" TargetName="contentPresenter" Value="0.56"/>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.Disabled.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,0,1,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,0,1,1"/>
                             </MultiDataTrigger>
@@ -632,6 +641,7 @@
                                 <Setter Property="Opacity" TargetName="contentPresenter" Value="0.56"/>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.Disabled.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="0,1,1,1"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="0,1,1,1"/>
                             </MultiDataTrigger>
@@ -643,6 +653,7 @@
                                 <Setter Property="Opacity" TargetName="contentPresenter" Value="0.56"/>
                                 <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="mainBorder" Value="{StaticResource TabItem.Disabled.Border}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.Disabled.Foreground}"/>
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,1,1,0"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,1,1,0"/>
                             </MultiDataTrigger>
@@ -722,6 +733,10 @@
                                 <Setter Property="BorderThickness" TargetName="innerBorder" Value="1,1,1,0"/>
                                 <Setter Property="BorderThickness" TargetName="mainBorder" Value="1,1,1,0"/>
                             </MultiDataTrigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="Background" TargetName="mainBorder" Value="{StaticResource TabItem.Selected.Background}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TabItem.Selected.Foreground}"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
