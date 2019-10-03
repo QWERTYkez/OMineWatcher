@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OMineWatcher"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" x:Class="OMineWatcher.MainWindow"
         mc:Ignorable="d"
-        Title="OMineWatcher" Height="500" Width="900" Background="{DynamicResource Custom.Window.Background}" MinWidth="857">
+        Title="OMineWatcher" Height="500" Width="1200" Background="{DynamicResource Custom.Window.Background}" MinWidth="1200">
     <Window.Resources>
         <!--#region Other-->
         <Style x:Key="FocusVisual">
@@ -85,8 +85,11 @@
         </LinearGradientBrush>
 
         <!--#endregion-->
+        <!--#region GroupBox-->
+        <SolidColorBrush x:Key="Custom.GroupBox.Foreground" Color="#FFFF7F00"/>
+        <!--#endregion-->
         <!--#region TabControl / TabItem-->
-        
+
         <SolidColorBrush x:Key="TabControl.Background" Color="#19A7A7B2"/>
         <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FF2E9B9E"/>
         <SolidColorBrush x:Key="TabItem.Selected.Foreground" Color="#FF0D0E0E"/>
@@ -104,6 +107,8 @@
         <SolidColorBrush x:Key="TabItem.Disabled.Foreground" Color="#FF636363"/>
 
         <!--#endregion-->
+        <SolidColorBrush x:Key="MSI.Border" Color="#FFB6B6B6"/>
+
         <!--#endregion-->
 
         <!--#region Стили и Шаблоны-->
@@ -377,7 +382,6 @@
         <!--#endregion-->
         <!--#region GroupBox-->
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
-        <SolidColorBrush x:Key="Custom.GroupBox.Foreground" Color="#FFFF7F00"/>
         <Style TargetType="{x:Type GroupBox}">
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{StaticResource Custom.GroupBox.Foreground}"/>
@@ -769,7 +773,6 @@
         <!--#endregion-->
     </Window.Resources>
 
-
     <TabControl>
         <TabItem Header="Базовый вид">
             <Grid x:Name="BaseGrid"/>
@@ -861,112 +864,273 @@
                     <!--Список ригов///-->
                     <!--Настройки ригов-->
                     <TabControl Grid.Column="1" Margin="4,0,4,4">
+                        
+                        
+                        
+                        
                         <TabItem Header="Настройки">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel>
-                                    <Grid Grid.Row="0" Margin="0,5" HorizontalAlignment="Stretch" Grid.ColumnSpan="2">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" FontWeight="Bold" Margin="5,0"><Run Text="Имя рига:"/></TextBlock>
-                                        <TextBox Grid.Column="1" FontWeight="Bold" TextAlignment="Center"/>
-                                        <TextBlock Grid.Column="2" Text="Автозапуск:" Margin="5,0" VerticalAlignment="Center"/>
-                                        <CheckBox Grid.Column="3" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                    </Grid>
-                                    <WrapPanel Margin="5">
-                                        <TextBlock VerticalAlignment="Center" TextAlignment="Center">Количество GPU:</TextBlock>
-                                        <ComboBox x:Name="GPUsCB" Width="60" Height="25" Margin="5,0,0,0" SelectionChanged="GPUsCB_SelectionChanged"></ComboBox>
-                                        <TextBlock x:Name="GPUsSwitchHeader" Foreground="White" Margin="10,0,5,0" VerticalAlignment="Center" TextAlignment="Center" Visibility="Collapsed">Вкл/Выкл:</TextBlock>
-                                        <Border x:Name="GPUswitchB" BorderBrush="White" BorderThickness="2" Visibility="Collapsed">
-                                            <WrapPanel Margin="3" x:Name="GPUswitchSP"/>
-                                        </Border>
-                                    </WrapPanel>
-                                    <Grid HorizontalAlignment="Right">
-
-                                    </Grid>
-                                </StackPanel>
-                                <Grid Grid.Row="2">
+                                <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Foreground="White" Text="Автозапуск:" Margin="0,0,5,0" VerticalAlignment="Center"></TextBlock>
+                                    <CheckBox x:Name="AutoStart" VerticalAlignment="Center" Margin="0,0,5,0" IsChecked="True"></CheckBox>
+                                </WrapPanel>
+                                <WrapPanel Grid.Row="0" Margin="10" HorizontalAlignment="Center">
+                                    <TextBlock Foreground="White" FontSize="16" FontWeight="Bold" Margin="0,0,20,0">Имя рига:</TextBlock>
+                                    <TextBox x:Name="RigName" Width="400" FontSize="16" FontWeight="Bold" TextAlignment="Center"></TextBox>
+                                </WrapPanel>
+                                <WrapPanel Grid.Row="1" Margin="5">
+                                    <TextBlock Foreground="White" VerticalAlignment="Center" TextAlignment="Center" FontSize="14">Количество GPU:</TextBlock>
+                                    <ComboBox x:Name="GPUsCB" Width="60" Height="25" Margin="5,0,0,0"></ComboBox>
+                                    <TextBlock x:Name="GPUsSwitchHeader" Foreground="White" Margin="10,0,5,0" VerticalAlignment="Bottom" TextAlignment="Center" Visibility="Hidden" FontSize="14">Вкл/Выкл:</TextBlock>
+                                    <Border x:Name="GPUswitchB" BorderBrush="White" BorderThickness="2" VerticalAlignment="Bottom">
+                                        <WrapPanel x:Name="GPUswitchSP" VerticalAlignment="Center" Margin="3"/>
+                                    </Border>
+                                </WrapPanel>
+                                <Grid Grid.Row="2" Margin="5" VerticalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Header="Список конфигураций" Margin="4,0,4,4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <GroupBox Grid.Column="0" Width="230" Grid.RowSpan="10" Header="Список конфигураций:" FontSize="14" Margin="0,0,5,0">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <ListBox Grid.Row="1" Margin="2" Width="200"/>
-                                            <Grid Grid.Row="2">
+                                            <ListBox x:Name="ConfigsList" Grid.Row="1" Margin="2" Grid.ColumnSpan="2"/>
+                                            <Grid Grid.Row="2" Grid.ColumnSpan="2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
-                                                <Button Grid.Column="0" Margin="3" Content="-"/>
-                                                <Button Grid.Column="1" Margin="3" Content="+"/>
-                                                <Button Grid.Column="2" Margin="3" Content="save"/>
-                                                <Button Grid.Column="3" Margin="3" Content="start"/>
+                                                <Button x:Name="MinusConfig" Grid.Column="0" Margin="2,0,0,2" Content="-"/>
+                                                <Button x:Name="PlusConfig" Grid.Column="1" Margin="0,0,0,2" Content="+"/>
+                                                <Button x:Name="ApplyConfig" Grid.Column="2" Margin="0,0,0,2" Content="save"/>
+                                                <Button x:Name="StartConfig" Grid.Column="3" Margin="0,0,2,2" Content="start"/>
                                             </Grid>
                                         </Grid>
                                     </GroupBox>
-                                    <Grid Grid.Column="1">
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14">Название:</TextBlock>
+                                    <TextBox Grid.Row="0" Grid.Column="2" x:Name="MiningConfigName" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14" HorizontalAlignment="Right">Разгон:</TextBlock>
+                                    <ComboBox Grid.Row="0" Grid.Column="4" x:Name="Overclock" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></ComboBox>
+                                    <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="75"/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5" FontSize="14" HorizontalAlignment="Right">Алгоритм:</TextBlock>
+                                        <ComboBox Grid.Column="1" x:Name="Algotitm" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></ComboBox>
+                                        <TextBlock Grid.Column="2" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14">Майнер:</TextBlock>
+                                        <ComboBox Grid.Column="3" x:Name="Miner" Margin="3" FontSize="14" FontWeight="Bold" IsEnabled="False" VerticalContentAlignment="Center"></ComboBox>
+                                        <TextBlock Grid.Column="4" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14" HorizontalAlignment="Right">Мин. хешрет:</TextBlock>
+                                        <TextBox Grid.Column="5" x:Name="MinHashrate" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
+                                    </Grid>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14" HorizontalAlignment="Right">Пул:</TextBlock>
+                                    <TextBox Grid.Row="2" Grid.Column="2" x:Name="Pool" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
+                                    <TextBlock Grid.Row="2" Grid.Column="3" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14" HorizontalAlignment="Right">Порт:</TextBlock>
+                                    <TextBox Grid.Row="2" Grid.Column="4" x:Name="Port" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5" FontSize="14" HorizontalAlignment="Right">Кошелек:</TextBlock>
+                                    <TextBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="5" x:Name="Wallet" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="6" x:Name="DopParam" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="5" FontSize="16">Дополнительные парамаетры:</TextBlock>
+                                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="6" x:Name="Params" Margin="3" FontSize="14" FontWeight="Bold" TextWrapping="Wrap"></TextBox>
+                                </Grid>
+                            </Grid>
+                        </TabItem>
+                        
+                        
+                        
+                        
+                        
+                        <TabItem Header="Разгон (MSI Afterburner)">
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Column="0" Width="250" Grid.RowSpan="20" Header="Список конфигураций:" FontSize="16" Margin="0,0,10,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <ListBox x:Name="ClocksList" Grid.Row="1" Margin="2"/>
+                                        <Grid Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button x:Name="MinuClock" Grid.Column="0" Margin="2,0,0,2" Content="-"/>
+                                            <Button x:Name="PlusClock" Grid.Column="1" Margin="0,0,0,2" Content="+"/>
+                                            <Button x:Name="SaveClockx" Grid.Column="2" Margin="0,0,0,2" Content="save"/>
+                                            <Button x:Name="ApplyClock" Grid.Column="3" Margin="0,0,2,2" Content="apply"/>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+                                <Border Grid.Row="0" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="97"/>
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="12" VerticalAlignment="Center" Margin="5" Foreground="White" HorizontalAlignment="Right">Название:</TextBlock>
+                                        <TextBox Grid.Column="1" x:Name="ClockName" Margin="3" FontSize="12" FontWeight="Bold" IsEnabled="False"></TextBox>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="1" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="97"/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" FontSize="12" VerticalAlignment="Center" Margin="5" Foreground="White" HorizontalAlignment="Right">PowerLimit:</TextBlock>
+                                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="PowLim" FontSize="12" Margin="3" FontWeight="Bold" FontFamily="Consolas" IsEnabled="False"></TextBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="12" x:Name="GPUsPowerLimit" Foreground="White" Margin="5,0,0,0" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" FontSize="12" Foreground="White" VerticalAlignment="Bottom" Margin="5">Auto</TextBlock>
+                                        <CheckBox Grid.Row="1" Grid.Column="2" x:Name="SwitcherPL" IsChecked="True" VerticalAlignment="Top" HorizontalAlignment="Center" IsEnabled="False"></CheckBox>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="2" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="97"/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="12" Grid.RowSpan="3" VerticalAlignment="Center" Margin="5" Foreground="White" HorizontalAlignment="Right">CoreClock:</TextBlock>
+                                        <TextBox Grid.Row="0" Grid.Column="1" FontSize="12" x:Name="CoreClock" Margin="3" FontWeight="Bold" FontFamily="Consolas" IsEnabled="False"></TextBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="12" x:Name="GPUsCoreClock" Foreground="White" Margin="5,0,0,0" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" FontSize="12" Foreground="White" VerticalAlignment="Bottom" Margin="5">Auto</TextBlock>
+                                        <CheckBox Grid.Row="1" Grid.Column="2" x:Name="SwitcherCC" IsChecked="True" VerticalAlignment="Top" HorizontalAlignment="Center" IsEnabled="False"></CheckBox>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="3" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="97"/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" FontSize="12" VerticalAlignment="Center" Margin="5" Foreground="White" HorizontalAlignment="Right">MemoryClock:</TextBlock>
+                                        <TextBox Grid.Row="0" Grid.Column="1" FontSize="12" x:Name="MemoryClock" Margin="3" FontWeight="Bold" FontFamily="Consolas" IsEnabled="False"></TextBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="12" x:Name="GPUsMemoryClocks" Foreground="White" Margin="5,0,0,0" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" FontSize="12" Foreground="White" VerticalAlignment="Bottom" Margin="5">Auto</TextBlock>
+                                        <CheckBox Grid.Row="1" Grid.Column="2" x:Name="SwitcherMC" IsChecked="True" VerticalAlignment="Top" HorizontalAlignment="Center" IsEnabled="False"></CheckBox>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="4" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="97"/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" FontSize="12" VerticalAlignment="Center" Margin="5" Foreground="White" HorizontalAlignment="Right">FanSpeed:</TextBlock>
+                                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="FanSpeed" Margin="3" FontSize="12" FontWeight="Bold" FontFamily="Consolas" IsEnabled="False"></TextBox>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="GPUsFans" FontSize="12" Foreground="White" Margin="5,0,0,0" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Foreground="White" FontSize="12" VerticalAlignment="Bottom" Margin="5">Auto</TextBlock>
+                                        <CheckBox Grid.Row="1" Grid.Column="2" x:Name="SwitcherFS" IsChecked="True" VerticalAlignment="Top" HorizontalAlignment="Center" IsEnabled="False"></CheckBox>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="5" Grid.Column="1" Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
-                                            <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="97"/>
                                             <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Название:"/></TextBlock>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Разгон:"/></TextBlock>
-                                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="2" SelectedIndex="0">
-                                            <ComboBoxItem>sgdfgsdfg</ComboBoxItem>
-                                        </ComboBox>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Алгоритм:"/></TextBlock>
-                                        <ComboBox Grid.Row="2" Grid.Column="1" Margin="2" IsEnabled="False"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Майнер:"/></TextBlock>
-                                        <ComboBox Grid.Row="3" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Мин. хеш:"/></TextBlock>
-                                        <TextBox Grid.Row="4" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Пул:"/></TextBlock>
-                                        <TextBox Grid.Row="5" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="6" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Порт:"/></TextBlock>
-                                        <TextBox Grid.Row="6" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"><Run Text="Кошелек:"/></TextBlock>
-                                        <TextBox Grid.Row="7" Grid.Column="1" Margin="2"/>
-                                        <TextBlock Grid.Row="8" Grid.ColumnSpan="2" HorizontalAlignment="Center"><Run Text="Дополнительные парамаетры:"/></TextBlock>
-                                        <TextBox Grid.Row="9" Grid.ColumnSpan="2" Margin="2">ghdfghdghdghdfghdghdghdghdghdghdghdgh</TextBox>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" FontSize="12" HorizontalAlignment="Right" Margin="3">Hashrate:</TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="GPUsHashrate" Foreground="White" FontSize="12" Margin="5,3,3,3" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Foreground="White" FontSize="12" HorizontalAlignment="Right" Margin="3">Temperature:</TextBlock>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="GPUsTemps" FontSize="12" Foreground="White" Margin="5,3,3,3" FontFamily="Consolas"></TextBlock>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Foreground="White" FontSize="12" HorizontalAlignment="Right" Margin="3">Total Hashrate:</TextBlock>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TotalHashrate" FontSize="12" Foreground="White" Margin="15,3,3,3" FontFamily="Consolas" Padding="0"></TextBlock>
+                                        <WrapPanel Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right">
+                                            <TextBlock FontSize="12" VerticalAlignment="Center" Foreground="White">количество цифр:</TextBlock>
+                                            <Slider x:Name="DigitsSlider" Width="80" VerticalAlignment="Center" Margin="3" Minimum="4" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                                            <TextBlock x:Name="Digits" FontSize="12" VerticalAlignment="Center" Foreground="White" Text="50" Margin="0,0,15,0"/>
+                                            <TextBlock Foreground="White" Margin="5" FontSize="12">Тест:</TextBlock>
+                                            <Button x:Name="KillProcess2" FontSize="12">Запустить процесс</Button>
+                                            <Ellipse x:Name="IndicatorEl2" Height="15" Width="15" Fill="Red" Margin="7,0,2,0"></Ellipse>
+                                        </WrapPanel>
                                     </Grid>
-                                </Grid>
+                                </Border>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Разгон (MSI Afterburner)">
-
-                        </TabItem>
+                        
+                        
+                        
+                        
+                        
+                        
                         <TabItem Header="| - Лог - |">
 
                         </TabItem>
+                        
+                        
+                        
+                        
+                        
                         <TabItem Header="Общие настройки">
 
                         </TabItem>
