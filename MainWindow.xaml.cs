@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Net;
+using OMineWatcher.Managers;
+using System.Windows.Media.Effects;
 
 namespace OMineWatcher
 {
@@ -21,22 +23,159 @@ namespace OMineWatcher
     public partial class MainWindow : Window
     {
         public static SynchronizationContext MainContext = SynchronizationContext.Current;
-        public static MainWindow ST;
+        public static MainWindow This;
 
         public MainWindow()
         {
             InitializeComponent();
-            ST = this;
+            This = this;
             StartingApplication();
         }
 
         private void StartingApplication()
         {
+            InitializeRigsSettings();
             GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
                 "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
-            RigTypeGen.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
-
+            RigType.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
         }
+
+        #region Список ригов
+        private static List<Ellipse> Indicators { get; set; } = new List<Ellipse>();
+        private void AddIndicator()
+        {
+            Ellipse E = new Ellipse
+            {
+                Height = 19,
+                Width = 19,
+                Fill = Brushes.Red,
+                Margin = new Thickness(0, 2, 0, 2),
+                Effect = new BlurEffect { Radius = 8 }
+            };
+            IndicatorsRigsSP.Children.Add(E);
+            Indicators.Add(E);
+        }
+        private void RemoveIndicator(int i)
+        {
+            IndicatorsRigsSP.Children.RemoveAt(i);
+            Indicators.RemoveAt(i);
+        }
+
+        private static List<Tumbler> Tumblers { get; set; } = new List<Tumbler>();
+        private void AddTumbler()
+        {
+            Tumbler T = new Tumbler();
+            WachingRigsSP.Children.Add(T);
+            Tumblers.Add(T);
+        }
+        private void RemoveTumbler(int i)
+        {
+            WachingRigsSP.Children.RemoveAt(i);
+            Tumblers.RemoveAt(i);
+        }
+
+        private void InitializeRigsSettings()
+        {
+            for (int i = 0; i < Settings.Rigs.Count; i++)
+            {
+                AddTumbler();
+                AddIndicator();
+            }
+            RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+            SelectRig(null, null);
+        }
+
+        private void PlusRig(object sender, RoutedEventArgs e)
+        {
+            Settings.AddRig();
+            RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+            AddTumbler(); AddIndicator();
+            RigsListBox.SelectedIndex = Settings.Rigs.Count - 1;
+        }
+        private void MinusRig(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            if (RigsListBox.SelectedIndex > -1)
+            {
+                Settings.RemoveRig(i); RemoveTumbler(i); RemoveIndicator(i);
+                RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+                if (RigsListBox.SelectedIndex == -1)
+                {
+                    RigsListBox.SelectedIndex = Settings.Rigs.Count - 1;
+                }
+            }
+        }
+        private void UpRig(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            if (i > 0)
+            {
+                Settings.Rig r = Settings.Rigs[i];
+                Settings.Rigs.RemoveAt(i);
+                Settings.Rigs.Insert(i - 1, r);
+                RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+                Settings.SaveSettings();
+            }
+        }
+        private void DownRig(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            if (i < RigsListBox.Items.Count - 1 && i > -1)
+            {
+                Settings.Rig r = Settings.Rigs[i];
+                Settings.Rigs.RemoveAt(i);
+                Settings.Rigs.Insert(i + 1, r);
+                RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+                Settings.SaveSettings();
+            }
+        }
+        private void SaveRig(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            Settings.Rigs[i].Name = SettingsRigName.Text;
+            Settings.Rigs[i].IP = SettingsRigIP.Text;
+            switch (RigType.SelectedItem)
+            {
+                case "OMineGuard":
+                    Settings.Rigs[i].Type = Settings.RigType.OMineGuard;
+                    break;
+                case "HiveOS":
+                    Settings.Rigs[i].Type = Settings.RigType.HiveOS;
+                    break;
+                default:
+                    Settings.Rigs[i].Type = null;
+                    break;
+            }
+            Settings.SaveSettings();
+            RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
+            RigsListBox.SelectedIndex = i;
+        }
+        private void SelectRig(object sender, SelectionChangedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            if (i > -1)
+            {
+                SettingsRigName.Text = Settings.Rigs[i].Name;
+                SettingsRigIP.Text = Settings.Rigs[i].IP;
+
+                switch (Settings.Rigs[i].Type)
+                {
+                    case Settings.RigType.OMineGuard:
+                        RigType.SelectedItem = "OMineGuard";
+                        break;
+                    case Settings.RigType.HiveOS:
+                        RigType.SelectedItem = "HiveOS";
+                        break;
+                    default:
+                        RigType.SelectedIndex = -1;
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region OMineWacher
+        #region Конфигурации майнинга
         private void GPUsCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             GPUswitchSP.Children.Clear();
@@ -44,8 +183,8 @@ namespace OMineWatcher
             string Selected = (string)GPUsCB.SelectedItem;
             if (Selected == "Auto")
             {
-                GPUsSwitchHeader.Visibility = Visibility.Hidden;
-                GPUswitchB.Visibility = Visibility.Hidden;
+                GPUsSwitchHeader.Visibility = Visibility.Collapsed;
+                GPUswitchB.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -56,13 +195,17 @@ namespace OMineWatcher
                 for (byte n = 0; n < k; n++)
                 {
                     Grid GR = new Grid { Width = 60 };
-                    GR.Children.Add(new TextBlock { Text = "GPU" + n, Effect = null });
+                    GR.Children.Add(new TextBlock { Text = "GPU" + n, Effect = null, Foreground = Brushes.White });
                     GR.Children.Add(new CheckBox { Name = "g" + n.ToString(),
-                        Margin = new Thickness(0, 0, 7, 0),
+                        Margin = new Thickness(0, 0, 7, 0), IsChecked = true,
                         HorizontalAlignment = HorizontalAlignment.Right });
                     GPUswitchSP.Children.Add(GR);
                 }
             }
         }
+
+        #endregion
+
+        #endregion
     }
 }

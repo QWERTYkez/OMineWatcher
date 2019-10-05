@@ -768,7 +768,7 @@
         <!--#endregion -->
 
         <!--#region Тумблер-->
-        <SolidColorBrush x:Key="Tumbler.Fill.On" Color="Green"/>
+        <SolidColorBrush x:Key="Tumbler.Fill.On" Color="#FF00B000"/>
         <SolidColorBrush x:Key="Tumbler.Fill.Off" Color="Red"/>
         <SolidColorBrush x:Key="Tumbler.Fill" Color="White"/>
         
@@ -846,12 +846,12 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Имя:"/></TextBlock>
-                            <TextBox x:Name="RigNameGen" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
+                            <TextBox x:Name="SettingsRigName" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
                             <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="IP:"/></TextBlock>
-                            <TextBox x:Name="RigIPGen" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
+                            <TextBox x:Name="SettingsRigIP" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Тип рига:"/></TextBlock>
-                            <ComboBox x:Name="RigTypeGen" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
+                            <ComboBox x:Name="RigType" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
                             <Grid Grid.Row="3" Grid.ColumnSpan="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -860,42 +860,27 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Button Grid.Column="0" Content="-" Margin="3"/>
-                                <Button Grid.Column="1" Content="+" Margin="3"/>
-                                <Button Grid.Column="2" Content="Вверх" Margin="3"/>
-                                <Button Grid.Column="3" Content="Вниз" Margin="3"/>
-                                <Button Grid.Column="4" Content="Сохранить" Margin="3"/>
+                                <Button Grid.Column="0" Content="-" Margin="3" Click="MinusRig"/>
+                                <Button Grid.Column="1" Content="+" Margin="3" Click="PlusRig"/>
+                                <Button Grid.Column="2" Content="Вверх" Margin="3" Click="UpRig"/>
+                                <Button Grid.Column="3" Content="Вниз" Margin="3" Click="DownRig"/>
+                                <Button Grid.Column="4" Content="Сохранить" Margin="3" Click="SaveRig"/>
                             </Grid>
                             <Grid Grid.Row="4" Grid.ColumnSpan="3">
                                 <TextBlock HorizontalAlignment="Left">Ping</TextBlock>
                                 <TextBlock HorizontalAlignment="Center" Margin="0,0,30,0">Имя</TextBlock>
-                                <TextBlock HorizontalAlignment="Right">Wachdog</TextBlock>
+                                <TextBlock HorizontalAlignment="Right">Waching</TextBlock>
                             </Grid>
                             <ScrollViewer Grid.Row="5" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="19"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Margin="0,5,0,0">
-                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
-                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
-                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
-                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
-                                    </StackPanel>
-                                    <ListBox Grid.Column="1" Margin="3" FontSize="14">
-                                        <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
-                                        <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
-                                        <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
-                                        <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
-                                    </ListBox>
-                                    <StackPanel Grid.Column="2" Margin="0,5,0,0">
-                                        <local:Tumbler/>
-                                        <local:Tumbler/>
-                                        <local:Tumbler/>
-                                        <local:Tumbler/>
-                                    </StackPanel>
+                                    <StackPanel x:Name="IndicatorsRigsSP" Grid.Column="0" Margin="0,5,0,0"/>
+                                    <ListBox x:Name="RigsListBox" Grid.Column="1" Margin="3" FontSize="14" SelectionChanged="SelectRig"/>
+                                    <StackPanel x:Name="WachingRigsSP" Grid.Column="2" Margin="0,5,0,0"/>
                                 </Grid>
                             </ScrollViewer>
                         </Grid>
@@ -934,17 +919,17 @@
                                     </Grid.RowDefinitions>
                                     <WrapPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <TextBlock Foreground="White" Text="Автозапуск:" Margin="0,0,5,0" VerticalAlignment="Center"></TextBlock>
-                                        <CheckBox x:Name="AutoStart" VerticalAlignment="Center" Margin="0,0,5,0" IsChecked="True"></CheckBox>
+                                        <local:Tumbler x:Name="AutoStart" Margin="0,0,5,0" IsChecked="False"></local:Tumbler>
                                     </WrapPanel>
                                     <WrapPanel Grid.Row="0" Margin="10" HorizontalAlignment="Center">
-                                        <TextBlock Foreground="White" FontSize="16" FontWeight="Bold" Margin="0,0,20,0">Имя рига:</TextBlock>
+                                        <TextBlock FontSize="16" FontWeight="Bold" Margin="0,0,20,0">Имя рига:</TextBlock>
                                         <TextBox x:Name="RigName" Width="400" FontSize="16" FontWeight="Bold" TextAlignment="Center"></TextBox>
                                     </WrapPanel>
                                     <WrapPanel Grid.Row="1" Margin="5">
                                         <TextBlock Foreground="White" VerticalAlignment="Center" TextAlignment="Center" FontSize="14">Количество GPU:</TextBlock>
-                                        <ComboBox x:Name="GPUsCB" Width="60" Height="25" Margin="5,0,0,0"></ComboBox>
+                                        <ComboBox x:Name="GPUsCB" Width="60" Height="25" Margin="5,0,0,0" SelectionChanged="GPUsCB_SelectionChanged"></ComboBox>
                                         <TextBlock x:Name="GPUsSwitchHeader" Foreground="White" Margin="10,0,5,0" VerticalAlignment="Bottom" TextAlignment="Center" Visibility="Hidden" FontSize="14">Вкл/Выкл:</TextBlock>
-                                        <Border x:Name="GPUswitchB" BorderBrush="White" BorderThickness="2" VerticalAlignment="Bottom">
+                                        <Border x:Name="GPUswitchB" BorderBrush="{StaticResource MSI.Border}" BorderThickness="1" VerticalAlignment="Bottom" Visibility="Collapsed">
                                             <WrapPanel x:Name="GPUswitchSP" VerticalAlignment="Center" Margin="3"/>
                                         </Border>
                                     </WrapPanel>
@@ -1279,7 +1264,7 @@
                                         <Border Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
                                             <WrapPanel HorizontalAlignment="Right">
                                                 <TextBlock Foreground="White">VK Informer:</TextBlock>
-                                                <CheckBox x:Name="VKInformerToggle" VerticalAlignment="Center" Margin="10,0,0,0"></CheckBox>
+                                                <local:Tumbler x:Name="VKInformerToggle" Margin="10,0,0,0"></local:Tumbler>
                                                 <TextBlock Foreground="White" Margin="20,0,0,0">user id:</TextBlock>
                                                 <TextBox x:Name="VKuserID" Width="200" Margin="10,0,0,0"></TextBox>
                                             </WrapPanel>
@@ -1287,7 +1272,7 @@
                                         <Border Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1">
                                             <WrapPanel HorizontalAlignment="Center">
                                                 <TextBlock Foreground="White">Telegram Informer:</TextBlock>
-                                                <CheckBox x:Name="TelegramInformerToggle" VerticalAlignment="Center" Margin="10,0,0,0" IsEnabled="False"></CheckBox>
+                                                <local:Tumbler x:Name="TelegramInformerToggle" VerticalAlignment="Center" Margin="10,0,0,0" IsEnabled="False"></local:Tumbler>
                                                 <TextBlock Foreground="White" Margin="20,0,0,0">user id:</TextBlock>
                                                 <TextBox Width="200" Margin="10,0,0,0" IsEnabled="False"></TextBox>
                                             </WrapPanel>
