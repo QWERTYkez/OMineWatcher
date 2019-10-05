@@ -17,6 +17,7 @@ using System.Net;
 
 namespace OMineWatcher
 {
+    public class Tumbler : CheckBox { }
     public partial class MainWindow : Window
     {
         public static SynchronizationContext MainContext = SynchronizationContext.Current;
@@ -33,6 +34,8 @@ namespace OMineWatcher
         {
             GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
                 "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
+            RigTypeGen.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
+
         }
         private void GPUsCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

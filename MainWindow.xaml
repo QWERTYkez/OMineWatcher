@@ -70,7 +70,7 @@
         <!--#endregion-->
         <!--#region ComboBox-->
         <SolidColorBrush x:Key="Custom.ComboBox.Static.Background" Color="#660F0051"/>
-        <SolidColorBrush x:Key="Custom.ComboBox.Static.Foreground" Color="#FFA28DFF"/>
+        <SolidColorBrush x:Key="Custom.ComboBox.Static.Foreground" Color="#FFC0B2FF"/>
         <SolidColorBrush x:Key="Custom.ComboBox.MouseOver.Background" Color="#665B46B6"/>
         <SolidColorBrush x:Key="Custom.ComboBox.MouseOver.Foreground" Color="#FFE2DCFF"/>
         <SolidColorBrush x:Key="Custom.ComboBox.Disabled.Background" Color="#664D4D4D"/>
@@ -482,6 +482,7 @@
         <Style TargetType="Button">
             <Setter Property="Template" Value="{StaticResource ContrastButtonKey}"/>
         </Style>
+
         <!--#endregion-->
         <!--#region TabControl-->
         <Style TargetType="{x:Type TabControl}">
@@ -766,9 +767,31 @@
         </Style>
         <!--#endregion -->
 
-
-
-
+        <!--#region Тумблер-->
+        <SolidColorBrush x:Key="Tumbler.Fill.On" Color="Green"/>
+        <SolidColorBrush x:Key="Tumbler.Fill.Off" Color="Red"/>
+        <SolidColorBrush x:Key="Tumbler.Fill" Color="White"/>
+        
+        <ControlTemplate x:Key="TumbletTemplate" TargetType="{x:Type local:Tumbler}">
+            <Grid x:Name="templateRoot" SnapsToDevicePixels="True" Height="23" Width="40">
+                <Rectangle x:Name="Border" Stroke="{StaticResource Tumbler.Fill}" StrokeThickness="1.5" RadiusX="10" RadiusY="10" Margin="0,1"/>
+                <Ellipse x:Name="Toggle" Fill="{StaticResource Tumbler.Fill}" Width="15" Height="15" Margin="3,4" ></Ellipse>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.On}"/>
+                    <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Right"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="False">
+                    <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.Off}"/>
+                    <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Left"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style TargetType="local:Tumbler">
+            <Setter Property="Template" Value="{StaticResource TumbletTemplate}"/>
+        </Style>
+        <!--#endregion-->
 
         <!--#endregion-->
     </Window.Resources>
@@ -815,19 +838,20 @@
                                 <ColumnDefinition Width="240"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Имя:"/></TextBlock>
-                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3">sdfsgdfgssdfg</TextBox>
+                            <TextBox x:Name="RigNameGen" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
                             <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="IP:"/></TextBlock>
-                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3">sdfsgdfgssdfg</TextBox>
+                            <TextBox x:Name="RigIPGen" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Тип рига:"/></TextBlock>
-                            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
+                            <ComboBox x:Name="RigTypeGen" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
                             <Grid Grid.Row="3" Grid.ColumnSpan="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -842,20 +866,35 @@
                                 <Button Grid.Column="3" Content="Вниз" Margin="3"/>
                                 <Button Grid.Column="4" Content="Сохранить" Margin="3"/>
                             </Grid>
-                            <ScrollViewer Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
+                            <Grid Grid.Row="4" Grid.ColumnSpan="3">
+                                <TextBlock HorizontalAlignment="Left">Ping</TextBlock>
+                                <TextBlock HorizontalAlignment="Center" Margin="0,0,30,0">Имя</TextBlock>
+                                <TextBlock HorizontalAlignment="Right">Wachdog</TextBlock>
+                            </Grid>
+                            <ScrollViewer Grid.Row="5" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="56"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <ListBox Grid.Column="0" Margin="3">
+                                    <StackPanel Grid.Column="0" Margin="0,5,0,0">
+                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
+                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
+                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
+                                        <Ellipse Height="11" Width="11" Fill="Red" Margin="0,6"></Ellipse>
+                                    </StackPanel>
+                                    <ListBox Grid.Column="1" Margin="3" FontSize="14">
                                         <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
                                         <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
                                         <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
                                         <ListBoxItem>sdfgsdfgsdf</ListBoxItem>
                                     </ListBox>
-                                    <StackPanel Grid.Column="1" Margin="0,5,0,3">
-                                        <Button x:Name="PrototypeWatchingButton" Height="20" Background="Crimson" BorderBrush="Black" IsEnabled="False" Visibility="Collapsed" Content="Вкл/Выкл"/>
+                                    <StackPanel Grid.Column="2" Margin="0,5,0,0">
+                                        <local:Tumbler/>
+                                        <local:Tumbler/>
+                                        <local:Tumbler/>
+                                        <local:Tumbler/>
                                     </StackPanel>
                                 </Grid>
                             </ScrollViewer>
@@ -863,13 +902,29 @@
                     </GroupBox>
                     <!--Список ригов///-->
                     <!--Настройки ригов-->
-                    <Grid Grid.Column="1" x:Name="OMineGuard_Management">
+                    <Grid Grid.Column="1" x:Name="OMineGuardanagement">
                         <TabControl Margin="4,0,4,4">
 
 
 
-
                             <TabItem Header="Настройки">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+
+
+                                </Grid>
+                            </TabItem>
+
+
+
+
+                            <TabItem Header="Конфигурации майнинга">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
