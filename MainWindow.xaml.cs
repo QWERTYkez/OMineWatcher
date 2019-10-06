@@ -16,6 +16,7 @@ using System.Threading;
 using System.Net;
 using OMineWatcher.Managers;
 using System.Windows.Media.Effects;
+using System.Net.NetworkInformation;
 
 namespace OMineWatcher
 {
@@ -41,25 +42,59 @@ namespace OMineWatcher
         }
 
         #region Список ригов
+        #region Индикация
         private static List<Ellipse> Indicators { get; set; } = new List<Ellipse>();
-        private void AddIndicator()
+        public static List<Thread> PingIndicationThreads { get; set; } = new List<Thread>();
+        private static int PingCheckDelay = 5; //sec
+        private static void SetIndicatorColor(object o)
+        {
+            object[] x = (object[])o;
+            int i = (int)(x[0]);
+            Brush B = (Brush)(x[1]);
+            Indicators[i].Fill = B;
+        }
+        private void AddIndicator(int i)
         {
             Ellipse E = new Ellipse
             {
-                Height = 19,
-                Width = 19,
+                Height = 15,
+                Width = 15,
                 Fill = Brushes.Red,
-                Margin = new Thickness(0, 2, 0, 2),
-                Effect = new BlurEffect { Radius = 8 }
+                Margin = new Thickness(2, 4, 2, 4),
+                Effect = new BlurEffect { Radius = 5 }
             };
             IndicatorsRigsSP.Children.Add(E);
             Indicators.Add(E);
+
+            PingIndicationThreads.Add(new Thread(() => 
+            {
+                Ping ping = new Ping();
+                IPStatus status;
+                while (true)
+                {
+                    try
+                    {
+                        status = ping.Send(IPAddress.Parse(Settings.Rigs[i].IP), 200).Status;
+                        if (status == IPStatus.Success)
+                        {
+                            MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Lime });
+                        }
+                        else { MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red }); }
+                    }
+                    catch { MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red }); }
+                    Thread.Sleep(PingCheckDelay * 1000);
+                }
+            }));
+            PingIndicationThreads[i].Start();
         }
         private void RemoveIndicator(int i)
         {
             IndicatorsRigsSP.Children.RemoveAt(i);
             Indicators.RemoveAt(i);
+            PingIndicationThreads[i].Abort();
+            PingIndicationThreads.RemoveAt(i);
         }
+        #endregion
 
         private static List<Tumbler> Tumblers { get; set; } = new List<Tumbler>();
         private void AddTumbler()
@@ -79,7 +114,7 @@ namespace OMineWatcher
             for (int i = 0; i < Settings.Rigs.Count; i++)
             {
                 AddTumbler();
-                AddIndicator();
+                AddIndicator(i);
             }
             RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
             SelectRig(null, null);
@@ -87,9 +122,8 @@ namespace OMineWatcher
 
         private void PlusRig(object sender, RoutedEventArgs e)
         {
-            Settings.AddRig();
+            AddTumbler(); AddIndicator(Settings.Rigs.Count); Settings.AddRig();
             RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
-            AddTumbler(); AddIndicator();
             RigsListBox.SelectedIndex = Settings.Rigs.Count - 1;
         }
         private void MinusRig(object sender, RoutedEventArgs e)
