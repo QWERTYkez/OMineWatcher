@@ -206,6 +206,34 @@ namespace OMineWatcher
                 }
             }
         }
+
+        private void SelectRigType(object sender, SelectionChangedEventArgs e)
+        {
+            switch (RigType.SelectedItem)
+            {
+                case "OMineGuard":
+                    OMGtabitem1.Visibility = Visibility.Visible;
+                    OMGtabitem2.Visibility = Visibility.Visible;
+                    OMGtabitem3.Visibility = Visibility.Visible;
+                    OMGtabitem4.Visibility = Visibility.Visible;
+                    OMGconnect.Visibility = Visibility.Visible;
+                    break;
+                case "HiveOS":
+                    OMGtabitem1.Visibility = Visibility.Collapsed;
+                    OMGtabitem2.Visibility = Visibility.Collapsed;
+                    OMGtabitem3.Visibility = Visibility.Collapsed;
+                    OMGtabitem4.Visibility = Visibility.Collapsed;
+                    OMGconnect.Visibility = Visibility.Collapsed;
+                    break;
+                default:
+                    OMGtabitem1.Visibility = Visibility.Collapsed;
+                    OMGtabitem2.Visibility = Visibility.Collapsed;
+                    OMGtabitem3.Visibility = Visibility.Collapsed;
+                    OMGtabitem4.Visibility = Visibility.Collapsed;
+                    OMGconnect.Visibility = Visibility.Collapsed;
+                    break;
+            }
+        }
         #endregion
 
         #region OMineWacher
@@ -241,5 +269,7 @@ namespace OMineWatcher
         #endregion
 
         #endregion
+
+        
     }
 }

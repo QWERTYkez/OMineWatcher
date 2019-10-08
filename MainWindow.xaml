@@ -188,7 +188,7 @@
         <!--#endregion-->
         <!--#region TextBox-->
         <ControlTemplate x:Key="ContrastTextBox" TargetType="{x:Type TextBox}">
-            <Grid>
+            <Grid x:Name="xxx">
                 <Border x:Name="Bx" BorderBrush="{StaticResource Custom.TextBox.Foreground}" BorderThickness="2" Background="{StaticResource Custom.TextBox.Background}" SnapsToDevicePixels="True">
                     <Border.Effect>
                         <BlurEffect Radius="2"/>
@@ -205,7 +205,7 @@
                     <Setter Property="TextBoxBase.SelectionBrush" Value="White"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                    <Setter Property="Opacity" TargetName="xxx" Value="0.56"/>
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -792,6 +792,59 @@
             <Setter Property="Template" Value="{StaticResource TumbletTemplate}"/>
         </Style>
         <!--#endregion-->
+        <!--#region PasswordBox-->
+        <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+        <Style TargetType="{x:Type PasswordBox}">
+            <Setter Property="PasswordChar" Value="●"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Grid x:Name="xxx">
+                            <Border x:Name="Bx" BorderBrush="{StaticResource Custom.TextBox.Foreground}" BorderThickness="2" Background="{StaticResource Custom.TextBox.Background}" SnapsToDevicePixels="True">
+                                <Border.Effect>
+                                    <BlurEffect Radius="2"/>
+                                </Border.Effect>
+                            </Border>
+                            <Border x:Name="border" BorderBrush="{StaticResource Custom.TextBox.Foreground}" BorderThickness="1" SnapsToDevicePixels="True">
+                                <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="TextBoxBase.Foreground" Value="{StaticResource Custom.TextBox.Foreground}"/>
+                                <Setter Property="TextBoxBase.CaretBrush" Value="White"/>
+                                <Setter Property="TextBoxBase.SelectionBrush" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="xxx" Value="0.56"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                        <Condition Property="IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--#endregion-->
 
         <!--#endregion-->
     </Window.Resources>
@@ -851,7 +904,7 @@
                             <TextBox x:Name="SettingsRigIP" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"></TextBox>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="Тип рига:"/></TextBlock>
-                            <ComboBox x:Name="RigType" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3"/>
+                            <ComboBox x:Name="RigType" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="3" SelectionChanged="SelectRigType"/>
                             <Grid Grid.Row="3" Grid.ColumnSpan="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -909,7 +962,7 @@
 
 
 
-                            <TabItem Header="Конфигурации майнинга">
+                            <TabItem x:Name="OMGtabitem1" Header="Конфигурации майнинга">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -1007,7 +1060,7 @@
 
 
 
-                            <TabItem Header="Разгон (MSI Afterburner)">
+                            <TabItem x:Name="OMGtabitem2" Header="Разгон (MSI Afterburner)">
                                 <Grid Margin="5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -1164,7 +1217,7 @@
 
 
 
-                            <TabItem Header="Лог работы">
+                            <TabItem x:Name="OMGtabitem3" Header="Лог работы">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
@@ -1215,7 +1268,7 @@
 
 
 
-                            <TabItem Header="Общие настройки">
+                            <TabItem x:Name="OMGtabitem4" Header="Общие настройки">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
@@ -1281,7 +1334,7 @@
                                 </Grid>
                             </TabItem>
                         </TabControl>
-                        <Button Height="19" HorizontalAlignment="Right" VerticalAlignment="Top">Подключиться</Button>
+                        <Button x:Name="OMGconnect" Height="19" HorizontalAlignment="Right" VerticalAlignment="Top">Подключиться</Button>
                     </Grid>
                     <!--Настройки ригов///-->
                 </Grid>
@@ -1317,7 +1370,39 @@
         </TabItem>
 
         <TabItem Header="Общие настройки">
-            <Grid x:Name="BaseSet"/>
+            <Grid x:Name="BaseSet">
+
+                <Border Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1" HorizontalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center" Margin="0,2">eWeLink Account</TextBlock>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,2,5,2" HorizontalAlignment="Right">Логин :</TextBlock>
+                            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,2"></TextBox>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,2,5,2" HorizontalAlignment="Right">Пароль :</TextBlock>
+                            <PasswordBox Grid.Row="1" Grid.Column="1" Margin="0,2"></PasswordBox>
+                        </Grid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0">Связать</Button>
+                            <TextBlock Grid.Row="1" HorizontalAlignment="Center">Успешно</TextBlock>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                
+                
+            </Grid>
         </TabItem>
     </TabControl>
 </Window>
