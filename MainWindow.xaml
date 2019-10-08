@@ -1374,7 +1374,7 @@
 
                 <Border Padding="3" BorderThickness="1" BorderBrush="{StaticResource MSI.Border}" Margin="-1" HorizontalAlignment="Center">
                     <StackPanel HorizontalAlignment="Center">
-                        <TextBlock HorizontalAlignment="Center" Margin="0,2">eWeLink Account</TextBlock>
+                        <TextBlock HorizontalAlignment="Center" FontSize="16" Margin="0,2">eWeLink Account</TextBlock>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -1394,7 +1394,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Row="0">Связать</Button>
+                            <Button Grid.Row="0" Margin="4">Связать</Button>
                             <TextBlock Grid.Row="1" HorizontalAlignment="Center">Успешно</TextBlock>
                         </Grid>
                     </StackPanel>
