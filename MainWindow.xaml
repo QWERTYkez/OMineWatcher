@@ -770,6 +770,7 @@
         <!--#region Тумблер-->
         <SolidColorBrush x:Key="Tumbler.Fill.On" Color="#FF00B000"/>
         <SolidColorBrush x:Key="Tumbler.Fill.Off" Color="Red"/>
+        <SolidColorBrush x:Key="Tumbler.Fill.Disable" Color="Black"/>
         <SolidColorBrush x:Key="Tumbler.Fill" Color="White"/>
         
         <ControlTemplate x:Key="TumbletTemplate" TargetType="{x:Type local:Tumbler}">
@@ -785,6 +786,11 @@
                 <Trigger Property="IsChecked" Value="False">
                     <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.Off}"/>
                     <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Left"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.Disable}"/>
+                    <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Center"/>
+                    <Setter Property="Opacity" Value="0.2"/>
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -954,6 +960,11 @@
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
 
+                                    <WrapPanel Margin="15">
+                                        <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">eWeLink устройство:</TextBlock>
+                                        <ComboBox x:Name="eWeDevicesBox" Width="150" SelectionChanged="SelecteWeDevice"/>
+                                        <local:Tumbler x:Name="eWeTumbler" IsEnabled="False" Margin="5,0,0,0" Checked="eWeTumbler_Checked" Unchecked="eWeTumbler_Unchecked"/>
+                                    </WrapPanel>
 
 
                                 </Grid>
@@ -1382,7 +1393,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
-                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,2,5,2" HorizontalAlignment="Right">Логин :</TextBlock>
                             <TextBox x:Name="eWeLoginBox" Grid.Row="0" Grid.Column="1" Margin="0,2"></TextBox>

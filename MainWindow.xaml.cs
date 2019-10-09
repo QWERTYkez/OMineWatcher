@@ -38,12 +38,12 @@ namespace OMineWatcher
         {
             InitializeRigsSettings();
             InitializeeWeLink();
-            GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
-                "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
-            RigType.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
+            
+            
         }
 
         #region Список ригов
+        #region Блок выбора
         #region Индикация
         private static List<Ellipse> Indicators { get; set; } = new List<Ellipse>();
         public static List<Thread> PingIndicationThreads { get; set; } = new List<Thread>();
@@ -120,6 +120,10 @@ namespace OMineWatcher
             }
             RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
             SelectRig(null, null);
+            RigType.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
+            GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
+                "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
+            SelectRigType(null, null);
         }
 
         private void PlusRig(object sender, RoutedEventArgs e)
@@ -206,6 +210,20 @@ namespace OMineWatcher
                         RigType.SelectedIndex = -1;
                         break;
                 }
+
+                eWeDevicesBox.SelectionChanged -= SelecteWeDevice;
+                if (Settings.Rigs[i].eWeDevice != "")
+                {
+                    eWeTumbler.IsEnabled = true;
+                    eWeTumbler.IsChecked = true;
+                    eWeDevicesBox.SelectedItem = Settings.Rigs[i].eWeDevice;
+                }
+                else
+                {
+                    eWeTumbler.IsEnabled = false;
+                    eWeDevicesBox.SelectedItem = "";
+                }
+                eWeDevicesBox.SelectionChanged += SelecteWeDevice;
             }
         }
 
@@ -218,6 +236,12 @@ namespace OMineWatcher
                     OMGtabitem2.Visibility = Visibility.Visible;
                     OMGtabitem3.Visibility = Visibility.Visible;
                     OMGtabitem4.Visibility = Visibility.Visible;
+
+                    OMGtabitem1.IsEnabled = false;
+                    OMGtabitem2.IsEnabled = false;
+                    OMGtabitem3.IsEnabled = false;
+                    OMGtabitem4.IsEnabled = false;
+
                     OMGconnect.Visibility = Visibility.Visible;
                     break;
                 case "HiveOS":
@@ -236,8 +260,29 @@ namespace OMineWatcher
                     break;
             }
         }
+        #endregion
 
-
+        #region Базовые настройки
+        private void SelecteWeDevice(object sender, SelectionChangedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            if (eWeDevicesBox.SelectedIndex == -1)
+            {
+                eWeTumbler.IsEnabled = false;
+                Settings.Rigs[i].eWeDevice = "";
+            }
+            else if ((string)eWeDevicesBox.SelectedItem == "")
+            {
+                eWeTumbler.IsEnabled = false;
+                Settings.Rigs[i].eWeDevice = "";
+            }
+            else
+            {
+                eWeTumbler.IsEnabled = true;
+                eWeTumbler.IsChecked = false;
+            }
+        }
+        #endregion
         #region OMineWacher
         #region Конфигурации майнинга
         private void GPUsCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -308,7 +353,7 @@ namespace OMineWatcher
             eWePasswordBox.Password = "";
             eWeAccountState.Text = "Аккаунт не подключен";
         }
-        private void InitializeeWeLink()
+        private async void InitializeeWeLink()
         {
             if (Settings.GenSets.eWeLogin != "" && Settings.GenSets.eWeLogin != null)
             {
@@ -316,10 +361,27 @@ namespace OMineWatcher
                 eWeLoginBox.Text = Settings.GenSets.eWeLogin;
                 eWePasswordBox.Password = Settings.GenSets.eWePassword;
                 eWeAccountState.Text = "Аккаунт подключен";
+
+                List<_eWelinkDevice> LE = await Task.Run(() => eWeLinkClient.eWeLinkGetDevices());
+                List<string> LST = (from x in LE select x.name).ToList();
+                LST.Insert(0, "");
+                eWeDevicesBox.ItemsSource = LST;
             }
         }
+        private void eWeTumbler_Checked(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            Settings.Rigs[i].eWeDevice = (string)eWeDevicesBox.SelectedItem;
+        }
+        private void eWeTumbler_Unchecked(object sender, RoutedEventArgs e)
+        {
+            int i = RigsListBox.SelectedIndex;
+            Settings.Rigs[i].eWeDevice = "";
+        }
         #endregion
+
         #endregion
+
 
     }
 }

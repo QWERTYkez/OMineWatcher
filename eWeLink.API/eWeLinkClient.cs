@@ -164,7 +164,21 @@ namespace eWeLink.API
             if (response.Contains("\"error\":401"))
             {
                 AutheWeLink(Login, Password, ref APIkey, ref AT);
-                return eWeLinkGetDevices();
+
+                using (var webClient = new WebClient())
+                {
+                    webClient.Headers.Add("Authorization", $"Bearer {AT}");
+                    response = webClient.DownloadString(uri);
+                }
+                if (response.Contains("\"error\":401"))
+                {
+                    return null;
+                }
+                else
+                {
+                    string str = $"{{\"Devices\":{response}}}";
+                    return JsonConvert.DeserializeObject<_eWelinkDevices>(str).Devices;
+                }
             }
             else
             {
@@ -172,50 +186,49 @@ namespace eWeLink.API
                 return JsonConvert.DeserializeObject<_eWelinkDevices>(str).Devices;
             }
         }
-
-        #region JSON clases
-        public class _eWelinkAuth
-        {
-            public string at { get; set; }
-            public _eWelinkUser user { get; set; }
-        }
-        public class _eWelinkUser
-        {
-            public string apikey { get; set; }
-        }
-        public class _LoginToEwelink
-        {
-            public string email { get; set; }
-            public string password { get; set; }
-            public int version = 6;
-            public string ts = $"{Math.Round((DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds) / 1000}";
-
-            public string appid = "oeVkj2lYFGnJu5XUtWisfW4utiN4u9Mq";
-            public string imei = $"DF7425A0-{new Random().Next(1000, 9999)}-{new Random().Next(1000, 9999)}-9F5E-3BC9179E48FB";
-            public string os = "iOS";
-            public string model = "iPhone10,6";
-            public string romVersion = "11.1.2";
-            public string appVersion = "3.5.3";
-        }
-
-        public class _eWelinkDevices
-        {
-            public List<_eWelinkDevice> Devices { get; set; }
-        }
-        public class _eWelinkDevice
-        {
-            public string _id { get; set; }
-            public string name { get; set; }
-            public string deviceid { get; set; }
-            public string apikey { get; set; }
-            public _Params @params { get; set; }
-            public bool online { get; set; }
-            public string devicekey { get; set; }
-        }
-        public class _Params
-        {
-            public string @switch { get; set; }
-        }
-        #endregion
     }
+    #region JSON clases
+    public class _eWelinkAuth
+    {
+        public string at { get; set; }
+        public _eWelinkUser user { get; set; }
+    }
+    public class _eWelinkUser
+    {
+        public string apikey { get; set; }
+    }
+    public class _LoginToEwelink
+    {
+        public string email { get; set; }
+        public string password { get; set; }
+        public int version = 6;
+        public string ts = $"{Math.Round((DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds) / 1000}";
+
+        public string appid = "oeVkj2lYFGnJu5XUtWisfW4utiN4u9Mq";
+        public string imei = $"DF7425A0-{new Random().Next(1000, 9999)}-{new Random().Next(1000, 9999)}-9F5E-3BC9179E48FB";
+        public string os = "iOS";
+        public string model = "iPhone10,6";
+        public string romVersion = "11.1.2";
+        public string appVersion = "3.5.3";
+    }
+
+    public class _eWelinkDevices
+    {
+        public List<_eWelinkDevice> Devices { get; set; }
+    }
+    public class _eWelinkDevice
+    {
+        public string _id { get; set; }
+        public string name { get; set; }
+        public string deviceid { get; set; }
+        public string apikey { get; set; }
+        public _Params @params { get; set; }
+        public bool online { get; set; }
+        public string devicekey { get; set; }
+    }
+    public class _Params
+    {
+        public string @switch { get; set; }
+    }
+    #endregion
 }

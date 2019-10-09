@@ -36,7 +36,7 @@ namespace OMineWatcher.Managers
         private class Profile
         {
             public List<Rig> Rigs { get; set; } = new List<Rig>();
-            public _GenSettings GenSets { get; set; }
+            public _GenSettings GenSets { get; set; } = new _GenSettings();
         }
 
         #region Rig
@@ -67,6 +67,7 @@ namespace OMineWatcher.Managers
             {
                 Name = "New";
                 IP = "";
+                eWeDevice = "";
                 ID = DateTime.UtcNow.ToBinary();
                 Waching = false;
             }
@@ -76,6 +77,8 @@ namespace OMineWatcher.Managers
             public RigType? Type;
             public bool Waching;
             public long ID;
+
+            public string eWeDevice;
         }
         public enum RigType
         {
@@ -130,6 +133,4 @@ namespace OMineWatcher.Managers
         }
         #endregion
     }
-
-    
 }
