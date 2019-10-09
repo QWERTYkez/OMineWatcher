@@ -23,16 +23,20 @@ namespace OMineWatcher.Managers
                 profile.Rigs = value;
             }
         }
+        public static _GenSettings GenSets
+        {
+            get { return profile.GenSets; }
+            set
+            {
+                profile.GenSets = value;
+            }
+        }
 
         private static Profile profile;
         private class Profile
         {
-            public Profile()
-            {
-
-            }
-
             public List<Rig> Rigs { get; set; } = new List<Rig>();
+            public _GenSettings GenSets { get; set; }
         }
 
         #region Rig
@@ -79,6 +83,13 @@ namespace OMineWatcher.Managers
             HiveOS
         }
         #endregion
+        #region GenSettings
+        public class _GenSettings
+        {
+            public string eWeLogin;
+            public string eWePassword;
+        }
+        #endregion
 
         #region FileStream Methods
         private static object key = new object();
@@ -119,4 +130,6 @@ namespace OMineWatcher.Managers
         }
         #endregion
     }
+
+    
 }

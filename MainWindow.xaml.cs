@@ -17,6 +17,7 @@ using System.Net;
 using OMineWatcher.Managers;
 using System.Windows.Media.Effects;
 using System.Net.NetworkInformation;
+using eWeLink.API;
 
 namespace OMineWatcher
 {
@@ -234,7 +235,7 @@ namespace OMineWatcher
                     break;
             }
         }
-        #endregion
+
 
         #region OMineWacher
         #region Конфигурации майнинга
@@ -253,23 +254,61 @@ namespace OMineWatcher
                 GPUsSwitchHeader.Visibility = Visibility.Visible;
                 GPUswitchB.Visibility = Visibility.Visible;
                 byte k = Convert.ToByte(Selected);
-                
+
                 for (byte n = 0; n < k; n++)
                 {
                     Grid GR = new Grid { Width = 60 };
                     GR.Children.Add(new TextBlock { Text = "GPU" + n, Effect = null, Foreground = Brushes.White });
-                    GR.Children.Add(new CheckBox { Name = "g" + n.ToString(),
-                        Margin = new Thickness(0, 0, 7, 0), IsChecked = true,
-                        HorizontalAlignment = HorizontalAlignment.Right });
+                    GR.Children.Add(new CheckBox
+                    {
+                        Name = "g" + n.ToString(),
+                        Margin = new Thickness(0, 0, 7, 0),
+                        IsChecked = true,
+                        HorizontalAlignment = HorizontalAlignment.Right
+                    });
                     GPUswitchSP.Children.Add(GR);
                 }
             }
         }
 
-        #endregion
 
         #endregion
 
-        
+        #endregion
+        #endregion
+
+        #region General Settings
+        #region eWeLink
+        private async void eWeLinkConnect(object sender, RoutedEventArgs e)
+        {
+            eWeAccountState.Text = "Подключение";
+            string login = eWeLoginBox.Text;
+            string pass = eWePasswordBox.Password;
+            if (await Task.Run(() => eWeLinkClient.AutheWeLink(login, pass)))
+            {
+                Settings.GenSets.eWeLogin = login;
+                Settings.GenSets.eWePassword = pass;
+                eWeAccountState.Text = "Аккаунт подключен";
+            }
+            else
+            {
+                Settings.GenSets.eWeLogin = null;
+                Settings.GenSets.eWePassword = null;
+                eWeAccountState.Text = "Ошибка";
+                await Task.Run(() => Thread.Sleep(2000));
+                eWeAccountState.Text = "Аккаунт не подключен";
+            }
+        }
+        private void eWeLinkDisconnect(object sender, RoutedEventArgs e)
+        {
+            Settings.GenSets.eWeLogin = null;
+            Settings.GenSets.eWePassword = null;
+            eWeLoginBox.Text = "";
+            eWePasswordBox.Password = "";
+            eWeAccountState.Text = "Аккаунт не подключен";
+        }
+        #endregion
+        #endregion
+
     }
 }

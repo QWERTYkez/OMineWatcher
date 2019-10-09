@@ -107,5 +107,11 @@
   <ItemGroup>
     <Resource Include="Icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="eWeLink.API\eWeLink.API.csproj">
+      <Project>{58561cec-3b10-4b20-9548-5ef7872a96ce}</Project>
+      <Name>eWeLink.API</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
