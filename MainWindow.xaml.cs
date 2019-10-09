@@ -37,6 +37,7 @@ namespace OMineWatcher
         private void StartingApplication()
         {
             InitializeRigsSettings();
+            InitializeeWeLink();
             GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
                 "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
             RigType.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
@@ -306,6 +307,16 @@ namespace OMineWatcher
             eWeLoginBox.Text = "";
             eWePasswordBox.Password = "";
             eWeAccountState.Text = "Аккаунт не подключен";
+        }
+        private void InitializeeWeLink()
+        {
+            if (Settings.GenSets.eWeLogin != "" && Settings.GenSets.eWeLogin != null)
+            {
+                eWeLinkClient.SetAuth(Settings.GenSets.eWeLogin, Settings.GenSets.eWePassword);
+                eWeLoginBox.Text = Settings.GenSets.eWeLogin;
+                eWePasswordBox.Password = Settings.GenSets.eWePassword;
+                eWeAccountState.Text = "Аккаунт подключен";
+            }
         }
         #endregion
         #endregion

@@ -12,13 +12,16 @@ namespace eWeLink.API
 {
     public static class eWeLinkClient
     {
+        private static string Login = "";
+        private static string Password = "";
+
         private static string APIkey = "";
         private static string AT = "";
         private static string payloadLogin = "";
         private static string payloadUpdate = "";
         private static WebSocket WS;
 
-        private static string device;
+        private static object key = new object();
 
         private static string HMAC(string str)
         {
@@ -35,6 +38,61 @@ namespace eWeLink.API
             return Convert.ToBase64String(hash);
         }
         private static bool AutheWeLink(string login, string password, ref string APIkey, ref string AT)
+        {
+            lock (key)
+            {
+                string uri = "https://eu-api.coolkit.cc:8080/api/user/login";
+                string json = JsonConvert.SerializeObject(new _LoginToEwelink
+                {
+                    email = login,
+                    password = password
+                });
+
+                byte[] body = Encoding.UTF8.GetBytes(json);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+
+                request.Method = "POST";
+                request.ContentType = "application/json";
+                request.ContentLength = body.Length;
+                request.Headers.Add("Authorization", $"Sign {HMAC(json)}");
+
+                using (Stream stream = request.GetRequestStream())
+                {
+                    stream.Write(body, 0, body.Length);
+                    stream.Close();
+                }
+
+                string req;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                {
+                    using (Stream str = response.GetResponseStream())
+                    {
+                        int count = 0;
+
+                        byte[] msg = new byte[1000];
+                        count = str.Read(msg, 0, msg.Length);
+                        req = Encoding.Default.GetString(msg, 0, count);
+                    }
+
+                    response.Close();
+                }
+                if (req.Contains("\"at\"") && req.Contains("\"apikey\""))
+                {
+                    _eWelinkAuth e = JsonConvert.DeserializeObject<_eWelinkAuth>(req);
+                    APIkey = e.user.apikey;
+                    AT = e.at;
+                    return true;
+                }
+                else return false;
+            }
+        }
+        /// <summary>
+        /// Метод проверяющй правильность данных для входа в аккаунт eWeLink
+        /// и автоматически сохраняет прошедшие проверку логин и пароль
+        /// для использования в других методах
+        /// </summary>
+        public static bool AutheWeLink(string login, string password)
         {
             string uri = "https://eu-api.coolkit.cc:8080/api/user/login";
             string json = JsonConvert.SerializeObject(new _LoginToEwelink
@@ -74,56 +132,46 @@ namespace eWeLink.API
             }
             if (req.Contains("\"at\"") && req.Contains("\"apikey\""))
             {
-                _eWelinkAuth e = JsonConvert.DeserializeObject<_eWelinkAuth>(req);
-                APIkey = e.user.apikey;
-                AT = e.at;
+                SetAuth(login, password);
                 return true;
             }
             else return false;
         }
-        public static bool AutheWeLink(string login, string password)
+        /// <summary>
+        /// Метод регистрирующий правильные логин и пароль для использования в других методах
+        /// </summary>
+        public static void SetAuth(string login, string password)
         {
-            string uri = "https://eu-api.coolkit.cc:8080/api/user/login";
-            string json = JsonConvert.SerializeObject(new _LoginToEwelink
-            {
-                email = login,
-                password = password
-            });
-
-            byte[] body = Encoding.UTF8.GetBytes(json);
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-
-            request.Method = "POST";
-            request.ContentType = "application/json";
-            request.ContentLength = body.Length;
-            request.Headers.Add("Authorization", $"Sign {HMAC(json)}");
-
-            using (Stream stream = request.GetRequestStream())
-            {
-                stream.Write(body, 0, body.Length);
-                stream.Close();
-            }
-
-            string req;
-
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            {
-                using (Stream str = response.GetResponseStream())
-                {
-                    int count = 0;
-
-                    byte[] msg = new byte[1000];
-                    count = str.Read(msg, 0, msg.Length);
-                    req = Encoding.Default.GetString(msg, 0, count);
-                }
-
-                response.Close();
-            }
-            if (req.Contains("\"at\"") && req.Contains("\"apikey\"")) return true;
-            else return false;
+            Login = login;
+            Password = password;
         }
 
+        public static List<_eWelinkDevice> eWeLinkGetDevices()
+        {
+            if (Login == "" || Login == null) { return null; }
+            if (Password == "" || Password == null) { return null; }
 
+            if (AT == "") { AutheWeLink(Login, Password, ref APIkey, ref AT); }
+
+            string uri = "https://eu-api.coolkit.cc:8080/api/user/device";
+
+            string response = "";
+            using (var webClient = new WebClient())
+            {
+                webClient.Headers.Add("Authorization", $"Bearer {AT}");
+                response = webClient.DownloadString(uri);
+            }
+            if (response.Contains("\"error\":401"))
+            {
+                AutheWeLink(Login, Password, ref APIkey, ref AT);
+                return eWeLinkGetDevices();
+            }
+            else
+            {
+                string str = $"{{\"Devices\":{response}}}";
+                return JsonConvert.DeserializeObject<_eWelinkDevices>(str).Devices;
+            }
+        }
 
         #region JSON clases
         public class _eWelinkAuth

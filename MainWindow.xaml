@@ -1400,7 +1400,7 @@
                             </Grid.ColumnDefinitions>
                             <Button Grid.Row="0" Grid.Column="0" Margin="4" Click="eWeLinkConnect">Подключить</Button>
                             <Button Grid.Row="0" Grid.Column="1" Margin="4" Click="eWeLinkDisconnect">Отключить</Button>
-                            <TextBlock x:Name="eWeAccountState" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center">Успешно</TextBlock>
+                            <TextBlock x:Name="eWeAccountState" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center">Аккаунт не подключен</TextBlock>
                         </Grid>
                     </StackPanel>
                 </Border>
