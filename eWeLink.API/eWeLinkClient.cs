@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using WebSocket4Net;
 
 namespace eWeLink.API
@@ -236,41 +238,53 @@ namespace eWeLink.API
         private static void AddOperation(string deviceID, Operations operation)
         {
             _Operation OP = new _Operation(deviceID, operation);
-            bool x;
+            bool x = false;
             lock (OPkey)
             {
-                OperationsList.Add(OP);
-                x = OperationsList.Count > 0;
+                if (OperationsList.Count == 0)
+                { x = true; }
+                else
+                {
+                    //фильтрация запросов к одному устройству
+                    OperationsList = (from Z in OperationsList where Z.DeviceID != deviceID select Z).ToList();
+                    OperationsList.Add(OP); 
+                }
             }
             if (x) OperationsHandle(OP);
         }
-        private static void OperationRemove(_Operation OP)
+        private static void NextOperation()
         {
-            bool x;
+            _Operation OP = null;
             lock (OPkey)
             {
-                OperationsList.Remove(OP);
-                x = OperationsList.Count > 0;
-                if (x) CurrentOP = OperationsList[0];
+                try
+                {
+                    OperationsList.Remove(CurrentOP);
+                }
+                catch { }
+                if (OperationsList.Count > 0)
+                { OP = OperationsList[0]; }
             }
-            if (x) OperationsHandle(CurrentOP);
+            if(OP != null) { OperationsHandle(OP); }
         }
         private static _Operation CurrentOP;
         private static void OperationsHandle(_Operation OP)
         {
-            CurrentOP = OP;
-            switch (CurrentOP.Operation)
-            {
-                case Operations.RebootDevice:
-                    OPRebootDevice(CurrentOP.DeviceID);
-                    break;
-                case Operations.SwitchOn:
-                    OPSwitchDevice(CurrentOP.DeviceID, DeviceState.on);
-                    break;
-                case Operations.SwitchOff:
-                    OPSwitchDevice(CurrentOP.DeviceID, DeviceState.off);
-                    break;
-            }
+            Task.Run(() => {
+                CurrentOP = OP;
+                switch (CurrentOP.Operation)
+                {
+                    case Operations.RebootDevice:
+                        OPRebootDevice(CurrentOP.DeviceID);
+                        break;
+                    case Operations.SwitchOn:
+                        OPSwitchDevice(CurrentOP.DeviceID, DeviceState.on);
+                        break;
+                    case Operations.SwitchOff:
+                        OPSwitchDevice(CurrentOP.DeviceID, DeviceState.off);
+                        break;
+                }
+            });
         }
         #endregion
         #region RebootDevice  //OPRebootDevice(string deviceID)
@@ -356,7 +370,7 @@ namespace eWeLink.API
                 Thread.Sleep(1000);
                 WS.Close();
                 WS.Dispose();
-                OperationRemove(CurrentOP);
+                NextOperation();
             }
         }
         #endregion
