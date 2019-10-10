@@ -12,16 +12,12 @@ namespace eWeLink.API
 {
     public static class eWeLinkClient
     {
+        private static object key = new object();
         private static string Login = "";
         private static string Password = "";
-
+        private static WebSocket WS;
         private static string APIkey = "";
         private static string AT = "";
-        private static string payloadLogin = "";
-        private static string payloadUpdate = "";
-        private static WebSocket WS;
-
-        private static object key = new object();
 
         private static string HMAC(string str)
         {
@@ -144,6 +140,7 @@ namespace eWeLink.API
         {
             Login = login;
             Password = password;
+
         }
 
         public static List<_eWelinkDevice> eWeLinkGetDevices()
@@ -186,6 +183,157 @@ namespace eWeLink.API
                 return JsonConvert.DeserializeObject<_eWelinkDevices>(str).Devices;
             }
         }
+
+        #region OperationsList //AddOperation(string deviceID, Operations operation, DeviceState deviceState)
+        private static object OPkey = new object();
+        private static List<_Operation> OperationsList = new List<_Operation>();
+        private class _Operation
+        {
+            public _Operation(string deviceID, Operations operation, DeviceState deviceState)
+            {
+                DeviceID = deviceID;
+                Operation = operation;
+                DevState = deviceState;
+            }
+
+            public string DeviceID;
+            public Operations Operation;
+            public DeviceState DevState;
+        }
+        public static void AddOperation(string deviceID, Operations operation, DeviceState deviceState)
+        {
+            _Operation OP = new _Operation(deviceID, operation, deviceState);
+            bool x;
+            lock (OPkey)
+            {
+                OperationsList.Add(OP);
+                x = OperationsList.Count > 0;
+            }
+            if (x) OperationsHandle(OP);
+        }
+        private static void OperationRemove(_Operation OP)
+        {
+            bool x;
+            lock (OPkey)
+            {
+                OperationsList.Remove(OP);
+                x = OperationsList.Count > 0;
+                if (x) CurrentOP = OperationsList[0];
+            }
+            if (x) OperationsHandle(CurrentOP);
+        }
+        private static _Operation CurrentOP;
+        private static void OperationsHandle(_Operation OP)
+        {
+            CurrentOP = OP;
+            switch (CurrentOP.Operation)
+            {
+                case Operations.RebootDevice:
+                    OPRebootDevice(CurrentOP.DeviceID);
+                    break;
+                case Operations.SetDeviceState:
+                    OPSetDeviceState(CurrentOP.DeviceID, CurrentOP.DevState);
+                    break;
+            }
+        }
+        #endregion
+        #region RebootDevice  //OPRebootDevice(string deviceID)
+        private static string payloadLoginR = "";
+        private static string payloadUpdateR = "";
+        private static int counterR;
+        private static string deviceID_R;
+        private static int SwichStateDelay = 10; // жка между переключениями, сек
+        private static void OPRebootDevice(string deviceID)
+        {
+            deviceID_R = deviceID;
+            counterR = 0;
+            AutheWeLink(Login, Password, ref APIkey, ref AT);
+
+            string uri = "wss://eu-pconnect3.coolkit.cc:8080/api/ws";
+
+            payloadLoginR = JsonConvert.SerializeObject(new _EwelinkLoginPayload(AT, APIkey));
+            payloadUpdateR = JsonConvert.SerializeObject(new _EwelinkUpdatePayload(deviceID, "off", APIkey));
+
+            WS = new WebSocket(uri);
+            WS.Opened += websocketopR;
+            WS.MessageReceived += websocketreqR;
+
+            WS.Open();
+        }
+        private static void websocketopR(object sender, EventArgs e)
+        {
+            WS.Send(payloadLoginR);
+        }
+        private static void websocketreqR(object sender, MessageReceivedEventArgs e)
+        {
+            counterR++;
+            if (counterR == 1)
+            {
+                WS.Send(payloadUpdateR);
+            }
+            if (counterR == 2)
+            {
+                WS.Close();
+                WS.Dispose();
+                Thread.Sleep(1000 * SwichStateDelay);
+                OPSetDeviceState(deviceID_R, DeviceState.on);
+            }
+        }
+        #endregion
+        #region SwichDevice  //OPSetDeviceState(string deviceID, DeviceState Dstate)
+        private static string payloadLoginS = "";
+        private static string payloadUpdateS = "";
+        private static int counterS;
+        private static void OPSetDeviceState(string deviceID, DeviceState Dstate)
+        {
+            counterS = 0;
+            AutheWeLink(Login, Password, ref APIkey, ref AT);
+
+            string uri = "wss://eu-pconnect3.coolkit.cc:8080/api/ws";
+
+            string state = "";
+            if (Dstate == DeviceState.on) { state = "on"; }
+            else { state = "off"; }
+
+            payloadLoginS = JsonConvert.SerializeObject(new _EwelinkLoginPayload(AT, APIkey));
+            payloadUpdateS = JsonConvert.SerializeObject(new _EwelinkUpdatePayload(deviceID, state, APIkey));
+
+            WS = new WebSocket(uri);
+            WS.Opened += websocketopS;
+            WS.MessageReceived += websocketreqS;
+
+            WS.Open();
+        }
+        private static void websocketopS(object sender, EventArgs e)
+        {
+            WS.Send(payloadLoginS);
+        }
+        private static void websocketreqS(object sender, MessageReceivedEventArgs e)
+        {
+            counterS++;
+            if (counterS == 1)
+            {
+                WS.Send(payloadUpdateS);
+            }
+            if (counterS == 2)
+            {
+                Thread.Sleep(1000);
+                WS.Close();
+                WS.Dispose();
+                OperationRemove(CurrentOP);
+            }
+        }
+        #endregion
+    }
+    public enum DeviceState
+    {
+        on,
+        off
+    }
+    public enum Operations
+    {
+        RebootDevice,
+        SetDeviceState
     }
     #region JSON clases
     public class _eWelinkAuth
@@ -229,6 +377,53 @@ namespace eWeLink.API
     public class _Params
     {
         public string @switch { get; set; }
+    }
+
+    public class _EwelinkLoginPayload
+    {
+        public _EwelinkLoginPayload(string AT, string APIkey)
+        {
+            double DT = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
+            ts = $"{Math.Floor(DT / 1000)}";
+            sequence = $"{Math.Floor(DT)}";
+
+            at = AT;
+            apikey = APIkey;
+        }
+
+        public string action = "userOnline";
+        public string userAgent = "app";
+        public int version = 6;
+        public string apkVesrion = "1.8";
+        public string os = "iOS";
+        public string at { get; set; }
+        public string apikey { get; set; }
+        public string ts { get; set; }
+        public string model = "iPhone10,6";
+        public string romVersion = "11.1.2";
+        public string sequence { get; set; }
+    }
+    public class _EwelinkUpdatePayload
+    {
+        public _EwelinkUpdatePayload(string deviceID, string state, string APIkey)
+        {
+            deviceid = deviceID;
+
+            double DT = (DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
+            sequence = $"{Math.Floor(DT)}";
+
+            @params = new _Params();
+            @params.@switch = state;
+
+            apikey = APIkey;
+        }
+
+        public string action = "update";
+        public string userAgent = "app";
+        public string apikey { get; set; }
+        public string deviceid { get; set; }
+        public _Params @params { get; set; }
+        public string sequence { get; set; }
     }
     #endregion
 }
