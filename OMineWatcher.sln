@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveOS.API", "HiveOS.API\Hi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eWeLink.API", "eWeLink.API\eWeLink.API.csproj", "{58561CEC-3B10-4B20-9548-5EF7872A96CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMineWOL", "OMineWOL\OMineWOL.csproj", "{37B1CDB7-F620-4B06-8F20-D21E50F303EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMineWOLTests", "OMineWOLTests\OMineWOLTests.csproj", "{9FD078BB-4513-4782-B95F-5F346DE6A7C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{58561CEC-3B10-4B20-9548-5EF7872A96CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58561CEC-3B10-4B20-9548-5EF7872A96CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58561CEC-3B10-4B20-9548-5EF7872A96CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37B1CDB7-F620-4B06-8F20-D21E50F303EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37B1CDB7-F620-4B06-8F20-D21E50F303EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37B1CDB7-F620-4B06-8F20-D21E50F303EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37B1CDB7-F620-4B06-8F20-D21E50F303EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

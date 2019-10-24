@@ -926,7 +926,7 @@
                                 <Button Grid.Column="4" Content="Сохранить" Margin="3" Click="SaveRig"/>
                             </Grid>
                             <Grid Grid.Row="4" Grid.ColumnSpan="3">
-                                <TextBlock HorizontalAlignment="Left">Ping</TextBlock>
+                                <TextBlock HorizontalAlignment="Left">Status</TextBlock>
                                 <TextBlock HorizontalAlignment="Center" Margin="0,0,30,0">Имя</TextBlock>
                                 <TextBlock HorizontalAlignment="Right">Waching</TextBlock>
                             </Grid>
