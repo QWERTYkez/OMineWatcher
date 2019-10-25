@@ -15,20 +15,15 @@ namespace OMineWOL.Tests
         [TestMethod()]
         public void GetMACfromIPTest()
         {
-            string ip = "192.168.88.11";
+            string ip = "ipAddres";
             Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.12";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.113";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.14";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.15";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.21";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
-            ip = "192.168.88.31";
-            Debug.WriteLine($"{ip} - {WOL.GetMACfromIP(ip)}");
+        }
+
+        [TestMethod()]
+        public void WakeFunctionTest()
+        {
+            byte[] mac = "MacAddres".Split('-').Select(x => Convert.ToByte(x, 16)).ToArray();
+            WOL.WakeFunction(mac);
         }
     }
 }
