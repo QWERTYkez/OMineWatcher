@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMineWOL", "OMineWOL\OMineW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMineWOLTests", "OMineWOLTests\OMineWOLTests.csproj", "{9FD078BB-4513-4782-B95F-5F346DE6A7C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{CC2FFC23-89D2-40B9-B540-00507AF1D677}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FD078BB-4513-4782-B95F-5F346DE6A7C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC2FFC23-89D2-40B9-B540-00507AF1D677}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC2FFC23-89D2-40B9-B540-00507AF1D677}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC2FFC23-89D2-40B9-B540-00507AF1D677}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC2FFC23-89D2-40B9-B540-00507AF1D677}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -235,14 +235,16 @@ namespace OMineWatcher
                     OMGtabitem2.IsEnabled = false;
                     OMGtabitem3.IsEnabled = false;
                     OMGtabitem4.IsEnabled = false;
-
+                    
                     OMGconnect.Visibility = Visibility.Visible;
+                    OMGconnect.Content = "Подключиться";
                     break;
                 case "HiveOS":
                     OMGtabitem1.Visibility = Visibility.Collapsed;
                     OMGtabitem2.Visibility = Visibility.Collapsed;
                     OMGtabitem3.Visibility = Visibility.Collapsed;
                     OMGtabitem4.Visibility = Visibility.Collapsed;
+
                     OMGconnect.Visibility = Visibility.Collapsed;
                     break;
                 default:
@@ -250,6 +252,7 @@ namespace OMineWatcher
                     OMGtabitem2.Visibility = Visibility.Collapsed;
                     OMGtabitem3.Visibility = Visibility.Collapsed;
                     OMGtabitem4.Visibility = Visibility.Collapsed;
+
                     OMGconnect.Visibility = Visibility.Collapsed;
                     break;
             }
@@ -372,10 +375,50 @@ namespace OMineWatcher
             int i = RigsListBox.SelectedIndex;
             Settings.Rigs[i].eWeDevice = "";
         }
-        #endregion
 
         #endregion
 
+        #endregion
 
+        #region Список ригов
+
+        private void OMGconnect_Click(object sender, RoutedEventArgs e)
+        {
+            switch (((Button)sender).Content)
+            {
+                case "Подключиться":
+                    {
+                        OMGtabitem1.IsEnabled = true;
+                        OMGtabitem2.IsEnabled = true;
+                        OMGtabitem3.IsEnabled = true;
+                        OMGtabitem4.IsEnabled = true;
+
+                        {
+
+                        }
+
+                        ((Button)sender).Content = "Отключиться";
+                    }
+                    break;
+                case "Отключиться":
+                    {
+                        {
+
+                        }
+
+                        OMGtabitem1.IsEnabled = false;
+                        OMGtabitem2.IsEnabled = false;
+                        OMGtabitem3.IsEnabled = false;
+                        OMGtabitem4.IsEnabled = false;
+
+                        RigSettings.SelectedIndex = 0;
+
+                        ((Button)sender).Content = "Подключиться";
+                    }
+                    break;
+            }
+        }
+
+        #endregion
     }
 }

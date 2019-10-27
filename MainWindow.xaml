@@ -946,25 +946,41 @@
                     </GroupBox>
                     <!--Список ригов///-->
                     <!--Настройки ригов-->
-                    <Grid Grid.Column="1" x:Name="OMineGuardanagement">
-                        <TabControl Margin="4,0,4,4">
+                    <Grid Grid.Column="1" x:Name="OMineGuardmanagement">
+                        <TabControl Margin="4,0,4,4" x:Name="RigSettings">
 
 
 
                             <TabItem Header="Настройки">
                                 <Grid>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
 
-                                    <WrapPanel Margin="15">
-                                        <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">eWeLink устройство:</TextBlock>
-                                        <ComboBox x:Name="eWeDevicesBox" Width="150" SelectionChanged="SelecteWeDevice"/>
-                                        <local:Tumbler x:Name="eWeTumbler" IsEnabled="False" Margin="5,0,0,0" Checked="eWeTumbler_Checked" Unchecked="eWeTumbler_Unchecked"/>
-                                    </WrapPanel>
+                                    <Border Grid.Row="0" Margin="15,4,15,-1" Padding="3" BorderThickness="2" BorderBrush="{StaticResource MSI.Border}">
+                                        <WrapPanel HorizontalAlignment="Center" Margin="0,4">
+                                            <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">eWeLink устройство:</TextBlock>
+                                            <ComboBox x:Name="eWeDevicesBox" Width="150" SelectionChanged="SelecteWeDevice"/>
+                                            <local:Tumbler x:Name="eWeTumbler" IsEnabled="False" Margin="5,0,0,0" Checked="eWeTumbler_Checked" Unchecked="eWeTumbler_Unchecked"/>
+                                        </WrapPanel>
+                                    </Border>
+                                    <Border Grid.Row="1" Margin="15,0" Padding="3" BorderThickness="2" BorderBrush="{StaticResource MSI.Border}">
+                                        <WrapPanel HorizontalAlignment="Center" Margin="0,4">
+                                            <TextBlock VerticalAlignment="Center" Margin="0,0,5,0" Text="MAC:"/>
+                                            <TextBox Margin="5,0" Width="150"/>
+                                            <Button Content="GetMAC"/>
+                                            <TextBlock VerticalAlignment="Center" Margin="10,0,5,0" Text="Wake-on-LAN"/>
+                                            <local:Tumbler x:Name="WOLTumbler" Margin="5,0"/>
+                                            <!--Checked="WOLTumbler_Checked" Unchecked="WOLTumbler_Unchecked"-->
+                                        </WrapPanel>
+                                    </Border>
+                                    
 
 
                                 </Grid>
@@ -1345,7 +1361,7 @@
                                 </Grid>
                             </TabItem>
                         </TabControl>
-                        <Button x:Name="OMGconnect" Height="19" HorizontalAlignment="Right" VerticalAlignment="Top">Подключиться</Button>
+                        <Button x:Name="OMGconnect" Height="19" HorizontalAlignment="Right" VerticalAlignment="Top" Click="OMGconnect_Click">Подключиться</Button>
                     </Grid>
                     <!--Настройки ригов///-->
                 </Grid>

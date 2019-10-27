@@ -16,41 +16,22 @@ namespace OMineWOL
         public static byte[] GetMACfromIP(string IP)
         {
             byte[] ab = new byte[6]; int len = ab.Length;
-            if (SendARP((int)IPAddress.Parse(IP).Address, 0, ab, ref len) == 0)
-            {
-                return ab;
-            }
+            if (SendARP((int)IPAddress.Parse(IP).Address, 0, ab, ref len) == 0) return ab;
             return null;
         }
 
-        //MAC адрес должен выглядеть следующим образом: 013FA049
         public static void WakeFunction(byte[] MAC_ADDRESS)
         {
             UdpClient UDP = new UdpClient();
-            UDP.Connect(new IPAddress(0xffffffff), 0x2fff); //Используем порт = 12287 
+            UDP.Connect(new IPAddress(0xffffffff), 0x2fff);
             UDP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 0);
             int counter = 0;
-            //буффер для отправки
             byte[] bytes = new byte[1024];
-            //Первые 6 бит 0xFF
-            for (int y = 0; y < 6; y++)
-                bytes[counter++] = 0xFF;
+            for (int y = 0; y < 6; y++) bytes[counter++] = 0xFF;
+            for (int y = 0; y < 16; y++) foreach (byte b in MAC_ADDRESS) bytes[counter++] = b;
 
-            //Повторим MAC адрес 16 раз
-            for (int y = 0; y < 16; y++)
-            {
-                foreach (byte b in MAC_ADDRESS)
-                {
-                    bytes[counter++] = b;
-                }
-            }
-            Debug.WriteLine(BitConverter.ToString(bytes));
-
-            //Отправим магический пакет
-            int reterned_value = UDP.Send(bytes, 1024);
-            Debug.WriteLine(reterned_value);
+            UDP.Send(bytes, 1024);
         }
-
 
         #region DllImport
 
