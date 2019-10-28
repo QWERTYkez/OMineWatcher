@@ -7,25 +7,42 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OMineGuard.Managers
+namespace OMineWatcher.Managers
 {
-    class Communication
+    class OMG_TCP
     {
         #region OMGcontrol
+        public static event Action OMGcontrolLost;
+        public static event Action OMGcontrolReceived;
+        public static event Action<RootObject> OMGsent;
+
+        public static bool OMGconnection;
+        public static void OMGcontrolDisconnect()
+        {
+            OMGconnection = false;
+        }
         private static TcpClient OMGcontrolClient;
         private static NetworkStream OMGcontrolStream;
-        private static void ConnectToOMG(string IP)
+        public static void ConnectToOMG(string IP)
         {
+            OMGconnection = true;
             Task.Run(() =>
             {
                 OMGcontrolClient = new TcpClient(IP, 2112);
+                if (OMGcontrolClient.Connected) OMGcontrolReceived?.Invoke();
                 OMGcontrolStream = OMGcontrolClient.GetStream();
                 try
                 {
-                    Profile profile = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream)).Profile;
-                    string Log = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream)).Log;
-
-                    //обработка лога
+                    RootObject RO;
+                    if (OMGconnection)
+                    {
+                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream));
+                        OMGsent?.Invoke(RO);
+                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream));
+                        RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
+                        OMGsent?.Invoke(RO);
+                    }
+                    else { OMGcontrolLost?.Invoke(); }
                 }
                 catch { }
 
@@ -35,17 +52,18 @@ namespace OMineGuard.Managers
                     {
                         using (NetworkStream stream = client.GetStream())
                         {
-                            while (client.Connected)
+                            RootObject RO;
+                            while (client.Connected && OMGconnection)
                             {
                                 try
                                 {
-                                    RootObject RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
-
-                                    //обработка лога
+                                    RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                    OMGsent?.Invoke(RO);
                                 }
                                 catch { }
                                 Thread.Sleep(50);
                             }
+                            OMGcontrolLost?.Invoke();
                         }
                     }
                 });
@@ -64,6 +82,8 @@ namespace OMineGuard.Managers
             return Encoding.Default.GetString(msg, 0, count);
         }
         private static object key = new object();
+
+        // обратная связь
         public static void SendAction(object body, msgType type)
         {
             if (OMGcontrolClient != null)
@@ -107,7 +127,6 @@ namespace OMineGuard.Managers
         #region JSON classes
         public class RootObject
         {
-            public string Log { get; set; }
             public Profile Profile { get; set; }
             public OC? Overclock { get; set; }
             public string Logging { get; set; }
@@ -173,7 +192,6 @@ namespace OMineGuard.Managers
             public int[] MSI_CoreClocks;
             public int[] MSI_MemoryClocks;
             public uint[] MSI_FanSpeeds;
-
             public float?[] OHM_Temperatures;
         }
         #endregion

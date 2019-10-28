@@ -12,6 +12,7 @@ using OMineWatcher.Managers;
 using System.Windows.Media.Effects;
 using System.Net.NetworkInformation;
 using eWeLink.API;
+using OMG = OMineWatcher.Managers.OMG_TCP;
 
 namespace OMineWatcher
 {
@@ -32,14 +33,21 @@ namespace OMineWatcher
         {
             InitializeRigsSettings();
             InitializeeWeLink();
-            
-            
+            InitializeOMGcontrol();
+
         }
 
         #region Список ригов
         #region Блок выбора
         #region Индикация
         private static List<Ellipse> Indicators { get; set; } = new List<Ellipse>();
+        private static List<RigStatus> RigsStatuses { get; set; } = new List<RigStatus>();
+        private enum RigStatus
+        {
+            offline,
+            online,
+            works
+        }
         public static List<Thread> PingIndicationThreads { get; set; } = new List<Thread>();
         private static int PingCheckDelay = 5; //sec
         private static void SetIndicatorColor(object o)
@@ -61,6 +69,7 @@ namespace OMineWatcher
             };
             IndicatorsRigsSP.Children.Add(E);
             Indicators.Add(E);
+            RigsStatuses.Add(new RigStatus());
 
             PingIndicationThreads.Add(new Thread(() => 
             {
@@ -73,11 +82,20 @@ namespace OMineWatcher
                         status = ping.Send(IPAddress.Parse(Settings.Rigs[i].IP), 200).Status;
                         if (status == IPStatus.Success)
                         {
-                            MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Lime });
+                            RigsStatuses[i] = RigStatus.online;
+                            MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Yellow });
                         }
-                        else { MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red }); }
+                        else
+                        {
+                            RigsStatuses[i] = RigStatus.offline;
+                            MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red });
+                        }
                     }
-                    catch { MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red }); }
+                    catch
+                    {
+                        RigsStatuses[i] = RigStatus.offline;
+                        MainContext.Send(SetIndicatorColor, new object[] { i, Brushes.Red });
+                    }
                     Thread.Sleep(PingCheckDelay * 1000);
                 }
             }));
@@ -380,45 +398,208 @@ namespace OMineWatcher
 
         #endregion
 
-        #region Список ригов
+        #region OMGcontrol
+        private void InitializeOMGcontrol()
+        {
+            OMG.OMGcontrolLost += OMGcontrolLost;
+            OMG.OMGcontrolReceived += OMGcontrolReceived;
+            OMG.OMGsent += OMGsent;
 
+            Digits.Text = Settings.GenSets.Digits.ToString();
+            DigitsSlider.Value = Settings.GenSets.Digits;
+            DigitsSlider.ValueChanged += DigitsSlider_ValueChanged;
+        }
         private void OMGconnect_Click(object sender, RoutedEventArgs e)
         {
             switch (((Button)sender).Content)
             {
                 case "Подключиться":
-                    {
-                        OMGtabitem1.IsEnabled = true;
-                        OMGtabitem2.IsEnabled = true;
-                        OMGtabitem3.IsEnabled = true;
-                        OMGtabitem4.IsEnabled = true;
-
-                        {
-
-                        }
-
-                        ((Button)sender).Content = "Отключиться";
-                    }
+                    OMG.ConnectToOMG(Settings.Rigs[RigsListBox.SelectedIndex].IP);
                     break;
                 case "Отключиться":
-                    {
-                        {
-
-                        }
-
-                        OMGtabitem1.IsEnabled = false;
-                        OMGtabitem2.IsEnabled = false;
-                        OMGtabitem3.IsEnabled = false;
-                        OMGtabitem4.IsEnabled = false;
-
-                        RigSettings.SelectedIndex = 0;
-
-                        ((Button)sender).Content = "Подключиться";
-                    }
+                    OMG.OMGcontrolDisconnect();
                     break;
             }
         }
+        private static void OMGcontrolReceived()
+        {
+            MainContext.Send((object o) =>
+            {
+                This.OMGtabitem1.IsEnabled = true;
+                This.OMGtabitem2.IsEnabled = true;
+                This.OMGtabitem3.IsEnabled = true;
+                This.OMGtabitem4.IsEnabled = true;
+
+                This.OMGconnect.Content = "Отключиться";
+
+                OMGindication();
+            }, 
+            null);
+        }
+        private static void OMGcontrolLost()
+        {
+            MainContext.Send((object o) => 
+            {
+                This.OMGtabitem1.IsEnabled = false;
+                This.OMGtabitem2.IsEnabled = false;
+                This.OMGtabitem3.IsEnabled = false;
+                This.OMGtabitem4.IsEnabled = false;
+
+                This.RigSettings.SelectedIndex = 0;
+
+                This.OMGconnect.Content = "Подключиться";
+
+                OMGworking = null;
+
+                This.MinerLog.Document.Blocks.Clear();
+            }, 
+            null);
+        }
+        private void OMGsent(OMG.RootObject RO)
+        {
+            if (RO.Hasrates != null)
+            {
+                Task.Run(() => 
+                {
+                    string str = "";
+                    foreach (double d in RO.Hasrates)
+                    {
+                        str += ToNChar(d.ToString());
+                    }
+
+                    MainContext.Send((object o) =>
+                    {
+                        This.GPUsHashrate.Text = " " + str.TrimStart(',');
+                        This.GPUsHashrate2.Text = " " + str.TrimStart(',');
+                        This.TotalHashrate.Text = RO.Hasrates.Sum().ToString().Replace(',', '.');
+                        This.TotalHashrate2.Text = RO.Hasrates.Sum().ToString().Replace(',', '.');
+                    },
+                    null);
+                });
+            }
+            if (RO.Indication != null) OMGworking = RO.Indication;
+            if (RO.Logging != null)
+            { MainContext.Send((object o) => This.MinerLog.AppendText(RO.Logging), null); }    
+            if (RO.Overclock != null)
+            {
+                Task.Run(() => 
+                {
+                    string[] MS = new string[5];
+
+                    foreach (int x in RO.Overclock?.MSI_PowerLimits)
+                    {
+                        MS[0] += ToNChar(x.ToString() + "%");
+                    }
+                    foreach (int x in RO.Overclock?.MSI_CoreClocks)
+                    {
+                        MS[1] += ToNChar(x.ToString());
+                    }
+                    foreach (int x in RO.Overclock?.MSI_MemoryClocks)
+                    {
+                        MS[2] += ToNChar(x.ToString());
+                    }
+                    foreach (uint x in RO.Overclock?.MSI_FanSpeeds)
+                    {
+                        MS[3] += ToNChar(x.ToString());
+                    }
+                    foreach (float x in RO.Overclock?.OHM_Temperatures)
+                    {
+                        MS[4] += ToNChar(x.ToString() + "°C");
+                    }
+
+                    for (int i = 0; i < MS.Length; i++)
+                    {
+                        MS[i] = MS[i] ?? "null";
+                    }
+
+                    MainContext.Send((object o) =>
+                    {
+                        This.GPUsPowerLimit.Text = " " + MS[0].TrimStart(',');
+                        This.GPUsCoreClock.Text = " " + MS[1].TrimStart(',');
+                        This.GPUsMemoryClocks.Text = " " + MS[2].TrimStart(',');
+                        This.GPUsFans.Text = " " + MS[3].TrimStart(',');
+                        This.GPUsTemps.Text = " " + MS[4].TrimStart(',');
+                        This.GPUsTemps2.Text = " " + MS[4].TrimStart(',');
+                    }, 
+                    null);
+                });
+            }
+            if (RO.Profile != null)
+            {
+                MainContext.Send((object o) =>
+                {
+                    This.RigName.Text = RO.Profile.RigName;
+                    This.AutoStart.IsChecked = RO.Profile.Autostart;
+                },
+                null);
+                
+
+            }
+        }
+        public static string ToNChar(string s)
+        {
+            string ext = "";
+            char[] ch = s.ToCharArray();
+            Queue<char> st = new Queue<char>();
+            for (int i = 0; i < Settings.GenSets.Digits - 1; i++)
+            { st.Enqueue(' '); }
+            for (int i = 0; i < Settings.GenSets.Digits - 1 && i < ch.Length; i++)
+            {
+                st.Enqueue(ch[i]);
+                st.Dequeue();
+            }
+            ch = st.ToArray();
+            for (int i = 0; i < Settings.GenSets.Digits - 1; i++)
+            { ext += ch[i]; }
+            return "," + ext.Replace(',', '.');
+        }
+        private void DigitsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Digits.Text = DigitsSlider.Value.ToString();
+            Settings.GenSets.Digits = Convert.ToInt32(DigitsSlider.Value);
+        }
+
+        private static bool? OMGworking;
+        private static void OMGindication()
+        {
+            Task.Run(() => 
+            {
+                OMGworking = false;
+                while (OMGworking != null)
+                {
+                    while (OMGworking == true)
+                    {
+                        MainContext.Send((object o) =>
+                        {
+                            This.IndicatorEl.Fill = Brushes.Lime;
+                            This.IndicatorEl2.Fill = Brushes.Lime;
+                        }, 
+                        null);
+                        Thread.Sleep(700);
+                        MainContext.Send((object o) =>
+                        {
+                            This.IndicatorEl.Fill = null;
+                            This.IndicatorEl2.Fill = null;
+                        }, 
+                        null);
+                        Thread.Sleep(300);
+                    }
+                    while (OMGworking == false)
+                    {
+                        MainContext.Send((object o) =>
+                        {
+                            This.IndicatorEl.Fill = Brushes.Red;
+                            This.IndicatorEl2.Fill = Brushes.Red;
+                        }, 
+                        null);
+                        Thread.Sleep(200);
+                    }
+                }
+            });
+        }
 
         #endregion
+
+        
     }
 }

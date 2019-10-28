@@ -89,8 +89,14 @@ namespace OMineWatcher.Managers
         #region GenSettings
         public class _GenSettings
         {
+            public _GenSettings()
+            {
+                Digits = 4;
+            }
+
             public string eWeLogin;
             public string eWePassword;
+            public int Digits;
         }
         #endregion
 

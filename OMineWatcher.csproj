@@ -76,7 +76,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Managers\Communication.cs" />
+    <Compile Include="Managers\OMG_TCP.cs" />
     <Compile Include="Managers\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
