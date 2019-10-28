@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -31,16 +32,34 @@ namespace OMineWatcher.Managers
                 OMGcontrolClient = new TcpClient(IP, 2112);
                 if (OMGcontrolClient.Connected) OMGcontrolReceived?.Invoke();
                 OMGcontrolStream = OMGcontrolClient.GetStream();
+
                 try
                 {
-                    RootObject RO;
+                    string[] result = new string[4];
                     if (OMGconnection)
                     {
-                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream));
-                        OMGsent?.Invoke(RO);
-                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream));
-                        RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
-                        OMGsent?.Invoke(RO);
+                        result[0] = OMGreadMSG(OMGcontrolStream); // Profile
+                        result[1] = OMGreadMSG(OMGcontrolStream); // Algoritms
+                        result[2] = OMGreadMSG(OMGcontrolStream); // Miners
+                        result[3] = OMGreadMSG(OMGcontrolStream); // Log
+
+                        Task.Run(() =>
+                        {
+                            RootObject RO;
+
+                            RO = JsonConvert.DeserializeObject<RootObject>(result[2]);
+                            OMGsent?.Invoke(RO);
+
+                            RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
+                            OMGsent?.Invoke(RO);
+
+                            RO = JsonConvert.DeserializeObject<RootObject>(result[0]);
+                            OMGsent?.Invoke(RO);
+
+                            RO = JsonConvert.DeserializeObject<RootObject>(result[3]);
+                            RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
+                            OMGsent?.Invoke(RO);
+                        });
                     }
                     else { OMGcontrolLost?.Invoke(); }
                 }
@@ -84,7 +103,7 @@ namespace OMineWatcher.Managers
         private static object key = new object();
 
         // обратная связь
-        public static void SendAction(object body, msgType type)
+        public static void SendAction(Profile prof)
         {
             if (OMGcontrolClient != null)
             {
@@ -92,14 +111,8 @@ namespace OMineWatcher.Managers
                 {
                     lock (key)
                     {
-                        string header = "";
-                        switch (type)
-                        {
-                            case msgType.Hasrates: header = "Profile"; break;
-                            case msgType.Overclock: header = "Log"; break;
-                        }
-
-                        string msg = $"{{\"{header}\":{JsonConvert.SerializeObject(body)}}}";
+                        string header = "prof";
+                        string msg = $"{{\"{header}\":{JsonConvert.SerializeObject(prof)}}}";
 
                         byte[] Message = Encoding.Default.GetBytes(msg);
                         byte[] Header = BitConverter.GetBytes(Message.Length);
@@ -114,14 +127,6 @@ namespace OMineWatcher.Managers
                 }
             }
         }
-        public enum msgType
-        {
-            Hasrates,
-            Overclock,
-            Indication,
-            Logging,
-            SaveProfile
-        }
         #endregion
 
         #region JSON classes
@@ -132,25 +137,27 @@ namespace OMineWatcher.Managers
             public string Logging { get; set; }
             public double[] Hasrates { get; set; }
             public bool? Indication { get; set; }
-        }
+            public string[] Miners { get; set; }
+            public Dictionary<string, int[]> Algoritms { get; set; }
+    }
 
         #region Profile
         public class Profile
         {
             public string RigName;
-            public bool Autostart;
+            public bool? Autostart;
             public long? StartedID;
             public string StartedProcess;
-            public int Digits;
+            public int? Digits;
             public bool[] GPUsSwitch;
             public List<Config> ConfigsList;
             public List<Overclock> ClocksList;
             public InformManager Informer;
-            public double LogTextSize;
+            public double? LogTextSize;
 
-            public int TimeoutWachdog;
-            public int TimeoutIdle;
-            public int TimeoutLH;
+            public int? TimeoutWachdog;
+            public int? TimeoutIdle;
+            public int? TimeoutLH;
         }
         public class Config
         {

@@ -13,7 +13,6 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-
             ConnectToOMG("127.0.0.1");
 
             Console.ReadLine();
@@ -28,6 +27,24 @@ namespace TestConsole
             {
                 OMGcontrolClient = new TcpClient(IP, 2112);
                 OMGcontrolStream = OMGcontrolClient.GetStream();
+
+                while (OMGcontrolClient.Connected)
+                {
+                    try
+                    {
+                        OMGreadMSG(OMGcontrolStream);
+                        OMGreadMSG(OMGcontrolStream);
+                        OMGreadMSG(OMGcontrolStream);
+                        OMGreadMSG(OMGcontrolStream);
+
+                        //обработка лога
+                    }
+                    catch { }
+                    Thread.Sleep(50);
+                }
+
+
+
                 try
                 {
                     Profile profile = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(OMGcontrolStream)).Profile;
@@ -63,12 +80,19 @@ namespace TestConsole
         {
             byte[] msg = new byte[4];
             stream.Read(msg, 0, msg.Length);
+
+            Console.WriteLine("||" + BitConverter.ToInt32(msg, 0).ToString() + "||" + Environment.NewLine);
+
+
             int MSGlength = BitConverter.ToInt32(msg, 0);
 
             stream.Write(new byte[] { 1 }, 0, 1);
-            
+
             msg = new byte[MSGlength];
             int count = stream.Read(msg, 0, msg.Length);
+
+            Console.WriteLine("||" + Encoding.Default.GetString(msg, 0, count) + "||" + Environment.NewLine);
+
             return Encoding.Default.GetString(msg, 0, count);
         }
         private static object key = new object();
