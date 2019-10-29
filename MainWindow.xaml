@@ -1067,7 +1067,7 @@
                                             <TextBlock Grid.Column="0" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5" FontSize="14" HorizontalAlignment="Right">Алгоритм:</TextBlock>
                                             <ComboBox Grid.Column="1" x:Name="Algotitm" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></ComboBox>
                                             <TextBlock Grid.Column="2" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14">Майнер:</TextBlock>
-                                            <ComboBox Grid.Column="3" x:Name="Miner" Margin="3" FontSize="14" FontWeight="Bold" IsEnabled="False" VerticalContentAlignment="Center"></ComboBox>
+                                            <ComboBox Grid.Column="3" x:Name="Miner" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></ComboBox>
                                             <TextBlock Grid.Column="4" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" Margin="5,5,5,5" FontSize="14" HorizontalAlignment="Right">Мин. хешрет:</TextBlock>
                                             <TextBox Grid.Column="5" x:Name="MinHashrate" Margin="3" FontSize="14" FontWeight="Bold" VerticalContentAlignment="Center"></TextBox>
                                         </Grid>
@@ -1117,9 +1117,9 @@
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
-                                                <Button x:Name="MinuClock" Grid.Column="0" Margin="2,0,0,2" Content="-"/>
+                                                <Button x:Name="MinusClock" Grid.Column="0" Margin="2,0,0,2" Content="-"/>
                                                 <Button x:Name="PlusClock" Grid.Column="1" Margin="0,0,0,2" Content="+"/>
-                                                <Button x:Name="SaveClockx" Grid.Column="2" Margin="0,0,0,2" Content="save"/>
+                                                <Button x:Name="SaveClock" Grid.Column="2" Margin="0,0,0,2" Content="save"/>
                                                 <Button x:Name="ApplyClock" Grid.Column="3" Margin="0,0,2,2" Content="apply"/>
                                             </Grid>
                                         </Grid>
@@ -1228,7 +1228,7 @@
                                             <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TotalHashrate" FontSize="12" Foreground="White" Margin="15,3,3,3" FontFamily="Consolas" Padding="0"></TextBlock>
                                             <WrapPanel Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right">
                                                 <TextBlock FontSize="12" VerticalAlignment="Center" Foreground="White">количество цифр:</TextBlock>
-                                                <Slider x:Name="DigitsSlider" Width="80" VerticalAlignment="Center" Margin="3" Minimum="4" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                                                <Slider x:Name="DigitsSlider" Width="80" VerticalAlignment="Center" Margin="3" Minimum="5" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"/>
                                                 <TextBlock x:Name="Digits" FontSize="12" VerticalAlignment="Center" Foreground="White" Text="50" Margin="0,0,15,0"/>
                                                 <TextBlock Foreground="White" Margin="5" FontSize="12">Тест:</TextBlock>
                                                 <Button x:Name="KillProcess2" FontSize="12">Запустить процесс</Button>
@@ -1266,10 +1266,26 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <WrapPanel Grid.Row="0" Grid.ColumnSpan="3">
-                                            <TextBlock x:Name="WachdogINFO" Foreground="Yellow" Background="Black" Margin="0,0,5,0" FontWeight="Bold" Text="" Visibility="Collapsed"/>
-                                            <TextBlock x:Name="LowHWachdog" Foreground="Red" Background="Black" Margin="0,0,5,0" FontWeight="Bold" Text="" Visibility="Collapsed"/>
-                                            <TextBlock x:Name="IdleWachdog" Foreground="Red" Background="Black" Margin="0,0,5,0" FontWeight="Bold" Text="" Visibility="Collapsed"/>
-                                            <TextBlock x:Name="ShowMLogTB" Foreground="Yellow" Background="Black" Margin="0,0,5,0" FontWeight="Bold" Text="" Visibility="Collapsed"/>
+                                            <TextBlock x:Name="WachdogINFO" Foreground="Yellow" Background="#20000000" Margin="0,0,5,0" FontWeight="Bold" Text="WachdogINFO" Visibility="Collapsed">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect BlurRadius="7" Color="Black" Opacity="1" ShadowDepth="0"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                            <TextBlock x:Name="LowHWachdog" Foreground="Red" Background="#20000000" Margin="0,0,5,0" FontWeight="Bold" Text="LowHWachdog" Visibility="Collapsed">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect BlurRadius="7" Color="Black" Opacity="1" ShadowDepth="0"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                            <TextBlock x:Name="IdleWachdog" Foreground="Red" Background="#20000000" Margin="0,0,5,0" FontWeight="Bold" Text="IdleWachdog" Visibility="Collapsed">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect BlurRadius="7" Color="Black" Opacity="1" ShadowDepth="0"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                            <TextBlock x:Name="ShowMLogTB" Foreground="Yellow" Background="#20000000" Margin="0,0,5,0" FontWeight="Bold" Text="ShowMLogTB" Visibility="Collapsed">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect BlurRadius="7" Color="Black" Opacity="1" ShadowDepth="0"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
                                         </WrapPanel>
                                         <TextBlock Grid.Row="1" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="3">Hashrate:</TextBlock>
                                         <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" x:Name="GPUsHashrate2" Foreground="White" Margin="5,3,3,3" FontFamily="Consolas"></TextBlock>

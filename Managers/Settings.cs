@@ -91,12 +91,14 @@ namespace OMineWatcher.Managers
         {
             public _GenSettings()
             {
-                Digits = 4;
+                Digits = 5;
+                LogTextSize = 12;
             }
 
             public string eWeLogin;
             public string eWePassword;
             public int Digits;
+            public int LogTextSize;
         }
         #endregion
 

@@ -103,29 +103,51 @@ namespace OMineWatcher.Managers
         private static object key = new object();
 
         // обратная связь
-        public static void SendAction(Profile prof)
+        public static void SendMSG(object body, MSGtype type)
         {
-            if (OMGcontrolClient != null)
+            Task.Run(() =>
             {
-                if (OMGcontrolClient.Connected)
+                if (OMGcontrolClient != null)
                 {
-                    lock (key)
+                    if (OMGcontrolClient.Connected)
                     {
-                        string header = "prof";
-                        string msg = $"{{\"{header}\":{JsonConvert.SerializeObject(prof)}}}";
+                        lock (key)
+                        {
+                            string header = "";
+                            switch (type)
+                            {
+                                case MSGtype.Profile: header = "Profile"; break;
+                                case MSGtype.RunConfig: header = "RunConfig"; break;
+                                case MSGtype.ApplyClock: header = "ApplyClock"; break;
+                                case MSGtype.StartProcess: header = "StartProcess"; break;
+                                case MSGtype.KillProcess: header = "KillProcess"; break;
+                                case MSGtype.ShowMinerLog: header = "ShowMinerLog"; break;
+                            }
 
-                        byte[] Message = Encoding.Default.GetBytes(msg);
-                        byte[] Header = BitConverter.GetBytes(Message.Length);
+                            string msg = $"{{\"{header}\":{JsonConvert.SerializeObject(body)}}}";
 
-                        OMGcontrolStream.Write(Header, 0, Header.Length);
+                            byte[] Message = Encoding.Default.GetBytes(msg);
+                            byte[] Header = BitConverter.GetBytes(Message.Length);
 
-                        byte[] b = new byte[1];
-                        OMGcontrolStream.Read(b, 0, b.Length);
+                            OMGcontrolStream.Write(Header, 0, Header.Length);
 
-                        OMGcontrolStream.Write(Message, 0, Message.Length);
+                            byte[] b = new byte[1];
+                            OMGcontrolStream.Read(b, 0, b.Length);
+
+                            OMGcontrolStream.Write(Message, 0, Message.Length);
+                        }
                     }
                 }
-            }
+            });
+        }
+        public enum MSGtype
+        {
+            Profile,
+            RunConfig,
+            ApplyClock,
+            StartProcess,
+            KillProcess,
+            ShowMinerLog
         }
         #endregion
 
@@ -137,9 +159,13 @@ namespace OMineWatcher.Managers
             public string Logging { get; set; }
             public double[] Hasrates { get; set; }
             public bool? Indication { get; set; }
-            public string[] Miners { get; set; }
+            public List<string> Miners { get; set; }
             public Dictionary<string, int[]> Algoritms { get; set; }
-    }
+            public string WachdogInfo { get; set; }
+            public string LowHWachdog { get; set; }
+            public string IdleWachdog { get; set; }
+            public string ShowMLogTB { get; set; }
+        }
 
         #region Profile
         public class Profile
@@ -163,7 +189,7 @@ namespace OMineWatcher.Managers
         {
             public string Name;
             public string Algoritm;
-            public Miners? Miner;
+            public int? Miner;
             public string Pool;
             public string Port;
             public string Wallet;
@@ -172,19 +198,13 @@ namespace OMineWatcher.Managers
             public double MinHashrate;
             public long ID;
         }
-        public enum Miners
-        {
-            Claymore,
-            Gminer,
-            Bminer
-        }
         public class Overclock
         {
             public string Name;
             public int[] PowLim;
             public int[] CoreClock;
             public int[] MemoryClock;
-            public uint[] FanSpeed;
+            public int[] FanSpeed;
             public long ID;
         }
         public class InformManager
