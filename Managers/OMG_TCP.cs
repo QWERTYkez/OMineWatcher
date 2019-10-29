@@ -29,7 +29,12 @@ namespace OMineWatcher.Managers
             OMGconnection = true;
             Task.Run(() =>
             {
-                OMGcontrolClient = new TcpClient(IP, 2112);
+                try
+                {
+                    OMGcontrolClient = new TcpClient(IP, 2112);
+                }
+                catch { OMGconnection = false; return; }
+
                 if (OMGcontrolClient.Connected) OMGcontrolReceived?.Invoke();
                 OMGcontrolStream = OMGcontrolClient.GetStream();
 
@@ -46,19 +51,32 @@ namespace OMineWatcher.Managers
                         Task.Run(() =>
                         {
                             RootObject RO;
-
-                            RO = JsonConvert.DeserializeObject<RootObject>(result[2]);
-                            OMGsent?.Invoke(RO);
-
-                            RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
-                            OMGsent?.Invoke(RO);
-
-                            RO = JsonConvert.DeserializeObject<RootObject>(result[0]);
-                            OMGsent?.Invoke(RO);
-
-                            RO = JsonConvert.DeserializeObject<RootObject>(result[3]);
-                            RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
-                            OMGsent?.Invoke(RO);
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<RootObject>(result[2]);
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = new RootObject();
+                                RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<RootObject>(result[0]);
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<RootObject>(result[3]);
+                                RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
                         });
                     }
                     else { OMGcontrolLost?.Invoke(); }
@@ -67,24 +85,28 @@ namespace OMineWatcher.Managers
 
                 Task.Run(() =>
                 {
-                    using (TcpClient client = new TcpClient(IP, 2113))
+                    try
                     {
-                        using (NetworkStream stream = client.GetStream())
+                        using (TcpClient client = new TcpClient(IP, 2113))
                         {
-                            RootObject RO;
-                            while (client.Connected && OMGconnection)
+                            using (NetworkStream stream = client.GetStream())
                             {
-                                try
+                                RootObject RO;
+                                while (client.Connected && OMGconnection)
                                 {
-                                    RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
-                                    OMGsent?.Invoke(RO);
+                                    try
+                                    {
+                                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                        OMGsent?.Invoke(RO);
+                                    }
+                                    catch { }
+                                    Thread.Sleep(50);
                                 }
-                                catch { }
-                                Thread.Sleep(50);
+                                OMGcontrolLost?.Invoke();
                             }
-                            OMGcontrolLost?.Invoke();
                         }
                     }
+                    catch { OMGcontrolLost?.Invoke(); }
                 });
             });
         }

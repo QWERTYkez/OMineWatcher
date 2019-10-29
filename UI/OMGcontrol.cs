@@ -107,6 +107,17 @@ namespace OMineWatcher
                 This.KillProcess.Click -= KillProcess_Click;
                 This.KillProcess2.Click -= KillProcess_Click;
                 This.ShowMinerLog.Click -= ShowMinerLog_Click;
+
+                This.GPUsPowerLimit.Text = "";
+                This.GPUsCoreClock.Text = "";
+                This.GPUsMemoryClocks.Text = "";
+                This.GPUsFans.Text = "";
+                This.GPUsHashrate.Text = "";
+                This.GPUsHashrate2.Text = "";
+                This.GPUsTemps.Text = "";
+                This.GPUsTemps2.Text = "";
+                This.TotalHashrate.Text = "";
+                This.TotalHashrate2.Text = "";
             },
             null);
         }
@@ -169,11 +180,13 @@ namespace OMineWatcher
                     {
                         MS[3] += ToNChar(x.ToString());
                     }
-                    foreach (float x in RO.Overclock?.OHM_Temperatures)
+                    if (RO.Overclock?.OHM_Temperatures[0] != null)
                     {
-                        MS[4] += ToNChar(x.ToString() + "°C");
+                        foreach (float x in RO.Overclock?.OHM_Temperatures)
+                        {
+                            MS[4] += ToNChar(x.ToString() + "°C");
+                        }
                     }
-
                     for (int i = 0; i < MS.Length; i++)
                     {
                         MS[i] = MS[i] ?? "null";
