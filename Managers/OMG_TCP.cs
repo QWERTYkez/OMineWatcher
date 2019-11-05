@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OMineWatcher.Managers
 {
-    class OMG_TCP
+    public class OMG_TCP
     {
         #region OMGcontrol
         public static event Action OMGcontrolLost;
@@ -26,6 +26,7 @@ namespace OMineWatcher.Managers
         private static NetworkStream OMGcontrolStream;
         public static void ConnectToOMG(string IP)
         {
+            if (OMGconnection) return;
             OMGconnection = true;
             Task.Run(() =>
             {
@@ -193,11 +194,11 @@ namespace OMineWatcher.Managers
         public class Profile
         {
             public string RigName;
-            public bool? Autostart;
+            public bool Autostart;
             public long? StartedID;
             public string StartedProcess;
             public int? Digits;
-            public bool[] GPUsSwitch;
+            public List<bool> GPUsSwitch;
             public List<Config> ConfigsList;
             public List<Overclock> ClocksList;
             public InformManager Informer;
@@ -209,6 +210,17 @@ namespace OMineWatcher.Managers
         }
         public class Config
         {
+            public Config()
+            {
+                Name = "Новый конфиг";
+                Algoritm = "";
+                Pool = "";
+                Wallet = "";
+                Params = "";
+                MinHashrate = 0;
+                ID = DateTime.UtcNow.ToBinary();
+            }
+
             public string Name;
             public string Algoritm;
             public int? Miner;
@@ -222,6 +234,12 @@ namespace OMineWatcher.Managers
         }
         public class Overclock
         {
+            public Overclock()
+            {
+                Name = "Новый разгон";
+                ID = DateTime.UtcNow.ToBinary();
+            }
+
             public string Name;
             public int[] PowLim;
             public int[] CoreClock;

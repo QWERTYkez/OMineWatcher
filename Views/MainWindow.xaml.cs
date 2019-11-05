@@ -12,11 +12,11 @@ using OMineWatcher.Managers;
 using System.Windows.Media.Effects;
 using System.Net.NetworkInformation;
 using eWeLink.API;
+using OMineWatcher.Styles;
 
 
 namespace OMineWatcher
 {
-    public class Tumbler : CheckBox { }
     public partial class MainWindow : Window
     {
         public static SynchronizationContext MainContext = SynchronizationContext.Current;
@@ -33,7 +33,7 @@ namespace OMineWatcher
         {
             InitializeRigsSettings();
             InitializeeWeLink();
-            InitializeOMGcontrol();
+            //InitializeOMGcontrol();
 
         }
 
@@ -133,9 +133,9 @@ namespace OMineWatcher
             RigsListBox.ItemsSource = (from x in Settings.Rigs select x.Name).ToList();
             SelectRig(null, null);
             RigType.ItemsSource = new string[] { "OMineGuard", "HiveOS" };
-            GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
-                "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
-            SelectRigType(null, null);
+            //GPUsCB.ItemsSource = new string[] { "Auto", "1", "2", "3", "4", "5",
+            //    "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
+            //SelectRigType(null, null);
         }
 
         private void PlusRig(object sender, RoutedEventArgs e)
@@ -239,42 +239,42 @@ namespace OMineWatcher
             }
         }
 
-        private void SelectRigType(object sender, SelectionChangedEventArgs e)
-        {
-            switch (RigType.SelectedItem)
-            {
-                case "OMineGuard":
-                    OMGtabitem1.Visibility = Visibility.Visible;
-                    OMGtabitem2.Visibility = Visibility.Visible;
-                    OMGtabitem3.Visibility = Visibility.Visible;
-                    OMGtabitem4.Visibility = Visibility.Visible;
+        //private void SelectRigType(object sender, SelectionChangedEventArgs e)
+        //{
+        //    switch (RigType.SelectedItem)
+        //    {
+        //        case "OMineGuard":
+        //            OMGtabitem1.Visibility = Visibility.Visible;
+        //            OMGtabitem2.Visibility = Visibility.Visible;
+        //            OMGtabitem3.Visibility = Visibility.Visible;
+        //            OMGtabitem4.Visibility = Visibility.Visible;
 
-                    OMGtabitem1.IsEnabled = false;
-                    OMGtabitem2.IsEnabled = false;
-                    OMGtabitem3.IsEnabled = false;
-                    OMGtabitem4.IsEnabled = false;
+        //            OMGtabitem1.IsEnabled = false;
+        //            OMGtabitem2.IsEnabled = false;
+        //            OMGtabitem3.IsEnabled = false;
+        //            OMGtabitem4.IsEnabled = false;
                     
-                    OMGconnect.Visibility = Visibility.Visible;
-                    OMGconnect.Content = "Подключиться";
-                    break;
-                case "HiveOS":
-                    OMGtabitem1.Visibility = Visibility.Collapsed;
-                    OMGtabitem2.Visibility = Visibility.Collapsed;
-                    OMGtabitem3.Visibility = Visibility.Collapsed;
-                    OMGtabitem4.Visibility = Visibility.Collapsed;
+        //            OMGconnect.Visibility = Visibility.Visible;
+        //            OMGconnect.Content = "Подключиться";
+        //            break;
+        //        case "HiveOS":
+        //            OMGtabitem1.Visibility = Visibility.Collapsed;
+        //            OMGtabitem2.Visibility = Visibility.Collapsed;
+        //            OMGtabitem3.Visibility = Visibility.Collapsed;
+        //            OMGtabitem4.Visibility = Visibility.Collapsed;
 
-                    OMGconnect.Visibility = Visibility.Collapsed;
-                    break;
-                default:
-                    OMGtabitem1.Visibility = Visibility.Collapsed;
-                    OMGtabitem2.Visibility = Visibility.Collapsed;
-                    OMGtabitem3.Visibility = Visibility.Collapsed;
-                    OMGtabitem4.Visibility = Visibility.Collapsed;
+        //            OMGconnect.Visibility = Visibility.Collapsed;
+        //            break;
+        //        default:
+        //            OMGtabitem1.Visibility = Visibility.Collapsed;
+        //            OMGtabitem2.Visibility = Visibility.Collapsed;
+        //            OMGtabitem3.Visibility = Visibility.Collapsed;
+        //            OMGtabitem4.Visibility = Visibility.Collapsed;
 
-                    OMGconnect.Visibility = Visibility.Collapsed;
-                    break;
-            }
-        }
+        //            OMGconnect.Visibility = Visibility.Collapsed;
+        //            break;
+        //    }
+        //}
         #endregion
 
         #region Базовые настройки
@@ -312,22 +312,22 @@ namespace OMineWatcher
         #region eWeLink
         private async void eWeLinkConnect(object sender, RoutedEventArgs e)
         {
-            eWeAccountState.Text = "Подключение";
+            eWeAccountState.Content = "Подключение";
             string login = eWeLoginBox.Text;
             string pass = eWePasswordBox.Password;
             if (await Task.Run(() => eWeLinkClient.AutheWeLink(login, pass)))
             {
                 Settings.GenSets.eWeLogin = login;
                 Settings.GenSets.eWePassword = pass;
-                eWeAccountState.Text = "Аккаунт подключен";
+                eWeAccountState.Content = "Аккаунт подключен";
             }
             else
             {
                 Settings.GenSets.eWeLogin = null;
                 Settings.GenSets.eWePassword = null;
-                eWeAccountState.Text = "Ошибка";
+                eWeAccountState.Content = "Ошибка";
                 await Task.Run(() => Thread.Sleep(2000));
-                eWeAccountState.Text = "Аккаунт не подключен";
+                eWeAccountState.Content = "Аккаунт не подключен";
             }
         }
         private void eWeLinkDisconnect(object sender, RoutedEventArgs e)
@@ -336,7 +336,7 @@ namespace OMineWatcher
             Settings.GenSets.eWePassword = null;
             eWeLoginBox.Text = "";
             eWePasswordBox.Password = "";
-            eWeAccountState.Text = "Аккаунт не подключен";
+            eWeAccountState.Content = "Аккаунт не подключен";
         }
         private async void InitializeeWeLink()
         {
@@ -345,7 +345,7 @@ namespace OMineWatcher
                 eWeLinkClient.SetAuth(Settings.GenSets.eWeLogin, Settings.GenSets.eWePassword);
                 eWeLoginBox.Text = Settings.GenSets.eWeLogin;
                 eWePasswordBox.Password = Settings.GenSets.eWePassword;
-                eWeAccountState.Text = "Аккаунт подключен";
+                eWeAccountState.Content = "Аккаунт подключен";
 
                 List<_eWelinkDevice> LE = await Task.Run(() => eWeLinkClient.GetDevices());
                 List<string> LST = (from x in LE select x.name).ToList();
