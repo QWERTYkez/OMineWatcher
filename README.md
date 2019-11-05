@@ -10,4 +10,4 @@
 
 ![Image alt](https://raw.githubusercontent.com/QWERTYkez/OMineWatcher/master/images/3.PNG)
 
-На данный момент находится в стадии разработки интерфейса.
+На данный момент реализовано подключение к [OMineGuard](https://github.com/QWERTYkez/OMineGuard) програмам для тонкой настройки.
