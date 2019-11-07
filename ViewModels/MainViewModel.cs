@@ -42,5 +42,7 @@ namespace OMineWatcher.ViewModels
         public string OmgConnectButtonName { get; set; } = "Подключиться";
         public RelayCommand OMGSwitchConnect { get; set; }
 
+
+
     }
 }

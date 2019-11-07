@@ -74,12 +74,12 @@
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Models\OmgModel.cs" />
     <Compile Include="Styles\Converters.xaml.cs" />
+    <Compile Include="Styles\RichTextBoxHelper.cs" />
     <Compile Include="Styles\Tumbler.xaml.cs">
       <DependentUpon>Tumbler.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\OMGcontrol.cs" />
-    <Compile Include="ViewModels\OmgViewModels.cs" />
-    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\OmgViewModel.cs" />
+    <Compile Include="ViewModels\_RelayCommand.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\OmgView.xaml.cs">
       <DependentUpon>OmgView.xaml</DependentUpon>

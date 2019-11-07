@@ -4,5 +4,10 @@
     xmlns:local="clr-namespace:OMineWatcher.Styles">
 
     <local:ObjectExistToVisibilityConverter x:Key="ObjectExistToVisibilityConverter" />
+    <local:SelectedIndexToboolConverter x:Key="SelectedIndexToboolConverter" />
+    <local:ObjectExistToBoolConverter x:Key="ObjectExistToBoolConverter" />
+    <local:ListIntExistToBool x:Key="ListIntExistToBool" />
+    <local:TextToVisibilityConverter x:Key="TextToVisibilityConverter" />
+    <local:FlowDocumentConverter x:Key="FlowDocumentConverter" />
 
 </ResourceDictionary>

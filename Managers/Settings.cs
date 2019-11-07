@@ -93,12 +93,14 @@ namespace OMineWatcher.Managers
             {
                 Digits = 5;
                 LogTextSize = 12;
+                LogAutoscroll = true;
             }
 
             public string eWeLogin;
             public string eWePassword;
             public int Digits;
             public int LogTextSize;
+            public bool LogAutoscroll;
         }
         #endregion
 

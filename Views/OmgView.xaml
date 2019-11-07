@@ -8,11 +8,11 @@
     xmlns:local="clr-namespace:OMineWatcher.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:OMineWatcher.ViewModels"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="500"
+    d:DesignWidth="1100"
     mc:Ignorable="d">
     <UserControl.DataContext>
-        <vm:OmgViewModels />
+        <vm:OmgViewModel />
     </UserControl.DataContext>
     <TabControl>
         <TabItem Header="Конфигурации майнинга">
@@ -31,6 +31,7 @@
                         Margin="0,0,5,0"
                         VerticalAlignment="Center"
                         Content="Автозапуск:"
+                        FontSize="14"
                         Foreground="White" />
                     <Styles:Tumbler
                         Margin="0,0,5,0"
@@ -131,7 +132,7 @@
                                 Grid.ColumnSpan="2"
                                 Margin="2"
                                 ItemsSource="{Binding ConfigsNames}"
-                                SelectedIndex="{Binding SelectedConfigIndex}">
+                                SelectedIndex="{Binding SelectedConfigIndex, Mode=TwoWay}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding SelectConfig}" />
@@ -172,6 +173,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         Margin="5,5,5,5"
+                        HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         FontSize="14"
                         Foreground="White">
@@ -184,6 +186,7 @@
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         Text="{Binding ConfigName}" />
                     <Label
                         Grid.Row="0"
@@ -202,36 +205,41 @@
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         ItemsSource="{Binding ConfigOverclocks}"
                         SelectedIndex="{Binding ConfigSelectedOverclockIndex, Mode=TwoWay}"
                         SelectedItem="{Binding ConfigSelectedOcerclockItem}" />
-                    <Grid
+
+
+                    <Label
                         Grid.Row="1"
                         Grid.Column="1"
+                        Margin="5,5,5,5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="White">
+                        Алгоритм:
+                    </Label>
+                    <Grid
+                        Grid.Row="1"
+                        Grid.Column="2"
                         Grid.ColumnSpan="4">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="75" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="70" />
                         </Grid.ColumnDefinitions>
-                        <Label
-                            Grid.Column="0"
-                            Margin="5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            Foreground="White">
-                            Алгоритм:
-                        </Label>
+
                         <ComboBox
-                            Grid.Column="1"
+                            Grid.Column="0"
                             Margin="3"
                             VerticalContentAlignment="Center"
                             FontSize="14"
                             FontWeight="Bold"
+                            IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                             ItemsSource="{Binding Algoritms}"
                             SelectedIndex="{Binding SelectedAlgoritmIndex, Mode=TwoWay}"
                             SelectedItem="{Binding SelectedAlgoritmItem}">
@@ -242,7 +250,7 @@
                             </i:Interaction.Triggers>
                         </ComboBox>
                         <Label
-                            Grid.Column="2"
+                            Grid.Column="1"
                             Margin="5,5,5,5"
                             VerticalAlignment="Center"
                             FontSize="14"
@@ -250,16 +258,17 @@
                             Майнер:
                         </Label>
                         <ComboBox
-                            Grid.Column="3"
+                            Grid.Column="2"
                             Margin="3"
                             VerticalContentAlignment="Center"
                             FontSize="14"
                             FontWeight="Bold"
+                            IsEnabled="{Binding SelectedAlgoritmIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                             ItemsSource="{Binding Miners}"
                             SelectedIndex="{Binding SelectedMinerIndex, Mode=TwoWay}"
                             SelectedItem="{Binding SelectedMinerItem}" />
                         <Label
-                            Grid.Column="4"
+                            Grid.Column="3"
                             Margin="5,5,5,5"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
@@ -268,11 +277,12 @@
                             Мин. хешрет:
                         </Label>
                         <TextBox
-                            Grid.Column="5"
+                            Grid.Column="4"
                             Margin="3"
                             VerticalContentAlignment="Center"
                             FontSize="14"
                             FontWeight="Bold"
+                            IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                             Text="{Binding MinHashrate, Mode=TwoWay}" />
                     </Grid>
                     <Label
@@ -292,6 +302,7 @@
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         Text="{Binding Pool, Mode=TwoWay}" />
                     <Label
                         Grid.Row="2"
@@ -310,6 +321,7 @@
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         Text="{Binding Port, Mode=TwoWay}" />
                     <Label
                         Grid.Row="3"
@@ -329,6 +341,7 @@
                         VerticalContentAlignment="Center"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         Text="{Binding Wallet, Mode=TwoWay}" />
                     <Label
                         Grid.Row="4"
@@ -348,15 +361,12 @@
                         Margin="3"
                         FontSize="14"
                         FontWeight="Bold"
+                        IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
                         Text="{Binding Params, Mode=TwoWay}"
                         TextWrapping="Wrap" />
                 </Grid>
             </Grid>
         </TabItem>
-
-
-
-
 
         <TabItem x:Name="OMGtabitem2" Header="Разгон (MSI Afterburner)">
             <Grid Margin="5">
@@ -366,18 +376,15 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <GroupBox
                     Grid.RowSpan="20"
                     Grid.Column="0"
                     Width="250"
                     Margin="0,0,10,0"
+                    VerticalAlignment="Stretch"
                     FontSize="16"
                     Header="Список конфигураций:">
                     <Grid>
@@ -389,7 +396,15 @@
                         <ListBox
                             x:Name="ClocksList"
                             Grid.Row="1"
-                            Margin="2" />
+                            Margin="2"
+                            ItemsSource="{Binding OverclocksNames}"
+                            SelectedIndex="{Binding SelectedOverclockIndex, Mode=TwoWay}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding SelectOverclock}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ListBox>
                         <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
@@ -398,28 +413,29 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Button
-                                x:Name="MinusClock"
                                 Grid.Column="0"
                                 Margin="2,0,0,2"
+                                Command="{Binding MinusOverclock}"
                                 Content="-" />
                             <Button
-                                x:Name="PlusClock"
                                 Grid.Column="1"
                                 Margin="0,0,0,2"
+                                Command="{Binding PlusOverclock}"
                                 Content="+" />
                             <Button
-                                x:Name="SaveClock"
                                 Grid.Column="2"
                                 Margin="0,0,0,2"
+                                Command="{Binding SaveOverclock}"
                                 Content="save" />
                             <Button
-                                x:Name="ApplyClock"
                                 Grid.Column="3"
                                 Margin="0,0,2,2"
+                                Command="{Binding ApplyOverclock}"
                                 Content="apply" />
                         </Grid>
                     </Grid>
                 </GroupBox>
+
                 <Border
                     Grid.Row="0"
                     Grid.Column="1"
@@ -429,96 +445,246 @@
                     BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="97" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Label
                             Grid.Column="0"
-                            Margin="5"
+                            Margin="2"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            FontSize="12"
+                            FontSize="16"
                             Foreground="White">
                             Название:
                         </Label>
                         <TextBox
-                            x:Name="ClockName"
                             Grid.Column="1"
                             Margin="3"
-                            FontSize="12"
+                            VerticalAlignment="Center"
+                            FontSize="18"
                             FontWeight="Bold"
-                            IsEnabled="False" />
+                            IsEnabled="{Binding OverclockName, Converter={StaticResource ObjectExistToBoolConverter}}"
+                            Text="{Binding OverclockName}" />
                     </Grid>
                 </Border>
+
                 <Border
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="-1"
                     Padding="3"
+                    VerticalAlignment="Top"
                     BorderBrush="{StaticResource MSI.Border}"
                     BorderThickness="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="97" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Label
-                            Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="0"
-                            Margin="5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            FontSize="12"
-                            Foreground="White">
-                            PowerLimit:
-                        </Label>
-                        <TextBox
-                            x:Name="PowLim"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            IsEnabled="False" />
-                        <Label
-                            x:Name="GPUsPowerLimit"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="5,0,0,0"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Margin="5"
-                            VerticalAlignment="Bottom"
-                            FontSize="12"
-                            Foreground="White">
-                            Auto
-                        </Label>
-                        <CheckBox
-                            x:Name="SwitcherPL"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            IsChecked="True"
-                            IsEnabled="False" />
-                    </Grid>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MinWidth="46" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" MinWidth="45" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" MinWidth="45" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" MinWidth="45" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" MinWidth="45" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="*" MinWidth="60" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="2" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Border
+                                Grid.Row="1"
+                                Grid.ColumnSpan="17"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="1"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="4"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="7"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="10"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="13"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="15"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1" />
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="GPU" />
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Grid.ColumnSpan="2"
+                                HorizontalAlignment="Center">
+                                <Label Content="Power Limit" />
+                                <Styles:Tumbler IsChecked="{Binding Path=PowerLimits, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding PowerLimitsOn}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding PowerLimitsOff}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Styles:Tumbler>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.Column="5"
+                                Grid.ColumnSpan="2"
+                                HorizontalAlignment="Center">
+                                <Label Content="Core Clock" />
+                                <Styles:Tumbler IsChecked="{Binding Path=CoreClocks, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding CoreClocksOn}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding CoreClocksOff}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Styles:Tumbler>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.Column="8"
+                                Grid.ColumnSpan="2"
+                                HorizontalAlignment="Center">
+                                <Label Content="Memory Clock" />
+                                <Styles:Tumbler IsChecked="{Binding Path=MemoryClocks, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding MemoryClocksOn}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding MemoryClocksOff}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Styles:Tumbler>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.Column="11"
+                                Grid.ColumnSpan="2"
+                                HorizontalAlignment="Center">
+                                <Label Content="Fan Speed" />
+                                <Styles:Tumbler IsChecked="{Binding Path=FanSpeeds, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked">
+                                            <i:InvokeCommandAction Command="{Binding FanSpeedsOn}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked">
+                                            <i:InvokeCommandAction Command="{Binding FanSpeedsOff}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Styles:Tumbler>
+                            </StackPanel>
+
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="14"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="Temp" />
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="16"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="Hashrate" />
+                            <StackPanel
+                                x:Name="GPUs"
+                                Grid.Row="2"
+                                Grid.Column="0" />
+                            <StackPanel
+                                x:Name="PowerLimits"
+                                Grid.Row="2"
+                                Grid.Column="2" />
+                            <StackPanel
+                                x:Name="InfPowerLimits"
+                                Grid.Row="2"
+                                Grid.Column="3" />
+                            <StackPanel
+                                x:Name="CoreClocks"
+                                Grid.Row="2"
+                                Grid.Column="5" />
+                            <StackPanel
+                                x:Name="InfCoreClocks"
+                                Grid.Row="2"
+                                Grid.Column="6" />
+                            <StackPanel
+                                x:Name="MemoryClocks"
+                                Grid.Row="2"
+                                Grid.Column="8" />
+                            <StackPanel
+                                x:Name="InfMemoryClocks"
+                                Grid.Row="2"
+                                Grid.Column="9" />
+                            <StackPanel
+                                x:Name="FanSpeeds"
+                                Grid.Row="2"
+                                Grid.Column="11" />
+                            <StackPanel
+                                x:Name="InfFanSpeeds"
+                                Grid.Row="2"
+                                Grid.Column="12" />
+                            <StackPanel
+                                x:Name="InfTemps"
+                                Grid.Row="2"
+                                Grid.Column="14" />
+                            <StackPanel
+                                x:Name="InfHashrates"
+                                Grid.Row="2"
+                                Grid.Column="16" />
+
+                        </Grid>
+                    </ScrollViewer>
+
                 </Border>
+
+
                 <Border
                     Grid.Row="2"
                     Grid.Column="1"
                     Margin="-1"
                     Padding="3"
+                    VerticalAlignment="Bottom"
                     BorderBrush="{StaticResource MSI.Border}"
                     BorderThickness="1">
                     <Grid>
@@ -527,292 +693,32 @@
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
                         <Label
-                            Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="0"
-                            Margin="5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            FontSize="12"
-                            Foreground="White">
-                            CoreClock:
-                        </Label>
-                        <TextBox
-                            x:Name="CoreClock"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            IsEnabled="False" />
-                        <Label
-                            x:Name="GPUsCoreClock"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="5,0,0,0"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Margin="5"
-                            VerticalAlignment="Bottom"
-                            FontSize="12"
-                            Foreground="White">
-                            Auto
-                        </Label>
-                        <CheckBox
-                            x:Name="SwitcherCC"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            IsChecked="True"
-                            IsEnabled="False" />
-                    </Grid>
-                </Border>
-                <Border
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Margin="-1"
-                    Padding="3"
-                    BorderBrush="{StaticResource MSI.Border}"
-                    BorderThickness="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="97" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Label
-                            Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="0"
-                            Margin="5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            FontSize="12"
-                            Foreground="White">
-                            MemoryClock:
-                        </Label>
-                        <TextBox
-                            x:Name="MemoryClock"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            IsEnabled="False" />
-                        <Label
-                            x:Name="GPUsMemoryClocks"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="5,0,0,0"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Margin="5"
-                            VerticalAlignment="Bottom"
-                            FontSize="12"
-                            Foreground="White">
-                            Auto
-                        </Label>
-                        <CheckBox
-                            x:Name="SwitcherMC"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            IsChecked="True"
-                            IsEnabled="False" />
-                    </Grid>
-                </Border>
-                <Border
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    Margin="-1"
-                    Padding="3"
-                    BorderBrush="{StaticResource MSI.Border}"
-                    BorderThickness="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="97" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Label
-                            Grid.Row="0"
-                            Grid.RowSpan="3"
-                            Grid.Column="0"
-                            Margin="5"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            FontSize="12"
-                            Foreground="White">
-                            FanSpeed:
-                        </Label>
-                        <TextBox
-                            x:Name="FanSpeed"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            IsEnabled="False" />
-                        <Label
-                            x:Name="GPUsFans"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="5,0,0,0"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Margin="5"
-                            VerticalAlignment="Bottom"
-                            FontSize="12"
-                            Foreground="White">
-                            Auto
-                        </Label>
-                        <CheckBox
-                            x:Name="SwitcherFS"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            IsChecked="True"
-                            IsEnabled="False" />
-                    </Grid>
-                </Border>
-                <Border
-                    Grid.Row="5"
-                    Grid.Column="1"
-                    Margin="-1"
-                    Padding="3"
-                    BorderBrush="{StaticResource MSI.Border}"
-                    BorderThickness="1">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="97" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label
-                            Grid.Row="0"
                             Grid.Column="0"
                             Margin="3"
                             HorizontalAlignment="Right"
-                            FontSize="12"
-                            Foreground="White">
-                            Hashrate:
-                        </Label>
-                        <Label
-                            x:Name="GPUsHashrate"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="2"
-                            Margin="5,3,3,3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Margin="3"
-                            HorizontalAlignment="Right"
-                            FontSize="12"
-                            Foreground="White">
-                            Temperature:
-                        </Label>
-                        <Label
-                            x:Name="GPUsTemps"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="2"
-                            Margin="5,3,3,3"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Foreground="White" />
-                        <Label
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Margin="3"
-                            HorizontalAlignment="Right"
-                            FontSize="12"
+                            FontSize="14"
                             Foreground="White">
                             Total Hashrate:
                         </Label>
                         <Label
-                            x:Name="TotalHashrate"
-                            Grid.Row="2"
                             Grid.Column="1"
                             Margin="15,3,3,3"
                             Padding="0"
+                            VerticalAlignment="Center"
+                            Content="{Binding TotalHashrate}"
+                            ContentStringFormat="0.000"
                             FontFamily="Consolas"
-                            FontSize="12"
+                            FontSize="14"
                             Foreground="White" />
                         <WrapPanel
-                            Grid.Row="2"
                             Grid.Column="2"
-                            HorizontalAlignment="Right">
-                            <Label
-                                VerticalAlignment="Center"
-                                FontSize="12"
-                                Foreground="White">
-                                количество цифр:
-                            </Label>
-                            <Slider
-                                x:Name="DigitsSlider"
-                                Width="80"
-                                Margin="3"
-                                VerticalAlignment="Center"
-                                IsSnapToTickEnabled="True"
-                                Maximum="10"
-                                Minimum="5"
-                                TickFrequency="1" />
-                            <Label
-                                x:Name="Digits"
-                                Margin="0,0,15,0"
-                                VerticalAlignment="Center"
-                                Content="50"
-                                FontSize="12"
-                                Foreground="White" />
-                            <Label
-                                Margin="5"
-                                FontSize="12"
-                                Foreground="White">
-                                Тест:
-                            </Label>
-                            <Button x:Name="KillProcess2" FontSize="12">Запустить процесс</Button>
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                            <Button
+                                Command="{Binding SwitchProcess}"
+                                Content="{Binding SwitchProcessButtonText}"
+                                FontSize="14" />
                             <Ellipse
                                 x:Name="IndicatorEl2"
                                 Width="15"
@@ -826,10 +732,6 @@
         </TabItem>
 
 
-
-
-
-
         <TabItem x:Name="OMGtabitem3" Header="Лог работы">
             <Grid>
                 <Grid.RowDefinitions>
@@ -838,7 +740,8 @@
                 </Grid.RowDefinitions>
                 <ScrollViewer x:Name="LogScroller" Grid.Row="0">
                     <RichTextBox
-                        x:Name="MinerLog"
+                        x:Name="LogRichTextBox"
+                        Styles:RichTextBoxHelper.DocumentXaml="{Binding Log}"
                         Background="Black"
                         Block.LineHeight="1"
                         FontFamily="Consolas"
@@ -853,19 +756,21 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="97" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <WrapPanel Grid.Row="0" Grid.ColumnSpan="3">
+                    <WrapPanel
+                        Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        Visibility="{Binding Path=TimersVisibility, Converter={StaticResource ObjectExistToVisibilityConverter}}">
                         <Label
-                            x:Name="WachdogINFO"
                             Margin="0,0,5,0"
                             Background="#20000000"
-                            Content="WachdogINFO"
+                            Content="{Binding WachdogInfo}"
                             FontWeight="Bold"
                             Foreground="Yellow"
-                            Visibility="Collapsed">
+                            Visibility="{Binding Path=WachdogInfo, Converter={StaticResource TextToVisibilityConverter}}">
                             <Label.Effect>
                                 <DropShadowEffect
                                     BlurRadius="7"
@@ -875,13 +780,12 @@
                             </Label.Effect>
                         </Label>
                         <Label
-                            x:Name="LowHWachdog"
                             Margin="0,0,5,0"
                             Background="#20000000"
-                            Content="LowHWachdog"
+                            Content="{Binding LowHWachdog}"
                             FontWeight="Bold"
                             Foreground="Red"
-                            Visibility="Collapsed">
+                            Visibility="{Binding Path=LowHWachdog, Converter={StaticResource TextToVisibilityConverter}}">
                             <Label.Effect>
                                 <DropShadowEffect
                                     BlurRadius="7"
@@ -891,13 +795,12 @@
                             </Label.Effect>
                         </Label>
                         <Label
-                            x:Name="IdleWachdog"
                             Margin="0,0,5,0"
                             Background="#20000000"
-                            Content="IdleWachdog"
+                            Content="{Binding IdleWachdog}"
                             FontWeight="Bold"
                             Foreground="Red"
-                            Visibility="Collapsed">
+                            Visibility="{Binding Path=IdleWachdog, Converter={StaticResource TextToVisibilityConverter}}">
                             <Label.Effect>
                                 <DropShadowEffect
                                     BlurRadius="7"
@@ -907,13 +810,12 @@
                             </Label.Effect>
                         </Label>
                         <Label
-                            x:Name="ShowMLogTB"
                             Margin="0,0,5,0"
                             Background="#20000000"
-                            Content="ShowMLogTB"
+                            Content="{Binding ShowMLogTB}"
                             FontWeight="Bold"
                             Foreground="Yellow"
-                            Visibility="Collapsed">
+                            Visibility="{Binding Path=ShowMLogTB, Converter={StaticResource TextToVisibilityConverter}}">
                             <Label.Effect>
                                 <DropShadowEffect
                                     BlurRadius="7"
@@ -926,90 +828,114 @@
                     <Label
                         Grid.Row="1"
                         Grid.Column="0"
-                        Margin="3"
+                        Margin="1"
                         HorizontalAlignment="Right"
+                        FontSize="14"
                         Foreground="White">
                         Hashrate:
                     </Label>
-                    <Label
-                        x:Name="GPUsHashrate2"
+                    <WrapPanel
+                        x:Name="LogHashrates"
                         Grid.Row="1"
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
-                        Margin="5,3,3,3"
-                        FontFamily="Consolas"
-                        Foreground="White" />
+                        VerticalAlignment="Center" />
                     <Label
                         Grid.Row="2"
                         Grid.Column="0"
-                        Margin="3"
+                        Margin="1"
                         HorizontalAlignment="Right"
+                        FontSize="14"
                         Foreground="White">
                         Temperature:
                     </Label>
-                    <Label
-                        x:Name="GPUsTemps2"
+                    <WrapPanel
+                        x:Name="LogTemperatures"
                         Grid.Row="2"
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
-                        Margin="5,3,3,3"
-                        FontFamily="Consolas"
-                        Foreground="White" />
+                        VerticalAlignment="Center" />
                     <Label
                         Grid.Row="3"
                         Grid.Column="0"
-                        Margin="3"
+                        Margin="1"
                         HorizontalAlignment="Right"
+                        FontSize="14"
                         Foreground="White">
                         Total Hashrate:
                     </Label>
                     <Label
-                        x:Name="TotalHashrate2"
                         Grid.Row="3"
                         Grid.Column="1"
                         Margin="15,3,3,3"
                         Padding="0"
+                        VerticalAlignment="Center"
+                        Content="{Binding TotalHashrate}"
+                        ContentStringFormat="0.000"
                         FontFamily="Consolas"
+                        FontSize="14"
                         Foreground="White" />
                     <WrapPanel
                         Grid.Row="3"
                         Grid.Column="2"
                         HorizontalAlignment="Right">
                         <Label
-                            Margin="10,0,5,0"
-                            Content="Размер шрифта:"
+                            Margin="5,0,5,0"
+                            Content="FontSize:"
+                            FontSize="14"
                             Foreground="White" />
                         <Slider
-                            x:Name="TextSizeSlider"
                             Width="100"
-                            Margin="10,0,5,0"
+                            Margin="5,0,5,0"
                             VerticalAlignment="Center"
                             IsSnapToTickEnabled="True"
                             Maximum="24"
                             Minimum="8"
-                            TickFrequency="1" />
+                            TickFrequency="1"
+                            Value="{Binding LogFontSize, Mode=TwoWay}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="ValueChanged">
+                                    <i:InvokeCommandAction Command="{Binding SetLogFontSize}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Slider>
                         <Label
-                            x:Name="TextSizeTB"
-                            Width="40"
-                            Foreground="White">
-                            --
-                        </Label>
+                            Width="Auto"
+                            Content="{Binding LogFontSize}"
+                            FontSize="14"
+                            Foreground="White" />
                         <Label
-                            Margin="40,0,5,0"
-                            Content="Автопрокрутка:"
+                            Margin="5,0,5,0"
+                            Content="AutoScroll:"
+                            FontSize="14"
                             Foreground="White" />
                         <CheckBox
-                            x:Name="Autoscroll"
                             Margin="0,0,5,0"
                             VerticalAlignment="Center"
-                            IsChecked="True" />
+                            FontSize="14"
+                            IsChecked="{Binding LogAutoscroll, Mode=TwoWay}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Checked">
+                                    <i:InvokeCommandAction Command="{Binding SetLogFontSize}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="Unchecked">
+                                    <i:InvokeCommandAction Command="{Binding SetLogFontSize}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </CheckBox>
                         <Button
-                            x:Name="ShowMinerLog"
-                            Width="130"
-                            Margin="0,0,5,0">
-                            Показать лог майнера
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Center"
+                            Command="{Binding ShowMinerLog}"
+                            FontSize="14">
+                            ShowMinerLog
                         </Button>
-                        <Button x:Name="KillProcess">Запустить процесс</Button>
+                        <Button
+                            Margin="5,0,5,0"
+                            VerticalAlignment="Center"
+                            Command="{Binding SwitchProcess}"
+                            Content="{Binding SwitchProcessButtonText}"
+                            FontSize="14" />
                         <Ellipse
                             x:Name="IndicatorEl"
                             Width="15"
@@ -1027,8 +953,8 @@
         <TabItem x:Name="OMGtabitem4" Header="Общие настройки">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
                     <GroupBox
@@ -1059,20 +985,24 @@
                                     Задержка вачдога:
                                 </Label>
                                 <Slider
-                                    x:Name="WachdogTimerSlider"
                                     Grid.Row="0"
                                     Grid.Column="1"
                                     Margin="5,0"
                                     IsSnapToTickEnabled="True"
                                     Maximum="120"
                                     Minimum="30"
-                                    TickFrequency="1" />
+                                    TickFrequency="1"
+                                    Value="{Binding WachdogTimer, Mode=TwoWay}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="ValueChanged">
+                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Slider>
                                 <Label
-                                    x:Name="WachdogTimerSec"
                                     Grid.Row="0"
-                                    Grid.Column="2">
-                                    120
-                                </Label>
+                                    Grid.Column="2"
+                                    Content="{Binding WachdogTimer}" />
                                 <Label
                                     Grid.Row="0"
                                     Grid.Column="3"
@@ -1088,20 +1018,24 @@
                                     Бездействие:
                                 </Label>
                                 <Slider
-                                    x:Name="IdleTimeoutSlider"
                                     Grid.Row="1"
                                     Grid.Column="1"
                                     Margin="5,0"
                                     IsSnapToTickEnabled="True"
                                     Maximum="300"
                                     Minimum="30"
-                                    TickFrequency="1" />
+                                    TickFrequency="1"
+                                    Value="{Binding IdleTimeout, Mode=TwoWay}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="ValueChanged">
+                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Slider>
                                 <Label
-                                    x:Name="IdleTimeoutSec"
                                     Grid.Row="1"
-                                    Grid.Column="2">
-                                    120
-                                </Label>
+                                    Grid.Column="2"
+                                    Content="{Binding IdleTimeout}" />
                                 <Label
                                     Grid.Row="1"
                                     Grid.Column="3"
@@ -1117,20 +1051,24 @@
                                     Низкий хешрейт:
                                 </Label>
                                 <Slider
-                                    x:Name="LHTimeoutSlider"
                                     Grid.Row="2"
                                     Grid.Column="1"
                                     Margin="5,0"
                                     IsSnapToTickEnabled="True"
                                     Maximum="300"
                                     Minimum="30"
-                                    TickFrequency="1" />
+                                    TickFrequency="1"
+                                    Value="{Binding LHTimeout, Mode=TwoWay}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="ValueChanged">
+                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Slider>
                                 <Label
-                                    x:Name="LHTimeoutSec"
                                     Grid.Row="2"
-                                    Grid.Column="2">
-                                    120
-                                </Label>
+                                    Grid.Column="2"
+                                    Content="{Binding LHTimeout}" />
                                 <Label
                                     Grid.Row="2"
                                     Grid.Column="3"
@@ -1154,12 +1092,27 @@
                         BorderThickness="1">
                         <WrapPanel HorizontalAlignment="Right">
                             <Label Foreground="White">VK Informer:</Label>
-                            <Styles:Tumbler x:Name="VKInformerToggle" Margin="10,0,0,0" />
+                            <Styles:Tumbler Margin="10,0,0,0" IsChecked="{Binding VKInformer, Mode=TwoWay}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Checked">
+                                        <i:InvokeCommandAction Command="{Binding SetVKInformer}" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="Unchecked">
+                                        <i:InvokeCommandAction Command="{Binding SetVKInformer}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Styles:Tumbler>
                             <Label Margin="20,0,0,0" Foreground="White">user id:</Label>
                             <TextBox
-                                x:Name="VKuserID"
                                 Width="200"
-                                Margin="10,0,0,0" />
+                                Margin="10,0,0,0"
+                                Text="{Binding VKUserID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="TextChanged">
+                                        <i:InvokeCommandAction Command="{Binding SetVKUserID}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBox>
                         </WrapPanel>
                     </Border>
                     <Border
@@ -1170,15 +1123,31 @@
                         <WrapPanel HorizontalAlignment="Center">
                             <Label Foreground="White">Telegram Informer:</Label>
                             <Styles:Tumbler
-                                x:Name="TelegramInformerToggle"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Center"
-                                IsEnabled="False" />
+                                IsChecked="{Binding TelegramInformer, Mode=TwoWay}"
+                                IsEnabled="False">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Checked">
+                                        <i:InvokeCommandAction Command="{Binding SetTelegramInformer}" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="Unchecked">
+                                        <i:InvokeCommandAction Command="{Binding SetTelegramInformer}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Styles:Tumbler>
                             <Label Margin="20,0,0,0" Foreground="White">user id:</Label>
                             <TextBox
                                 Width="200"
                                 Margin="10,0,0,0"
-                                IsEnabled="False" />
+                                IsEnabled="False"
+                                Text="{Binding TelegramUserID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="TextChanged">
+                                        <i:InvokeCommandAction Command="{Binding SetTelegramUserID}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBox>
                         </WrapPanel>
                     </Border>
                 </StackPanel>

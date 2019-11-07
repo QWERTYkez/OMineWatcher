@@ -41,13 +41,15 @@ namespace OMineWatcher.Managers
 
                 try
                 {
-                    string[] result = new string[4];
+                    string[] result = new string[6];
                     if (OMGconnection)
                     {
                         result[0] = OMGreadMSG(OMGcontrolStream); // Profile
                         result[1] = OMGreadMSG(OMGcontrolStream); // Algoritms
                         result[2] = OMGreadMSG(OMGcontrolStream); // Miners
-                        result[3] = OMGreadMSG(OMGcontrolStream); // Log
+                        result[3] = OMGreadMSG(OMGcontrolStream); // DefClock
+                        result[4] = OMGreadMSG(OMGcontrolStream); // Indication
+                        result[5] = OMGreadMSG(OMGcontrolStream); // Log
 
                         Task.Run(() =>
                         {
@@ -74,6 +76,19 @@ namespace OMineWatcher.Managers
                             try
                             {
                                 RO = JsonConvert.DeserializeObject<RootObject>(result[3]);
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<RootObject>(result[4]);
+                                OMGsent?.Invoke(RO);
+                                OMGsent?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<RootObject>(result[5]);
                                 RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
                                 OMGsent?.Invoke(RO);
                             }
@@ -179,8 +194,10 @@ namespace OMineWatcher.Managers
         {
             public Profile Profile { get; set; }
             public OC? Overclock { get; set; }
+            public DC? DefClock { get; set; }
             public string Logging { get; set; }
-            public double[] Hasrates { get; set; }
+            public double[] Hashrates { get; set; }
+            public int[] Temperatures { get; set; }
             public bool? Indication { get; set; }
             public List<string> Miners { get; set; }
             public Dictionary<string, int[]> Algoritms { get; set; }
@@ -258,8 +275,14 @@ namespace OMineWatcher.Managers
             public int[] MSI_PowerLimits;
             public int[] MSI_CoreClocks;
             public int[] MSI_MemoryClocks;
-            public uint[] MSI_FanSpeeds;
-            public float?[] OHM_Temperatures;
+            public int[] MSI_FanSpeeds;
+        }
+        public struct DC
+        {
+            public int[] PowerLimits;
+            public int[] CoreClocks;
+            public int[] MemoryClocks;
+            public int[] FanSpeeds;
         }
         #endregion
 
