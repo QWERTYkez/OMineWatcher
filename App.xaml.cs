@@ -13,18 +13,7 @@ namespace OMineWatcher
     {
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            foreach (Thread t in OMineWatcher.MainWindow.PingIndicationThreads)
-            {
-                AbortThread(t);
-            }
-        }
-        private void AbortThread(Thread t)
-        {
-            try
-            {
-                t.Abort();
-            }
-            catch { }
+            
         }
     }
 }

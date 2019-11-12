@@ -71,16 +71,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\DrawingCanvas.cs" />
     <Compile Include="Models\MainModel.cs" />
+    <Compile Include="Models\RigModel.cs" />
     <Compile Include="Models\OmgModel.cs" />
-    <Compile Include="Styles\Converters.xaml.cs" />
-    <Compile Include="Styles\RichTextBoxHelper.cs" />
+    <Compile Include="Classes\Converters.xaml.cs" />
+    <Compile Include="Classes\RichTextBoxHelper.cs" />
     <Compile Include="Styles\Tumbler.xaml.cs">
       <DependentUpon>Tumbler.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\RigViewModel.cs" />
     <Compile Include="ViewModels\OmgViewModel.cs" />
     <Compile Include="ViewModels\_RelayCommand.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Views\RigView.xaml.cs">
+      <DependentUpon>RigView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\OmgView.xaml.cs">
       <DependentUpon>OmgView.xaml</DependentUpon>
     </Compile>
@@ -147,6 +153,10 @@
     <Page Include="Styles\Tumbler.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RigView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\OmgView.xaml">
       <SubType>Designer</SubType>

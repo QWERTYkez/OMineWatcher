@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-namespace OMineWatcher.Styles
+namespace OMineWatcher.Classes
 {
     public class RichTextBoxHelper : DependencyObject
     {

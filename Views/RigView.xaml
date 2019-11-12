@@ -1,0 +1,17 @@
+﻿<UserControl
+    x:Class="OMineWatcher.Views.RigView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Styles="clr-namespace:OMineWatcher.Styles"
+    xmlns:Classes="clr-namespace:OMineWatcher.Classes"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:OMineWatcher.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:OMineWatcher.ViewModels"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <vm:RigViewModel />
+    </UserControl.DataContext>
+    <Classes:DrawingCanvas x:Name="BaseCanvas"/>
+</UserControl>

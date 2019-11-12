@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -221,9 +219,9 @@ namespace OMineWatcher.Managers
             public InformManager Informer;
             public double? LogTextSize;
 
-            public int? TimeoutWachdog;
-            public int? TimeoutIdle;
-            public int? TimeoutLH;
+            public int TimeoutWachdog;
+            public int TimeoutIdle;
+            public int TimeoutLH;
         }
         public class Config
         {
@@ -286,79 +284,59 @@ namespace OMineWatcher.Managers
         }
         #endregion
 
-
-
-
-
-
-
-
-
-
-        static void GetInfoStream()
+        #region GetInformStream
+        public static event Action<string> OMGInformStreamLost;
+        public static event Action<string> OMGInformStreamReceived;
+        public static event Action<string, RootObject> OMGInformSent;
+        private static Dictionary<string, bool> RigsInformState = new Dictionary<string, bool>();
+        public static void StartInformStream(string IP)
         {
-            TcpClient client;
-            try
+            if (RigsInformState.ContainsKey(IP))
             {
-                using (client = new TcpClient("127.0.0.1", 2112))
+                if (RigsInformState[IP])
+                    return;
+                else
+                    RigsInformState[IP] = true;
+            }
+            else
+                RigsInformState.Add(IP, true);
+            Task.Run(() =>
+            {
+                try
                 {
-                    int MessageLength = 15;
-                    string header;
-                    byte[] msg;
-                    string body;
-                    MinerInfo MI;
-
-                    using (NetworkStream stream = client.GetStream())
+                    using (TcpClient client = new TcpClient(IP, 2111))
                     {
-                        Console.WriteLine("старт цикла");
-                        while (true)
+                        if (client.Connected) OMGInformStreamReceived?.Invoke(IP);
+                        using (NetworkStream stream = client.GetStream())
                         {
-                            msg = new byte[MessageLength];     // готовим место для принятия сообщения
-                            int count = stream.Read(msg, 0, msg.Length);   // читаем сообщение от клиента
-                            string request = Encoding.Default.GetString(msg, 0, count);
-                            if (15 == request.Length)
+                            RootObject RO;
+                            while (client.Connected && RigsInformState[IP])
                             {
-                                continue;
+                                try
+                                {
+                                    RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                    OMGInformSent?.Invoke(IP, RO);
+                                }
+                                catch { }
+                                Thread.Sleep(50);
                             }
-                            string[] req = null;
-                            req = JsonConvert.DeserializeObject<string[]>(request);
-                            header = req[0];
-                            body = req[1];
-
-                            switch (header)
-                            {
-                                case "js":
-                                    {
-                                        MessageLength = Convert.ToInt32(body);
-                                    }
-                                    break;
-                                case "info":
-                                    {
-                                        MI = JsonConvert.DeserializeObject<MinerInfo>(body);
-
-                                        Console.WriteLine($"{MI.TimeStamp.ToShortTimeString()} | {MI.AVGHashrates[0]} | " +
-                                            $"{MI.AVGTemperatures[0]} | {MI.AVGFanspeeds[0]} | {MI.ShAccepted[0]}");
-                                        MessageLength = 15;
-                                    }
-                                    break;
-                            }
-                            Thread.Sleep(100);
+                            RigsInformState[IP] = false;
+                            OMGInformStreamLost?.Invoke(IP);
                         }
                     }
                 }
-            }
-            catch { }
+                catch
+                {
+                    RigsInformState[IP] = false;
+                    OMGInformStreamLost?.Invoke(IP);
+                }
+            });
         }
-
-        public class MinerInfo
+        public static void StopInformStream(string IP)
         {
-            public DateTime TimeStamp;
-            public double[] AVGHashrates;
-            public double[] AVGTemperatures;
-            public double[] AVGFanspeeds;
-            public int[] ShAccepted;
-            public int[] ShRejected;
-            public int[] ShInvalid;
+            if (RigsInformState.ContainsKey(IP))
+                RigsInformState[IP] = false;
         }
+        #endregion
     }
 }

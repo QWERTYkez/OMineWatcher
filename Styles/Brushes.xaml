@@ -47,10 +47,10 @@
     </LinearGradientBrush>
     <SolidColorBrush x:Key="Custom.Button.Click.Foreground" Color="White"/>
     <LinearGradientBrush x:Key="Custom.Button.Disabled.Background" EndPoint="0.5,1" StartPoint="0.5,0">
-        <GradientStop Color="#9933004D" Offset="0"/>
-        <GradientStop Color="#99270024" Offset="1"/>
+        <GradientStop Color="#9944125D" Offset="0"/>
+        <GradientStop Color="#99361D34" Offset="1"/>
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="Custom.Button.Disabled.Foreground" Color="#99A100C5"/>
+    <SolidColorBrush x:Key="Custom.Button.Disabled.Foreground" Color="#99856E91"/>
     <!--#endregion-->
     
     <!--#region ComboBox-->

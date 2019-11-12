@@ -5,393 +5,352 @@
     xmlns:Styles="clr-namespace:OMineWatcher.Styles"
     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:OMineWatcher"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:OMineWatcher.ViewModels"
     Title="OMineWatcher"
-    Width="1200"
+    Width="900"
     Height="500"
-    MinWidth="1200"
+    MinWidth="900"
     Background="{StaticResource Custom.Window.Background}"
     mc:Ignorable="d">
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
-
-    <TabControl>
-        <TabItem Header="Базовый вид">
-            <Grid x:Name="BaseGrid" />
-        </TabItem>
-
-        <TabItem Header="Детальный вид">
-            <Grid x:Name="DetalGrid">
-
-                <ComboBox
-                    Width="100"
-                    Height="25"
-                    SelectedIndex="0">
-                    <ComboBoxItem>dfgsdfg</ComboBoxItem>
-                    <ComboBoxItem>dfgsdfg</ComboBoxItem>
-                    <ComboBoxItem Background="#FF32266A" BorderBrush="#FFC8C1E6">dfgsdfg</ComboBoxItem>
-                    <ComboBoxItem>dfgsdfg</ComboBoxItem>
-                    <ComboBoxItem>dfgsdfg</ComboBoxItem>
-                    <ComboBoxItem>dfgsdfg</ComboBoxItem>
-                </ComboBox>
-
-            </Grid>
-
-        </TabItem>
-
-        <TabItem Header="Управление ригами">
-            <Grid>
-
-
-
-                <Grid x:Name="RigsSet">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <!--  Список ригов  -->
-                    <GroupBox
-                        Grid.Column="0"
-                        Margin="4,0,4,4"
-                        Header="Список ригов">
-                        <Grid Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="240" />
-                            </Grid.ColumnDefinitions>
+    <Grid>
+        <ContentPresenter Content="{Binding OmgControlView}" Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
+        <Button
+            Height="19"
+            Margin="2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Command="{Binding OMGdisconnect}"
+            Content="Отключиться"
+            Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
+        <TabControl Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverterReverce}}">
+            <TabItem Header="Базовый вид"/>
+            <TabItem Header="Детальный вид"/>
+            <TabItem Header="Управление ригами">
+                <Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <!--  Список ригов  -->
+                        <GroupBox
+                            Grid.Column="0"
+                            Margin="4,0,4,4"
+                            Header="Список ригов">
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="240" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Run Text="Имя:" />
+                                </Label>
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="3"
+                                    Text="{Binding RigName, Mode=TwoWay}" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Run Text="IP:" />
+                                </Label>
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="3"
+                                    Text="{Binding RigIP, Mode=TwoWay}" />
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                    <Run Text="Тип рига:" />
+                                </Label>
+                                <ComboBox
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="3"
+                                    ItemsSource="{Binding RigTypes}"
+                                    SelectedIndex="{Binding SelectedRigTypeIndex, Mode=TwoWay}"
+                                    SelectedItem="{Binding SelectedRigTypeString, Mode=TwoWay}" />
+                                <Grid Grid.Row="3" Grid.ColumnSpan="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Grid.Column="0"
+                                        Margin="3"
+                                        Command="{Binding RigMinus}"
+                                        Content="-"
+                                        IsEnabled="{Binding MinusButtonEnable}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        Command="{Binding RigPlus}"
+                                        Content="+" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Margin="3"
+                                        Command="{Binding RigUp}"
+                                        Content="Вверх"
+                                        IsEnabled="{Binding UPButtonEnable}" />
+                                    <Button
+                                        Grid.Column="3"
+                                        Margin="3"
+                                        Command="{Binding RigDown}"
+                                        Content="Вниз"
+                                        IsEnabled="{Binding DownButtonEnable}" />
+                                    <Button
+                                        Grid.Column="4"
+                                        Margin="3"
+                                        Command="{Binding RigSave}"
+                                        Content="Сохранить"
+                                        IsEnabled="{Binding SaveButtonEnable}" />
+                                </Grid>
+                                <Grid Grid.Row="4" Grid.ColumnSpan="3">
+                                    <Label HorizontalAlignment="Left">Status</Label>
+                                    <Label Margin="0,0,30,0" HorizontalAlignment="Center">Имя</Label>
+                                    <Label HorizontalAlignment="Right">Wach</Label>
+                                </Grid>
+                                <ScrollViewer
+                                    Grid.Row="5"
+                                    Grid.ColumnSpan="2"
+                                    VerticalScrollBarVisibility="Auto">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="19" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="40" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            x:Name="IndicatorsRigsSP"
+                                            Grid.Column="0"
+                                            Margin="0,5,0,0" />
+                                        <ListBox
+                                            Grid.Column="1"
+                                            Margin="3"
+                                            FontSize="14"
+                                            ItemsSource="{Binding RigsNames}"
+                                            SelectedIndex="{Binding SelectedRigIndex, Mode=TwoWay}"
+                                            SelectedItem="{Binding SelectedRigString, Mode=TwoWay}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SelectRig}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ListBox>
+                                        <StackPanel
+                                            x:Name="WachingRigsSP"
+                                            Grid.Column="2"
+                                            Margin="0,5,0,0" />
+                                    </Grid>
+                                </ScrollViewer>
+                            </Grid>
+                        </GroupBox>
+                        <!--  Список ригов///  -->
+                        <!--  Настройки ригов  -->
+                        <Grid Grid.Column="1" Margin="15,5,5,5">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Run Text="Имя:" />
-                            </Label>
-                            <TextBox
-                                x:Name="SettingsRigName"
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                Margin="3" />
-                            <Label
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Run Text="IP:" />
-                            </Label>
-                            <TextBox
-                                x:Name="SettingsRigIP"
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                Margin="3" />
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
 
+                            <Border
+                                Grid.Row="0"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="2"
+                                Visibility="{Binding OmgConnectButtonVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                    <Label
+                                        Margin="0,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Content="Управление OMineGuard:" />
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding OMGconnect}"
+                                        Content="Подключиться" />
+                                </WrapPanel>
+                            </Border>
+                            <Border
+                                Grid.Row="1"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="2">
+                                <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                    <Label Margin="0,0,5,0" VerticalAlignment="Center">eWeLink устройство:</Label>
+                                    <ComboBox
+                                        Width="150"
+                                        ItemsSource="{Binding eWeDevicesNames}"
+                                        SelectedIndex="{Binding SelectedeWeDeviceIndex, Mode=TwoWay}"
+                                        SelectedItem="{Binding SelectedeWeDevice, Mode=TwoWay}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding SelecteWeDevice}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                    <Styles:Tumbler
+                                        Margin="5,0,0,0"
+                                        IsChecked="{Binding eWeDeviceActive, Mode=TwoWay}"
+                                        IsEnabled="{Binding SelectedeWeDeviceIndex, Converter={StaticResource SelectedIndexToboolConverterZero}}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Styles:Tumbler>
+                                </WrapPanel>
+                            </Border>
+                            <Border
+                                Grid.Row="2"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="2">
+                                <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                    <Label
+                                        Margin="0,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Content="MAC:" />
+                                    <TextBox Width="150" Margin="5,0" />
+                                    <Button Content="GetMAC" />
+                                    <Label
+                                        Margin="10,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Content="Wake-on-LAN" />
+                                    <Styles:Tumbler Margin="5,0" />
+                                </WrapPanel>
+                            </Border>
+
+                        </Grid>
+                        <!--  Настройки ригов///  -->
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Настройки пулов"/>
+            <TabItem Header="Общие настройки">
+                <Grid>
+
+                    <Border
+                        Margin="-1"
+                        Padding="3"
+                        HorizontalAlignment="Center"
+                        BorderBrush="{StaticResource MSI.Border}"
+                        BorderThickness="1">
+                        <StackPanel HorizontalAlignment="Center">
                             <Label
-                                Grid.Row="2"
-                                Grid.Column="0"
+                                Margin="0,2"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Run Text="Тип рига:" />
+                                FontSize="16">
+                                eWeLink Account
                             </Label>
-                            <ComboBox
-                                x:Name="RigType"
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                Margin="3" />
-                            <Grid Grid.Row="3" Grid.ColumnSpan="3">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="200" />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="0,2,5,2"
+                                    HorizontalAlignment="Right">
+                                    Логин :
+                                </Label>
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0,2"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding eWeLogin, Mode=TwoWay}" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,2,5,2"
+                                    HorizontalAlignment="Right">
+                                    Пароль :
+                                </Label>
+                                <PasswordBox
+                                    x:Name="eWePasswordBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0,2"
+                                    VerticalContentAlignment="Center"
+                                    PasswordChanged="PasswordBox_PasswordChanged" />
+                            </Grid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
                                     <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Button
+                                    Grid.Row="0"
                                     Grid.Column="0"
-                                    Margin="3"
-                                    Click="MinusRig"
-                                    Content="-" />
+                                    Margin="4"
+                                    Command="{Binding eweConnect}">
+                                    Подключить
+                                </Button>
                                 <Button
+                                    Grid.Row="0"
                                     Grid.Column="1"
-                                    Margin="3"
-                                    Click="PlusRig"
-                                    Content="+" />
-                                <Button
-                                    Grid.Column="2"
-                                    Margin="3"
-                                    Click="UpRig"
-                                    Content="Вверх" />
-                                <Button
-                                    Grid.Column="3"
-                                    Margin="3"
-                                    Click="DownRig"
-                                    Content="Вниз" />
-                                <Button
-                                    Grid.Column="4"
-                                    Margin="3"
-                                    Click="SaveRig"
-                                    Content="Сохранить" />
+                                    Margin="4"
+                                    Command="{Binding eweDisonnect}">
+                                    Отключить
+                                </Button>
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    HorizontalAlignment="Center"
+                                    Content="{Binding eWeAccountState}" />
                             </Grid>
-                            <Grid Grid.Row="4" Grid.ColumnSpan="3">
-                                <Label HorizontalAlignment="Left">Status</Label>
-                                <Label Margin="0,0,30,0" HorizontalAlignment="Center">Имя</Label>
-                                <Label HorizontalAlignment="Right">Waching</Label>
-                            </Grid>
-                            <ScrollViewer
-                                Grid.Row="5"
-                                Grid.ColumnSpan="2"
-                                VerticalScrollBarVisibility="Auto">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="19" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="40" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel
-                                        x:Name="IndicatorsRigsSP"
-                                        Grid.Column="0"
-                                        Margin="0,5,0,0" />
-                                    <ListBox
-                                        x:Name="RigsListBox"
-                                        Grid.Column="1"
-                                        Margin="3"
-                                        FontSize="14"
-                                        SelectionChanged="SelectRig" />
-                                    <StackPanel
-                                        x:Name="WachingRigsSP"
-                                        Grid.Column="2"
-                                        Margin="0,5,0,0" />
-                                </Grid>
-                            </ScrollViewer>
-                        </Grid>
-                    </GroupBox>
-                    <!--  Список ригов///  -->
-                    <!--  Настройки ригов  -->
-                    <Grid x:Name="OMineGuardmanagement" Grid.Column="1">
-                        <TabControl x:Name="RigSettings" Margin="4,0,4,4">
+                        </StackPanel>
+                    </Border>
 
 
 
-                            <TabItem Header="Настройки">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-
-                                    <Border
-                                        Grid.Row="0"
-                                        Margin="15,4,15,-1"
-                                        Padding="3"
-                                        BorderBrush="{StaticResource MSI.Border}"
-                                        BorderThickness="2">
-                                        <WrapPanel Margin="0,4" HorizontalAlignment="Center">
-                                            <Label Margin="0,0,5,0" VerticalAlignment="Center">eWeLink устройство:</Label>
-                                            <ComboBox
-                                                x:Name="eWeDevicesBox"
-                                                Width="150"
-                                                SelectionChanged="SelecteWeDevice" />
-                                            <Styles:Tumbler
-                                                x:Name="eWeTumbler"
-                                                Margin="5,0,0,0"
-                                                Checked="eWeTumbler_Checked"
-                                                IsEnabled="False"
-                                                Unchecked="eWeTumbler_Unchecked" />
-                                        </WrapPanel>
-                                    </Border>
-                                    <Border
-                                        Grid.Row="1"
-                                        Margin="15,0"
-                                        Padding="3"
-                                        BorderBrush="{StaticResource MSI.Border}"
-                                        BorderThickness="2">
-                                        <WrapPanel Margin="0,4" HorizontalAlignment="Center">
-                                            <Label
-                                                Margin="0,0,5,0"
-                                                VerticalAlignment="Center"
-                                                Content="MAC:" />
-                                            <TextBox Width="150" Margin="5,0" />
-                                            <Button Content="GetMAC" />
-                                            <Label
-                                                Margin="10,0,5,0"
-                                                VerticalAlignment="Center"
-                                                Content="Wake-on-LAN" />
-                                            <Styles:Tumbler x:Name="WOLTumbler" Margin="5,0" />
-                                            <!--  Checked="WOLTumbler_Checked" Unchecked="WOLTumbler_Unchecked"  -->
-                                        </WrapPanel>
-                                    </Border>
-
-
-
-                                </Grid>
-                            </TabItem>
-
-                            <TabItem
-                                Content="{Binding OmgControlView}"
-                                Header="OMineGuard control"
-                                Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
-                            
-                        </TabControl>
-                        <Button
-                            x:Name="OMGconnect"
-                            Height="19"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Command="{Binding OMGSwitchConnect}"
-                            Content="{Binding OmgConnectButtonName}" />
-                    </Grid>
-                    <!--  Настройки ригов///  -->
                 </Grid>
-            </Grid>
-        </TabItem>
+            </TabItem>
+        </TabControl>
+    </Grid>
 
-        <TabItem Header="Настройки пулов">
-            <Grid x:Name="PoolSet">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ListBox
-                        Grid.Row="0"
-                        Width="200"
-                        Margin="5" />
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Button
-                            Grid.Column="0"
-                            Margin="5,0,5,5"
-                            Content="-" />
-                        <Button
-                            Grid.Column="1"
-                            Margin="5,0,5,5"
-                            Content="Вверх" />
-                        <Button
-                            Grid.Column="2"
-                            Margin="5,0,5,5"
-                            Content="Вниз" />
-                        <Button
-                            Grid.Column="3"
-                            Margin="5,0,5,5"
-                            Content="+" />
-                    </Grid>
-                </Grid>
-            </Grid>
-        </TabItem>
-
-        <TabItem Header="Общие настройки">
-            <Grid x:Name="BaseSet">
-
-                <Border
-                    Margin="-1"
-                    Padding="3"
-                    HorizontalAlignment="Center"
-                    BorderBrush="{StaticResource MSI.Border}"
-                    BorderThickness="1">
-                    <StackPanel HorizontalAlignment="Center">
-                        <Label
-                            Margin="0,2"
-                            HorizontalAlignment="Center"
-                            FontSize="16">
-                            eWeLink Account
-                        </Label>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="200" />
-                            </Grid.ColumnDefinitions>
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Margin="0,2,5,2"
-                                HorizontalAlignment="Right">
-                                Логин :
-                            </Label>
-                            <TextBox
-                                x:Name="eWeLoginBox"
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Margin="0,2" />
-                            <Label
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Margin="0,2,5,2"
-                                HorizontalAlignment="Right">
-                                Пароль :
-                            </Label>
-                            <PasswordBox
-                                x:Name="eWePasswordBox"
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Margin="0,2" />
-                        </Grid>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Button
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Margin="4"
-                                Click="eWeLinkConnect">
-                                Подключить
-                            </Button>
-                            <Button
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Margin="4"
-                                Click="eWeLinkDisconnect">
-                                Отключить
-                            </Button>
-                            <Label
-                                x:Name="eWeAccountState"
-                                Grid.Row="1"
-                                Grid.ColumnSpan="2"
-                                HorizontalAlignment="Center">
-                                Аккаунт не подключен
-                            </Label>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-
-
-            </Grid>
-        </TabItem>
-    </TabControl>
 </Window>

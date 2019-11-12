@@ -68,7 +68,9 @@ namespace OMineWatcher.ViewModels
                         CL.Insert(0, "---");
                         ConfigOverclocks = CL;
                         OverclocksNames = from i in Profile.ClocksList select i.Name;
-
+                        WachdogTimer = Profile.TimeoutWachdog;
+                        IdleTimeout = Profile.TimeoutIdle;
+                        LHTimeout = Profile.TimeoutLH;
                         break;
                     }
                 case "Miners":
@@ -590,7 +592,10 @@ namespace OMineWatcher.ViewModels
         public int WachdogTimer { get; set; }
         public int IdleTimeout { get; set; }
         public int LHTimeout { get; set; }
-        public RelayCommand SetTimer { get; set; }
+        public RelayCommand SetWachdogTimer { get; set; }
+        public RelayCommand SetIdleTimeout { get; set; }
+        public RelayCommand SetLHTimeout { get; set; }
+
         public bool VKInformer { get; set; }
         public RelayCommand SetVKInformer { get; set; }
         public string VKUserID { get; set; }
@@ -602,10 +607,22 @@ namespace OMineWatcher.ViewModels
 
         private void IniBaseSettingsCommands()
         {
-            SetTimer = new RelayCommand(obj =>
+            SetWachdogTimer = new RelayCommand(obj =>
             {
                 Profile.TimeoutWachdog = WachdogTimer;
+                if (IdleTimeout < WachdogTimer)
+                {
+                    IdleTimeout = WachdogTimer;
+                }
+                _model.cmd_SaveProfile(Profile);
+            });
+            SetIdleTimeout = new RelayCommand(obj =>
+            {
                 Profile.TimeoutIdle = IdleTimeout;
+                _model.cmd_SaveProfile(Profile);
+            });
+            SetLHTimeout = new RelayCommand(obj =>
+            {
                 Profile.TimeoutLH = LHTimeout;
                 _model.cmd_SaveProfile(Profile);
             });

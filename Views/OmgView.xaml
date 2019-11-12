@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Styles="clr-namespace:OMineWatcher.Styles"
+    xmlns:Classes="clr-namespace:OMineWatcher.Classes"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:OMineWatcher.Views"
@@ -661,7 +662,7 @@
                                 Grid.Row="2"
                                 Grid.Column="11" />
                             <StackPanel
-                                x:Name="InfFanSpeeds"
+                                x:Name="InfoFanSpeeds"
                                 Grid.Row="2"
                                 Grid.Column="12" />
                             <StackPanel
@@ -741,7 +742,7 @@
                 <ScrollViewer x:Name="LogScroller" Grid.Row="0">
                     <RichTextBox
                         x:Name="LogRichTextBox"
-                        Styles:RichTextBoxHelper.DocumentXaml="{Binding Log}"
+                        Classes:RichTextBoxHelper.DocumentXaml="{Binding Log}"
                         Background="Black"
                         Block.LineHeight="1"
                         FontFamily="Consolas"
@@ -995,7 +996,7 @@
                                     Value="{Binding WachdogTimer, Mode=TwoWay}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="ValueChanged">
-                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                            <i:InvokeCommandAction Command="{Binding SetWachdogTimer}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Slider>
@@ -1023,12 +1024,12 @@
                                     Margin="5,0"
                                     IsSnapToTickEnabled="True"
                                     Maximum="300"
-                                    Minimum="30"
+                                    Minimum="{Binding WachdogTimer}"
                                     TickFrequency="1"
                                     Value="{Binding IdleTimeout, Mode=TwoWay}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="ValueChanged">
-                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                            <i:InvokeCommandAction Command="{Binding SetIdleTimeout}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Slider>
@@ -1061,7 +1062,7 @@
                                     Value="{Binding LHTimeout, Mode=TwoWay}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="ValueChanged">
-                                            <i:InvokeCommandAction Command="{Binding SetTimer}" />
+                                            <i:InvokeCommandAction Command="{Binding SetLHTimeout}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Slider>

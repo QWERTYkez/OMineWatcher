@@ -51,39 +51,30 @@ namespace OMineWatcher.Managers
             }
             return null;
         }
-        public static void AddRig()
-        {
-            Rigs.Add(new Rig());
-            SaveSettings();
-        }
-        public static void RemoveRig(int i)
-        {
-            Rigs.RemoveAt(i);
-            SaveSettings();
-        }
         public class Rig
         {
-            public Rig()
+            public Rig(int index)
             {
                 Name = "New";
-                IP = "";
-                eWeDevice = "";
-                ID = DateTime.UtcNow.ToBinary();
+                IP = null;
+                Type = null;
                 Waching = false;
+                ID = DateTime.UtcNow.ToBinary();
+
+                eWeDevice = null;
+
+                Index = index;
             }
 
             public string Name;
             public string IP;
-            public RigType? Type;
+            public string Type;
             public bool Waching;
-            public long ID;
+            public long ID { get; private set; }
 
             public string eWeDevice;
-        }
-        public enum RigType
-        {
-            OMineGuard, 
-            HiveOS
+
+            public int Index;
         }
         #endregion
         #region GenSettings
@@ -108,16 +99,19 @@ namespace OMineWatcher.Managers
         private static object key = new object();
         public static void SaveSettings()
         {
-            lock (key)
+            Task.Run(() => 
             {
-                string JSON = JsonConvert.SerializeObject(profile);
-
-                using (FileStream fstream = new FileStream("Settings.json", FileMode.Create))
+                lock (key)
                 {
-                    byte[] array = System.Text.Encoding.Default.GetBytes(JSON);
-                    fstream.Write(array, 0, array.Length);
+                    string JSON = JsonConvert.SerializeObject(profile);
+
+                    using (FileStream fstream = new FileStream("Settings.json", FileMode.Create))
+                    {
+                        byte[] array = System.Text.Encoding.Default.GetBytes(JSON);
+                        fstream.Write(array, 0, array.Length);
+                    }
                 }
-            }
+            });
         }
         public static void ReadSettings()
         {
@@ -142,5 +136,7 @@ namespace OMineWatcher.Managers
             }
         }
         #endregion
+
+        public static string[] RigTypes = new string[] { "---", "OMineGuard", "HiveOS" };
     }
 }

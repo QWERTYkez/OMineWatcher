@@ -127,7 +127,7 @@ namespace OMineWatcher.Views
                             SetTextBoxes(CoreClocks, "CoreClocks", n);
                             SetLabels(InfMemoryClocks, "InfMemoryClocks", n);
                             SetTextBoxes(MemoryClocks, "MemoryClocks", n);
-                            SetLabels(InfFanSpeeds, "InfFanSpeeds", n);
+                            SetLabels(InfoFanSpeeds, "InfFanSpeeds", n);
                             SetTextBoxes(FanSpeeds, "FanSpeeds", n);
                             SetLabels(InfTemps, "InfTemperatures", n);
                             SetLabels(LogTemperatures, "InfTemperatures", n, "0°C");
@@ -160,23 +160,6 @@ namespace OMineWatcher.Views
                 };
                 Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
                 SP.Children.Add(Lb);
-            }
-        }
-        private void SetLabels(WrapPanel WP, string prop, int length)
-        {
-            WP.Children.Clear();
-            for (int i = 0; i < length; i++)
-            {
-                Label Lb = new Label
-                {
-                    Width = 65,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    FontFamily = new FontFamily("Consolas"),
-                    FontSize = 14
-                };
-                Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
-                WP.Children.Add(Lb);
             }
         }
         private void SetLabels(StackPanel SP, string prop, int length, string format)
@@ -230,7 +213,7 @@ namespace OMineWatcher.Views
                 };
                 Tb.SetBinding(TextBox.TextProperty, $"{prop}[{i}]");
                 Binding b = new Binding($"{prop}");
-                b.Converter = new Styles.ListIntExistToBool();
+                b.Converter = new Classes.ListIntExistToBool();
                 Tb.SetBinding(TextBox.IsEnabledProperty, b);
                 SP.Children.Add(Tb);
             }

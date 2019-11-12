@@ -12,8 +12,8 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 SnapsToDevicePixels="True">
                 <ContentPresenter
+                    Margin="4,0,4,0"
                     x:Name="contentPresenter"
-                    Margin="{TemplateBinding Padding}"
                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                     Content="{TemplateBinding Content}"

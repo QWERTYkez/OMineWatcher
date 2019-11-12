@@ -8,8 +8,9 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Markup;
+using System.Windows.Media;
 
-namespace OMineWatcher.Styles
+namespace OMineWatcher.Classes
 {
     public class ObjectExistToVisibilityConverter : IValueConverter
     {
@@ -21,7 +22,98 @@ namespace OMineWatcher.Styles
             }
             else
             {
-                return Visibility.Hidden;
+                return Visibility.Collapsed;
+            }
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RigStatusToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Models.MainModel.RigStatus Type = (Models.MainModel.RigStatus)value;
+            switch (Type)
+            {
+                case Models.MainModel.RigStatus.offline:
+                    return Brushes.Red;
+                case Models.MainModel.RigStatus.online:
+                    return Brushes.Yellow;
+                case Models.MainModel.RigStatus.works:
+                    return Brushes.Lime;
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ObjectExistToVisibilityConverterReverce : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+            {
+                return Visibility.Collapsed;
+            }
+            else
+            {
+                return Visibility.Visible;
+            }
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BoolInverceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+    }
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed;
+            }
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BoolToVisibilityConverterReverce : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return Visibility.Collapsed;
+            }
+            else
+            {
+                return Visibility.Visible;
             }
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -56,6 +148,32 @@ namespace OMineWatcher.Styles
             if (value != null)
             {
                 if ((int)value > -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SelectedIndexToboolConverterZero : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+            {
+                if ((int)value > 0)
                 {
                     return true;
                 }
@@ -113,12 +231,12 @@ namespace OMineWatcher.Styles
                 }
                 else
                 {
-                    return Visibility.Hidden;
+                    return Visibility.Collapsed;
                 }
             }
             else
             {
-                return Visibility.Hidden;
+                return Visibility.Collapsed;
             }
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
