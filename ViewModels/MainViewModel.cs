@@ -1,14 +1,14 @@
-﻿using System.ComponentModel;
-using OMineWatcher.Models;
-using System.Windows.Controls;
+﻿using eWeLink.API;
 using OMineWatcher.Managers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eWeLink.API;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
+using OMineWatcher.Models;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace OMineWatcher.ViewModels
 {

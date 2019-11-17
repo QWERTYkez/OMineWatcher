@@ -1,16 +1,15 @@
-﻿using OMineWatcher.ViewModels;
+﻿using OMineWatcher.Classes;
+using OMineWatcher.Managers;
+using OMineWatcher.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
-using OMineWatcher.Classes;
-using OMineWatcher.Managers;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace OMineWatcher.Views
 {
@@ -25,8 +24,7 @@ namespace OMineWatcher.Views
             Index = index;
             _ViewModel.PropertyChanged += RigView_PropertyChanged;
 
-            DrawingVisual V = new DrawingVisual { Effect = new BlurEffect { Radius = 5 } };
-            BaseTemp.AddVisual(V);
+            BaseTemp.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
         }
         private SynchronizationContext _context;
         private RigViewModel _ViewModel;
@@ -323,8 +321,7 @@ namespace OMineWatcher.Views
                                 Height = 20
                             };
 
-                            DrawingVisual V = new DrawingVisual { Effect = new BlurEffect { Radius = 5 } };
-                            DC.AddVisual(V);
+                            DC.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
 
                             DCs.Add(DC);
                             vb2.Child = DC;

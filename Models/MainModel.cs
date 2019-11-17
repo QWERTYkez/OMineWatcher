@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using OMineWatcher.Managers;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Net;
+﻿using OMineWatcher.Managers;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace OMineWatcher.Models
 {

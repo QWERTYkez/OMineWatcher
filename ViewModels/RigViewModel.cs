@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
+﻿using OMineWatcher.Managers;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
-using OMineWatcher.Managers;
 
 namespace OMineWatcher.ViewModels
 {

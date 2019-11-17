@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using OMineWatcher.Managers;
+﻿using OMineWatcher.Managers;
 using OMineWatcher.Views;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OMineWatcher.ViewModels
 {
