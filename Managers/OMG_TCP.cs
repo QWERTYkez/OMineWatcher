@@ -203,6 +203,8 @@ namespace OMineWatcher.Managers
             public string LowHWachdog { get; set; }
             public string IdleWachdog { get; set; }
             public string ShowMLogTB { get; set; }
+
+            public bool? RigInactive;
         }
 
         #region Profile

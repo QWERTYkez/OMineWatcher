@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using OMineWatcher.Managers;
@@ -48,6 +47,12 @@ namespace OMineWatcher.Models
             {
                 int n = IPs.IndexOf(IP);
                 Statuses[n] = RigStatus.online;
+
+                OMG_TCP.RootObject ro = new OMG_TCP.RootObject();
+
+                ro.RigInactive = true;
+
+                OMGInformSent(IP, ro);
             }
         }
         
@@ -92,7 +97,7 @@ namespace OMineWatcher.Models
         private const int PingCheckTimeout = 300; //msec
         private void StartRigsScanning()
         {
-            Task.Run(() => 
+            Task.Run(async () => 
             {
                 while (true)
                 {
@@ -142,10 +147,12 @@ namespace OMineWatcher.Models
                             }
                         });
                     }
+                    await Task.Delay(100);
                 }
             });
         }
 
+        public RigInform RigInform { get; set; }
         private void OMGInformSent(string IP, OMG_TCP.RootObject RO)
         {
             List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
@@ -154,23 +161,21 @@ namespace OMineWatcher.Models
                 OMG_TCP.StopInformStream(IP);
                 return;
             }
-            //Settings.Rigs[IPs.IndexOf(IP)]
-
-
-            if (RO.Indication != null)
+            else
             {
-                Debug.WriteLine($"{IP} -> {RO.Indication.ToString()}");
-            }
-            if (RO.Hashrates != null)
-            {
-                Debug.WriteLine($"{IP} -> {RO.Hashrates.ToString()}");
-            }
-            if (RO.Temperatures != null)
-            {
-                string str = "";
-                foreach (int i in RO.Temperatures) str += $"{i} ";
-                Debug.WriteLine($"{IP} -> {str}");
+                RigInform = new RigInform(IP, RO);
             }
         }
+    }
+    public struct RigInform
+    {
+        public RigInform(string ip, OMG_TCP.RootObject ro)
+        {
+            IP = ip;
+            RO = ro;
+        }
+
+        public string IP;
+        public OMG_TCP.RootObject RO;
     }
 }

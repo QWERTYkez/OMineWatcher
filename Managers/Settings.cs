@@ -64,6 +64,8 @@ namespace OMineWatcher.Managers
                 eWeDevice = null;
 
                 Index = index;
+                MaxTemp = null;
+                MinTemp = null;
             }
 
             public string Name;
@@ -75,6 +77,8 @@ namespace OMineWatcher.Managers
             public string eWeDevice;
 
             public int Index;
+            public int? MaxTemp;
+            public int? MinTemp;
         }
         #endregion
         #region GenSettings
@@ -85,6 +89,9 @@ namespace OMineWatcher.Managers
                 Digits = 5;
                 LogTextSize = 12;
                 LogAutoscroll = true;
+
+                TotalMaxTemp = 75;
+                TotalMinTemp = 20;
             }
 
             public string eWeLogin;
@@ -92,6 +99,8 @@ namespace OMineWatcher.Managers
             public int Digits;
             public int LogTextSize;
             public bool LogAutoscroll;
+            public int TotalMaxTemp;
+            public int TotalMinTemp;
         }
         #endregion
 

@@ -73,10 +73,10 @@
     </ApplicationDefinition>
     <Compile Include="Classes\DrawingCanvas.cs" />
     <Compile Include="Models\MainModel.cs" />
-    <Compile Include="Models\RigModel.cs" />
     <Compile Include="Models\OmgModel.cs" />
-    <Compile Include="Classes\Converters.xaml.cs" />
+    <Compile Include="Classes\Converters.cs" />
     <Compile Include="Classes\RichTextBoxHelper.cs" />
+    <Compile Include="Models\RigModel.cs" />
     <Compile Include="Styles\Tumbler.xaml.cs">
       <DependentUpon>Tumbler.xaml</DependentUpon>
     </Compile>

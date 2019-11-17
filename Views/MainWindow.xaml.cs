@@ -8,17 +8,21 @@ using System.Collections.ObjectModel;
 using System.Windows.Data;
 using Microsoft.Xaml.Behaviors;
 using System.Windows.Controls;
+using OMineWatcher.ViewModels;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
 
-namespace OMineWatcher
+namespace OMineWatcher.Views
 {
     public partial class MainWindow : Window
     {
         public static SynchronizationContext STAContext = SynchronizationContext.Current;
-        private static ViewModels.MainViewModel _ViewModel = new ViewModels.MainViewModel();
+        private static MainViewModel _ViewModel = new MainViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = _ViewModel;
+            _ViewModel = (MainViewModel)DataContext;
             _ViewModel.PropertyChanged += MainViewModel_PropertyChanged;
             _ViewModel.Watch.CollectionChanged += SetTumblers;
             _ViewModel.InitializeMainViewModel();
@@ -69,7 +73,7 @@ namespace OMineWatcher
             }
         }
         private static List<Tumbler> Tumblers { get; set; } = new List<Tumbler>();
-        private void SetTumblers(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SetTumblers(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (Tumblers.Count == _ViewModel.Watch.Count) return;
             ObservableCollection<bool> watch = _ViewModel.Watch;

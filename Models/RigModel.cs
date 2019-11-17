@@ -1,25 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using OMineWatcher.Managers;
+using OMineWatcher.Views;
 
-namespace OMineWatcher.Models
+namespace OMineWatcher.ViewModels
 {
-    public class RigModel : INotifyPropertyChanged
+    public partial class MainViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName]string prop = "")
+        public List<RigView> RVs { get; set; } = new List<RigView>();
+        private List<RigViewModel> RVMs { get; set; } = new List<RigViewModel>();
+        private void AddRigPanel(int RigIndex)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
+            List<RigView> rvs = RVs;
+            List<RigViewModel> rvms = RVMs;
 
-        public RigModel()
+            RigViewModel RVM = new RigViewModel(this, RigIndex);
+            rvms.Add(RVM);
+            RVMs = (from rvm in rvms orderby rvm.Index select rvm).ToList();
+
+            RigView RV = new RigView(RVM, RigIndex);
+            rvs.Add(RV);
+            RVs = (from rv in rvs orderby rv.Index select rv).ToList();
+        }
+        private void RemoveRigPanel(int RigIndex)
         {
-            
+            List<RigView> rvs = RVs;
+            List<RigViewModel> rvms = RVMs;
+
+            for (int i = 0; i < rvs.Count; i++)
+            {
+                if (rvs[i].Index == RigIndex)
+                {
+                    rvs.RemoveAt(i);
+                    break;
+                }
+            }
+            RVs = (from r in rvs orderby r.Index select r).ToList();
+            for (int i = 0; i < rvms.Count; i++)
+            {
+                if (rvms[i].Index == RigIndex)
+                {
+                    rvms.RemoveAt(i);
+                    break;
+                }
+            }
+            RVMs = (from r in rvms orderby r.Index select r).ToList();
+        }
+        private void RigInform()
+        {
+            string ip = _model.RigInform.IP;
+            OMG_TCP.RootObject ro = _model.RigInform.RO;
+            foreach (RigViewModel rvm in RVMs)
+            {
+                if (ip == rvm.IP)
+                {
+                    if (ro.Indication != null)
+                    {
+                        rvm.SetIndicator((bool)ro.Indication);
+                    }
+                    if (ro.Hashrates != null)
+                    {
+                        rvm.Hashrates = ro.Hashrates;
+                        rvm.Totalhashrate = ro.Hashrates.Sum();
+                    }
+                    if (ro.Temperatures != null)
+                    {
+                        rvm.Temperatures = ro.Temperatures;
+                        rvm.TotalTemperature = ro.Temperatures.Max();
+                    }
+
+                    if (ro.RigInactive != null)
+                    {
+                        rvm.SetIndicator(false);
+                        rvm.Hashrates = null;
+                        rvm.Totalhashrate = null;
+                        rvm.Temperatures = null;
+                        rvm.TotalTemperature = null;
+                    }
+                }
+            }
+        }
+        private void SetBaseMaxTemp(int t)
+        {
+            foreach (RigViewModel rvm in RVMs)
+            {
+                rvm.SetBaseMaxTemp(t);
+            }
+        }
+        private void SetBaseMinTemp(int t)
+        {
+            foreach (RigViewModel rvm in RVMs)
+            {
+                rvm.SetBaseMinTemp(t);
+            }
         }
     }
 }
