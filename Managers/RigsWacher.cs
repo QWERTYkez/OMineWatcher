@@ -233,7 +233,7 @@ namespace OMineWatcher.Managers
                             if (Settings.Rigs[i].WachdogMinHashrate != null)
                             {
                                 HiveStatuses[i] = 
-                                    mi.Value.Temperatures.Sum() > Settings.Rigs[i].WachdogMinHashrate.Value ? 
+                                    mi.Value.Temperatures.Sum() < Settings.Rigs[i].WachdogMinHashrate.Value ? 
                                     HiveStatus.LowHashrate : HiveStatus.Normal;
                             }
                             else { HiveStatuses[i] = HiveStatus.Normal; }
