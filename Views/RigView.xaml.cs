@@ -62,9 +62,16 @@ namespace OMineWatcher.Views
 
                             if (Temps != null)
                             {
-                                if (Temps.Max() != Temperatures.Max() || Temps.Min() != Temperatures.Min())
+                                if (Temps.Length > 0)
                                 {
-                                    SetTemperature(BaseTemp, Temps);
+                                    if (Temps.Max() != Temperatures.Max() || Temps.Min() != Temperatures.Min())
+                                    {
+                                        SetTemperature(BaseTemp, Temps);
+                                    }
+                                }
+                                else
+                                {
+                                    SetTemperature(BaseTemp, -1);
                                 }
                             }
                             while (DCs.Count != Temps.Length)

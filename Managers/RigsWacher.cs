@@ -28,19 +28,8 @@ namespace OMineWatcher.Managers
             OMG_TCP.OMGInformStreamReceived += OMGRigWorks;
             OMG_TCP.OMGInformStreamLost += OMGRigInactive;
             RigStatusChanged += ChangeStatus;
-            IniAllStatuses();
+            foreach (Settings.Rig r in Settings.Rigs) AddToAllStatuses();
             StartRigsScanning();
-        }
-        private static void IniAllStatuses()
-        {
-            foreach (Settings.Rig r in Settings.Rigs)
-            {
-                Statuses.Add(RigStatus.offline);
-                HiveWach.Add(false);
-                WachdogStatuses.Add(false);
-                PingBlocks.Add(false);
-                HiveStatuses.Add(HiveStatus.WorkerOffline);
-            } 
         }
 
         private static void OMGRigWorks(string IP)
@@ -82,6 +71,24 @@ namespace OMineWatcher.Managers
             }
         }
 
+        private static void AddToAllStatuses()
+        {
+            Statuses.Add(RigStatus.offline);
+            HiveWach.Add(false);
+            WachdogStatuses.Add(false);
+            PingBlocks.Add(false);
+            HiveStatuses.Add(HiveStatus.WorkerOffline);
+            HiveWachdogs.Add(false);
+        }
+        private static void RemoveInAllStatuses()
+        {
+            Statuses.RemoveAt(Statuses.Count - 1);
+            HiveWach.RemoveAt(HiveWach.Count - 1);
+            WachdogStatuses.RemoveAt(WachdogStatuses.Count - 1);
+            PingBlocks.RemoveAt(PingBlocks.Count - 1);
+            HiveStatuses.RemoveAt(HiveStatuses.Count - 1);
+            HiveWachdogs.RemoveAt(HiveWachdogs.Count - 1);
+        }
         private static int Scanned = 0;
         private static bool InternetConnection = InternetConnectionWacher.InternetConnectedState;
         private static void StartRigsScanning()
@@ -93,21 +100,9 @@ namespace OMineWatcher.Managers
                     while (Settings.Rigs.Count != Statuses.Count)
                     {
                         if (Settings.Rigs.Count > Statuses.Count)
-                        {
-                            Statuses.Add(RigStatus.offline);
-                            HiveWach.Add(false);
-                            WachdogStatuses.Add(false);
-                            PingBlocks.Add(false);
-                            HiveStatuses.Add(HiveStatus.WorkerOffline);
-                        }
+                            AddToAllStatuses();
                         else
-                        {
-                            Statuses.RemoveAt(Statuses.Count - 1);
-                            HiveWach.RemoveAt(HiveWach.Count - 1);
-                            WachdogStatuses.RemoveAt(WachdogStatuses.Count - 1);
-                            PingBlocks.RemoveAt(PingBlocks.Count - 1);
-                            HiveStatuses.RemoveAt(HiveStatuses.Count - 1);
-                        }
+                            RemoveInAllStatuses();
                     }
 
                     if (Statuses.Count > Scanned)
@@ -232,9 +227,16 @@ namespace OMineWatcher.Managers
                             // low hashrate wachdog
                             if (Settings.Rigs[i].WachdogMinHashrate != null)
                             {
-                                HiveStatuses[i] = 
-                                    mi.Value.Temperatures.Sum() < Settings.Rigs[i].WachdogMinHashrate.Value ? 
+                                if (mi.Value.Hashrates.Length > 0)
+                                {
+                                    HiveStatuses[i] =
+                                    mi.Value.Hashrates.Sum() < Settings.Rigs[i].WachdogMinHashrate.Value ?
                                     HiveStatus.LowHashrate : HiveStatus.Normal;
+                                }
+                                else
+                                {
+                                    HiveStatuses[i] = HiveStatus.LowHashrate;
+                                }
                             }
                             else { HiveStatuses[i] = HiveStatus.Normal; }
                         }
@@ -268,42 +270,49 @@ namespace OMineWatcher.Managers
             LowHashrate,
             WorkerOffline
         }
-        private static async void HiveWachdog(int i)
+        private static List<bool> HiveWachdogs = new List<bool>();
+        private static void HiveWachdog(int i)
         {
-            await Task.Delay(new TimeSpan(0, 0, HiveOSWachdogDelay));
-            HiveStatuses[i] = HiveStatus.Normal;
-            UserInformer.SendMSG(Settings.Rigs[i].Name, "Start hive wach");
-        BackToLoop:
-            while (HiveStatuses[i] == HiveStatus.Normal && InternetConnection)
+            if (HiveWachdogs[i]) return;
+            Task.Run(async () =>
             {
-                await Task.Delay(1000);
-            }
-            if (InternetConnection)
-            {
-                //задержка
-                for (int n = 0; n < 100; n++)
+                HiveWachdogs[i] = true;
+                await Task.Delay(new TimeSpan(0, 0, HiveOSWachdogDelay));
+                HiveStatuses[i] = HiveStatus.Normal;
+                UserInformer.SendMSG(Settings.Rigs[i].Name, "Start hive wach");
+            BackToLoop:
+                while (HiveStatuses[i] == HiveStatus.Normal && InternetConnection)
                 {
-                    if (HiveStatuses[i] == HiveStatus.Normal) goto BackToLoop;
-                    await Task.Delay(100);
+                    await Task.Delay(1000);
                 }
+                if (InternetConnection)
+                {
+                    //задержка
+                    for (int n = 0; n < 100; n++)
+                    {
+                        if (HiveStatuses[i] == HiveStatus.Normal) goto BackToLoop;
+                        await Task.Delay(100);
+                    }
 
-                string msg = "";
-                switch (HiveStatuses[i])
-                {
-                    case HiveStatus.LowHashrate:
-                        {
-                            msg = "Hive: Low hashrate";
-                        }
-                        break;
-                    case HiveStatus.WorkerOffline:
-                        {
-                            msg = "Hive: Worker offline";
-                        }
-                        break;
+                    string msg = "";
+                    switch (HiveStatuses[i])
+                    {
+                        case HiveStatus.LowHashrate:
+                            {
+                                msg = "Hive: Low hashrate";
+                            }
+                            break;
+                        case HiveStatus.WorkerOffline:
+                            {
+                                msg = "Hive: Worker offline";
+                            }
+                            break;
+                    }
+                    UserInformer.SendMSG(Settings.Rigs[i].Name, msg);
+                    eWeReboot(i);
                 }
-                UserInformer.SendMSG(Settings.Rigs[i].Name, msg);
-                eWeReboot(i);
-            }
+                HiveWachdogs[i] = false;
+            });
         }
         #endregion
 

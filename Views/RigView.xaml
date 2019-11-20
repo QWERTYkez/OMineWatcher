@@ -30,13 +30,13 @@
                         HorizontalAlignment="Left"
                         Content="{Binding Totalhashrate}"
                         ContentStringFormat="0.00"
-                        FontSize="20"
+                        FontSize="32"
                         FontWeight="Bold"
                         Foreground="Lime" />
                     <Label
                         HorizontalAlignment="Left"
                         Content="{Binding HashrateType}"
-                        FontSize="20"
+                        FontSize="32"
                         FontWeight="Bold"
                         Foreground="Lime"
                         Template="{DynamicResource LabelControlTemplate1}" />
@@ -44,7 +44,7 @@
                 <WrapPanel HorizontalAlignment="Center">
                     <Label
                         Content="{Binding RigName}"
-                        FontSize="20"
+                        FontSize="32"
                         FontWeight="Bold"
                         Foreground="Cyan" />
                     <Grid>
@@ -74,7 +74,7 @@
                     HorizontalAlignment="Right"
                     Content="{Binding TotalTemperature}"
                     ContentStringFormat="0℃"
-                    FontSize="20"
+                    FontSize="32"
                     FontWeight="Bold"
                     Foreground="Yellow" />
             </Grid>
