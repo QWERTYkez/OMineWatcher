@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using HiveOS.API;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace OMineWatcher.Managers
 {
@@ -75,6 +74,13 @@ namespace OMineWatcher.Managers
             public long ID { get; private set; }
 
             public string eWeDevice;
+            public int? eWeDelayTimeout;
+
+            public int? HiveFarmID;
+            public int? HiveWorkerID;
+
+            public double? WachdogMinHashrate;
+            public int? WachdogMaxTemp;
 
             public int Index;
             public int? MaxTemp;
@@ -92,15 +98,23 @@ namespace OMineWatcher.Managers
 
                 TotalMaxTemp = 75;
                 TotalMinTemp = 20;
+
+                eWeDelayTimeout = 60; //sec
             }
 
             public string eWeLogin;
             public string eWePassword;
+            public int eWeDelayTimeout;
+
+            public string HiveLogin;
+            public string HivePassword;
+
             public int Digits;
             public int LogTextSize;
             public bool LogAutoscroll;
             public int TotalMaxTemp;
             public int TotalMinTemp;
+            public int? VKuserID;
         }
         #endregion
 

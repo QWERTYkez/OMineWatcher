@@ -19,12 +19,16 @@ namespace OMineWatcher.ViewModels
             Index = index;
             _model = MVM;
             _model.PropertyChanged += ModelChanged;
+        }
+        public void InitializeRigViewModel()
+        {
             SetRig(_model.Rigs[Index]);
             _model.Rigs.CollectionChanged += (s, e) =>
             {
                 SetRig(_model.Rigs[Index]);
             };
         }
+
         private void SetRig(Settings.Rig R)
         {
             RigName = R.Name; IP = R.IP;

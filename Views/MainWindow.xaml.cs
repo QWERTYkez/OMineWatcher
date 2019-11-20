@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Shapes;
-using System.Threading;
-using System.Windows.Media.Effects;
+﻿using Microsoft.Xaml.Behaviors;
 using OMineWatcher.Styles;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
-using Microsoft.Xaml.Behaviors;
-using System.Windows.Controls;
 using OMineWatcher.ViewModels;
-using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
+using System.Threading;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media.Effects;
+using System.Windows.Shapes;
 
 namespace OMineWatcher.Views
 {
@@ -28,26 +25,32 @@ namespace OMineWatcher.Views
             _ViewModel.InitializeMainViewModel();
         }
 
-        private void MainViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void MainViewModel_PropertyChanged(object sender, 
+            System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case "eWePasswordSend":
-                    eWePasswordBox.Password = _ViewModel.eWePasswordSend;
+                    Dispatcher.Invoke(() => { eWePasswordBox.Password = _ViewModel.eWePasswordSend; });
+                    break;
+                case "HivePasswordSend":
+                    Dispatcher.Invoke(() => { HivePasswordBox.Password = _ViewModel.HivePasswordSend; });
                     break;
                 case "Indicators":
                     STAContext.Send(obj => SetIndicators(), null);
                     break;
             }
         }
-        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        private void eWePasswordChanged(object sender, RoutedEventArgs e)
         { _ViewModel.eWePasswordReceive = eWePasswordBox.Password; }
+        private void HivePasswordChanged(object sender, RoutedEventArgs e)
+        { _ViewModel.HivePasswordReceive = HivePasswordBox.Password; }
 
         private static List<Ellipse> Indicators { get; set; } = new List<Ellipse>();
         private void SetIndicators()
         {
             if (Indicators.Count == _ViewModel.Indicators.Count) return;
-            List<Models.MainModel.RigStatus> types = _ViewModel.Indicators;
+            List<Managers.RigStatus?> types = _ViewModel.Indicators;
             while (Indicators.Count != types.Count)
             {
                 if (Indicators.Count < types.Count)

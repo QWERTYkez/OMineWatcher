@@ -72,6 +72,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\DrawingCanvas.cs" />
+    <Compile Include="Managers\InternetConnectionWacher.cs" />
+    <Compile Include="Managers\RigsWacher.cs" />
+    <Compile Include="Managers\UserInformer.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Models\OmgModel.cs" />
     <Compile Include="Classes\Converters.cs" />
@@ -199,6 +202,10 @@
     <ProjectReference Include="eWeLink.API\eWeLink.API.csproj">
       <Project>{58561cec-3b10-4b20-9548-5ef7872a96ce}</Project>
       <Name>eWeLink.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="HiveOS.API\HiveOS.API.csproj">
+      <Project>{8c54101e-9d64-48fc-8707-52607f5ae56c}</Project>
+      <Name>HiveOS.API</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

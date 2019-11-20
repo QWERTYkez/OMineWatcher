@@ -2,8 +2,8 @@
     x:Class="OMineWatcher.Views.OmgView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Styles="clr-namespace:OMineWatcher.Styles"
     xmlns:Classes="clr-namespace:OMineWatcher.Classes"
+    xmlns:Styles="clr-namespace:OMineWatcher.Styles"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:OMineWatcher.Views"
@@ -284,7 +284,7 @@
                             FontSize="14"
                             FontWeight="Bold"
                             IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
-                            Text="{Binding MinHashrate, Mode=TwoWay}" />
+                            Text="{Binding MinHashrate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                     <Label
                         Grid.Row="2"

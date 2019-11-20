@@ -35,16 +35,22 @@ namespace OMineWatcher.Classes
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Models.MainModel.RigStatus Type = (Models.MainModel.RigStatus)value;
-            switch (Type)
+            Managers.RigStatus? Type = (Managers.RigStatus?)value;
+            if (Type != null)
             {
-                case Models.MainModel.RigStatus.offline:
-                    return Brushes.Red;
-                case Models.MainModel.RigStatus.online:
-                    return Brushes.Yellow;
-                case Models.MainModel.RigStatus.works:
-                    return Brushes.Lime;
+                Managers.RigStatus type = Type.Value;
+                switch (type)
+                {
+                    case Managers.RigStatus.offline:
+                        return Brushes.Red;
+                    case Managers.RigStatus.online:
+                        return Brushes.Yellow;
+                    case Managers.RigStatus.works:
+                        return Brushes.Lime;
+                }
             }
+            else { return Brushes.Purple; }
+            
             return null;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -159,6 +165,32 @@ namespace OMineWatcher.Classes
             else
             {
                 return false;
+            }
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SelectedIndexToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+            {
+                if ((int)value > -1)
+                {
+                    return Visibility.Visible;
+                }
+                else
+                {
+                    return Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                return Visibility.Collapsed;
             }
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

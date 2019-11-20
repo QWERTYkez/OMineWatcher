@@ -192,6 +192,8 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -216,42 +218,110 @@
                                         Content="Подключиться" />
                                 </WrapPanel>
                             </Border>
+
+                            <Border
+                                Grid.Row="0"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="2"
+                                Visibility="{Binding HiveWorkerSettingsVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                        <Label Content="Hive worker:" />
+                                        <ComboBox
+                                            Width="250"
+                                            Margin="10,0"
+                                            IsEnabled="{Binding HiveConnection}"
+                                            ItemsSource="{Binding HiveWorkersNames}"
+                                            SelectedIndex="{Binding SelectedHiveWorkerIndex, Mode=TwoWay}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SelectHiveWorker}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+                                        <Styles:Tumbler IsChecked="{Binding HiveWorkerActive, Mode=TwoWay}" IsEnabled="{Binding HiveWorkerActive, Converter={StaticResource ObjectExistToBoolConverter}}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Checked">
+                                                    <i:InvokeCommandAction Command="{Binding HiveWorkerEnable}" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="Unchecked">
+                                                    <i:InvokeCommandAction Command="{Binding HiveWorkerDisable}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Styles:Tumbler>
+                                    </WrapPanel>
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="2"
+                                        Height="23"
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding HiveConnectionState}"
+                                        FontSize="14" />
+                                </StackPanel>
+                            </Border>
+
                             <Border
                                 Grid.Row="1"
                                 BorderBrush="{StaticResource MSI.Border}"
-                                BorderThickness="2">
-                                <WrapPanel Margin="0,4" HorizontalAlignment="Center">
-                                    <Label Margin="0,0,5,0" VerticalAlignment="Center">eWeLink устройство:</Label>
-                                    <ComboBox
-                                        Width="150"
-                                        ItemsSource="{Binding eWeDevicesNames}"
-                                        SelectedIndex="{Binding SelectedeWeDeviceIndex, Mode=TwoWay}"
-                                        SelectedItem="{Binding SelectedeWeDevice, Mode=TwoWay}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction Command="{Binding SelecteWeDevice}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </ComboBox>
-                                    <Styles:Tumbler
-                                        Margin="5,0,0,0"
-                                        IsChecked="{Binding eWeDeviceActive, Mode=TwoWay}"
-                                        IsEnabled="{Binding SelectedeWeDeviceIndex, Converter={StaticResource SelectedIndexToboolConverterZero}}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="Checked">
-                                                <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Unchecked">
-                                                <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </Styles:Tumbler>
-                                </WrapPanel>
+                                BorderThickness="2"
+                                Visibility="{Binding SelectedRigIndex, Converter={StaticResource SelectedIndexToVisibilityConverter}}">
+                                <StackPanel>
+                                    <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                        <Label Margin="0,0,5,0" VerticalAlignment="Center">eWeLink устройство:</Label>
+                                        <ComboBox
+                                            Width="150"
+                                            ItemsSource="{Binding eWeDevicesNames}"
+                                            SelectedIndex="{Binding SelectedeWeDeviceIndex, Mode=TwoWay}"
+                                            SelectedItem="{Binding SelectedeWeDevice, Mode=TwoWay}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SelecteWeDevice}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+                                        <Styles:Tumbler
+                                            Margin="5,0,0,0"
+                                            IsChecked="{Binding eWeDeviceActive, Mode=TwoWay}"
+                                            IsEnabled="{Binding SelectedeWeDeviceIndex, Converter={StaticResource SelectedIndexToboolConverterZero}}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Checked">
+                                                    <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="Unchecked">
+                                                    <i:InvokeCommandAction Command="{Binding SwitchActiveDevice}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Styles:Tumbler>
+                                    </WrapPanel>
+                                    <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                        <Label VerticalAlignment="Center" Content="Задержка повторной перезагрузки: " />
+                                        <TextBox
+                                            Width="50"
+                                            IsEnabled="{Binding SelectedeWeDeviceIndex, Converter={StaticResource SelectedIndexToVisibilityConverter}}"
+                                            Text="{Binding eWeDelayTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SeteWeDelayTimeout}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                        <Label VerticalAlignment="Center" Content=" секунд" />
+                                    </WrapPanel>
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="2"
+                                        Height="23"
+                                        HorizontalAlignment="Center"
+                                        Content="{Binding eWeAccountState}"
+                                        FontSize="14" />
+                                </StackPanel>
                             </Border>
+
                             <Border
                                 Grid.Row="2"
                                 BorderBrush="{StaticResource MSI.Border}"
-                                BorderThickness="2">
+                                BorderThickness="2"
+                                Visibility="{Binding SelectedRigIndex, Converter={StaticResource SelectedIndexToVisibilityConverter}}">
                                 <WrapPanel Margin="0,4" HorizontalAlignment="Center">
                                     <Label
                                         Margin="0,0,5,0"
@@ -267,6 +337,140 @@
                                 </WrapPanel>
                             </Border>
 
+                            <Border
+                                Grid.Row="3"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="2"
+                                Visibility="{Binding SelectedRigIndex, Converter={StaticResource SelectedIndexToVisibilityConverter}}">
+                                <StackPanel>
+                                    <Label
+                                        HorizontalAlignment="Center"
+                                        Content="Настройки тревоги:"
+                                        FontSize="18" />
+                                    <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                        <Label
+                                            VerticalAlignment="Center"
+                                            Content="Минимальный хешрейт: "
+                                            FontSize="14" />
+                                        <TextBox
+                                            Width="50"
+                                            FontSize="14"
+                                            Text="{Binding WachdogMinHashrate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SetWachdogMinHashrate}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                    </WrapPanel>
+                                    <WrapPanel Margin="0,4" HorizontalAlignment="Center">
+                                        <Label
+                                            VerticalAlignment="Center"
+                                            Content="Максимальная температура: "
+                                            FontSize="14" />
+                                        <TextBox
+                                            Width="50"
+                                            FontSize="14"
+                                            Text="{Binding WachdogMaxTemp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="TextChanged">
+                                                    <i:InvokeCommandAction Command="{Binding SetWachdogMaxTemp}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                Grid.Row="4"
+                                Grid.Column="0"
+                                Margin="-1"
+                                Padding="3"
+                                HorizontalAlignment="Stretch"
+                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderThickness="1"
+                                Visibility="{Binding SelectedRigIndex, Converter={StaticResource SelectedIndexToVisibilityConverter}}">
+                                <StackPanel>
+                                    <Label
+                                        HorizontalAlignment="Center"
+                                        Content="Диапазон температурной шкалы рига:"
+                                        FontSize="16" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="33" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Right"
+                                            Content="Начало:"
+                                            FontSize="18" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Right"
+                                            Content="Конец:"
+                                            FontSize="18" />
+
+                                        <Slider
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Margin="5"
+                                            VerticalAlignment="Center"
+                                            Maximum="90"
+                                            Minimum="0"
+                                            SmallChange="5"
+                                            TickFrequency="5"
+                                            Value="{Binding CurrentStartOfRange}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="ValueChanged">
+                                                    <i:InvokeCommandAction Command="{Binding ChangeCurrentStartOfRange}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Slider>
+                                        <Slider
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="5"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="10"
+                                            SmallChange="5"
+                                            TickFrequency="5"
+                                            Value="{Binding CurrentEndOfRange}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="ValueChanged">
+                                                    <i:InvokeCommandAction Command="{Binding ChangeCurrentEndOfRange}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Slider>
+
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Content="{Binding CurrentStartOfRangeD}"
+                                            FontSize="18" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Content="{Binding CurrentEndOfRangeD}"
+                                            FontSize="18" />
+
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
                         </Grid>
                         <!--  Настройки ригов///  -->
                     </Grid>
@@ -279,15 +483,109 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <Border
-                        Grid.Row="0"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="-1"
+                        Padding="3"
+                        HorizontalAlignment="Center"
+                        BorderBrush="{StaticResource MSI.Border}"
+                        BorderThickness="1">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Label
+                                Margin="0,2"
+                                HorizontalAlignment="Center"
+                                FontSize="20">
+                                HiveOS Account
+                            </Label>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="300" />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="0,2,5,2"
+                                    HorizontalAlignment="Right"
+                                    FontSize="18">
+                                    Логин :
+                                </Label>
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0,2"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="18"
+                                    Text="{Binding HiveLogin, Mode=TwoWay}" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0,2,5,2"
+                                    HorizontalAlignment="Right"
+                                    FontSize="18">
+                                    Пароль :
+                                </Label>
+                                <PasswordBox
+                                    x:Name="HivePasswordBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0,2"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="18"
+                                    PasswordChanged="HivePasswordChanged" />
+                            </Grid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="4"
+                                    Command="{Binding HiveConnect}"
+                                    FontSize="18">
+                                    Подключить
+                                </Button>
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="4"
+                                    Command="{Binding HiveDisonnect}"
+                                    FontSize="18">
+                                    Отключить
+                                </Button>
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    Height="28"
+                                    HorizontalAlignment="Center"
+                                    Content="{Binding HiveAccountState}"
+                                    FontSize="18" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Row="2"
                         Grid.Column="0"
                         Margin="-1"
                         Padding="3"
@@ -340,7 +638,7 @@
                                     Margin="0,2"
                                     VerticalContentAlignment="Center"
                                     FontSize="18"
-                                    PasswordChanged="PasswordBox_PasswordChanged" />
+                                    PasswordChanged="eWePasswordChanged" />
                             </Grid>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -378,7 +676,7 @@
                     </Border>
 
                     <Border
-                        Grid.Row="1"
+                        Grid.Row="0"
                         Grid.Column="0"
                         Margin="-1"
                         Padding="3"
@@ -464,6 +762,28 @@
                             </Grid>
                         </StackPanel>
                     </Border>
+
+                    <StackPanel Grid.Row="0" Grid.Column="1">
+                        <Border
+                            Margin="-1"
+                            Padding="3"
+                            BorderBrush="{StaticResource MSI.Border}"
+                            BorderThickness="1">
+                            <WrapPanel Margin="10">
+                                <Label
+                                    Content="VK user id:  "
+                                    FontSize="18"
+                                    Foreground="White" />
+                                <TextBox Width="200" Text="{Binding VKuserID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="TextChanged">
+                                            <i:InvokeCommandAction Command="{Binding VKuserIDchanged}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </TextBox>
+                            </WrapPanel>
+                        </Border>
+                    </StackPanel>
 
                 </Grid>
             </TabItem>

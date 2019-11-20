@@ -24,6 +24,8 @@ namespace OMineWatcher.Views
             Index = index;
             _ViewModel.PropertyChanged += RigView_PropertyChanged;
 
+            _ViewModel.InitializeRigViewModel();
+
             BaseTemp.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
         }
         private SynchronizationContext _context;

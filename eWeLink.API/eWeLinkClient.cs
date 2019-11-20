@@ -71,7 +71,14 @@ namespace eWeLink.API
         {
             Login = login;
             Password = password;
-
+            ItCanAct = true;
+        }
+        public static bool ItCanAct { get; private set; } = false;
+        public static void RemoveAuth()
+        {
+            Login = null;
+            Password = null;
+            ItCanAct = false;
         }
         /// <summary>
         /// Метод возвращает список устройств (требует предварительного вызова AutheWeLink(...) или SetAuth(...))
@@ -79,8 +86,7 @@ namespace eWeLink.API
         /// <returns>Список устройств с их параметрами</returns>
         public static List<_eWelinkDevice> GetDevices()
         {
-            if (Login == "" || Login == null) { return null; }
-            if (Password == "" || Password == null) { return null; }
+            if (!ItCanAct) { return null; }
 
             if (AT == "") { AutheWeLink(Login, Password, ref APIkey, ref AT); }
 
@@ -92,7 +98,7 @@ namespace eWeLink.API
                 webClient.Headers.Add("Authorization", $"Bearer {AT}");
                 response = webClient.DownloadString(uri);
             }
-            if (response.Contains("\"error\":401"))
+            if (response.Contains("\"error\":401") || response.Contains("\"error\":400"))
             {
                 AutheWeLink(Login, Password, ref APIkey, ref AT);
 
@@ -101,7 +107,7 @@ namespace eWeLink.API
                     webClient.Headers.Add("Authorization", $"Bearer {AT}");
                     response = webClient.DownloadString(uri);
                 }
-                if (response.Contains("\"error\":401"))
+                if (response.Contains("\"error\":401") || response.Contains("\"error\":400"))
                 {
                     return null;
                 }
@@ -124,6 +130,7 @@ namespace eWeLink.API
         /// <param name="deviceID">ID устройства</param>
         public static void RebootDevice(string deviceID)
         {
+            if (!ItCanAct) { return; }
             AddOperation(deviceID, Operations.RebootDevice);
         }
         /// <summary>
@@ -134,6 +141,7 @@ namespace eWeLink.API
         /// <param name="Dstate">Желаемое состояние устройства</param>
         public static void SwitchDevice(string deviceID, DeviceState Dstate)
         {
+            if (!ItCanAct) { return; }
             switch (Dstate)
             {
                 case DeviceState.on:
@@ -143,14 +151,12 @@ namespace eWeLink.API
                     AddOperation(deviceID, Operations.SwitchOff);
                     break;
             }
-
-            
         }
 
 
         private static object key = new object();
-        private static string Login = "";
-        private static string Password = "";
+        private static string Login = null;
+        private static string Password = null;
         private static WebSocket WS;
         private static string APIkey = "";
         private static string AT = "";

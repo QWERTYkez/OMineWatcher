@@ -62,6 +62,7 @@ namespace OMineWatcher.ViewModels
                     {
                         rvm.Hashrates = ro.Hashrates;
                         rvm.Totalhashrate = ro.Hashrates.Sum();
+                        rvm.SetIndicator(true);
                     }
                     if (ro.Temperatures != null)
                     {
@@ -92,6 +93,26 @@ namespace OMineWatcher.ViewModels
             foreach (RigViewModel rvm in RVMs)
             {
                 rvm.SetBaseMinTemp(t);
+            }
+        }
+        private void SetCurrentMaxTemp(int i, int t)
+        {
+            foreach (RigViewModel rvm in RVMs)
+            {
+                if (Rigs[i].Index == rvm.Index)
+                {
+                    rvm.MaxTempCurr = t;
+                }
+            }
+        }
+        private void SetCurrentMinTemp(int i, int t)
+        {
+            foreach (RigViewModel rvm in RVMs)
+            {
+                if (Rigs[i].Index == rvm.Index)
+                {
+                    rvm.MinTempCurr = t;
+                }
             }
         }
     }

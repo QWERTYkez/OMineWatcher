@@ -3,61 +3,45 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OMineWatcher.Models
 {
     public class MainModel : INotifyPropertyChanged
     {
+        public MainModel()
+        {
+            InternetConnectionWacher.InternetConnectionLost += NullAllStatuses;
+            NullAllStatuses();
+            RigsWacher.SendInform += inf => { RigInform = inf; };
+            RigsWacher.RigStatusChanged += (n, status) => { Statuses[n] = status; };
+        }
+        public void InitializeModel()
+        {
+            Rigs = Settings.Rigs;
+            GenSettings = Settings.GenSets;
+        }
+        private void NullAllStatuses()
+        {
+            List<RigStatus?> lrs = new List<RigStatus?>();
+            foreach (Settings.Rig r in Settings.Rigs) lrs.Add(null);
+            Statuses = new ObservableCollection<RigStatus?>(lrs);
+        }
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName]string prop = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
-        public MainModel()
-        {
-            Statuses = new ObservableCollection<RigStatus>(from r in Settings.Rigs select RigStatus.offline);
-            OMG_TCP.OMGInformSent += OMGInformSent;
-            OMG_TCP.OMGInformStreamReceived += RigWorks;
-            OMG_TCP.OMGInformStreamLost += RigInactive;
-        }
-        public void InitializeModel()
-        {
-            Rigs = Settings.Rigs;
-            StartRigsScanning();
-        }
-        private void RigWorks(string IP)
-        {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (IPs.Contains(IP))
-            {
-                int n = IPs.IndexOf(IP);
-                Statuses[n] = RigStatus.works;
-            }
-        }
-        private void RigInactive(string IP)
-        {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (IPs.Contains(IP))
-            {
-                int n = IPs.IndexOf(IP);
-                Statuses[n] = RigStatus.online;
-
-                OMG_TCP.RootObject ro = new OMG_TCP.RootObject();
-
-                ro.RigInactive = true;
-
-                OMGInformSent(IP, ro);
-            }
-        }
-        
         public List<Settings.Rig> Rigs { get; set; }
+        public Settings._GenSettings GenSettings { get; set; }
+        public ObservableCollection<RigStatus?> Statuses { get; set; }
+        public RigInform RigInform { get; set; }
+        #endregion
 
+        #region Commands
         public void cmd_StopWach(string ip)
         {
             OMG_TCP.StopInformStream(ip);
@@ -84,98 +68,11 @@ namespace OMineWatcher.Models
             }
             Settings.SaveSettings();
         }
-
-        public enum RigStatus
+        public void cmd_SaveGenSettings(Settings._GenSettings gs)
         {
-            offline,
-            online,
-            works
+            Settings.GenSets = gs;
+            Settings.SaveSettings();
         }
-        public ObservableCollection<RigStatus> Statuses { get; set; }
-        private int Scanned = 0;
-        private const int PingCheckDelay = 3; //sec
-        private const int PingCheckTimeout = 300; //msec
-        private void StartRigsScanning()
-        {
-            Task.Run(async () => 
-            {
-                while (true)
-                {
-                    if (Statuses.Count > Scanned)
-                    {
-                        Scanned++;
-                        int n = Scanned;
-                        int i = Scanned - 1;
-                        string IP = Rigs[i].IP;
-                        Task.Run(() =>
-                        {
-                            Ping ping = new Ping();
-                            IPStatus? status;
-                            while (true)
-                            {
-                                if (Statuses.Count < n) { Scanned--; return; }
-                                if (Statuses[i] != RigStatus.works || IP != Rigs[i].IP)
-                                {
-                                    status = null;
-                                    IP = Rigs[i].IP;
-
-                                    try { status = ping.Send(IPAddress.Parse(IP), PingCheckTimeout).Status; }
-                                    catch { }
-                                    if (status == IPStatus.Success)
-                                    {
-                                        if (Statuses.Count < n) { Scanned--; return; }
-                                        Statuses[i] = RigStatus.online;
-                                        if (Settings.Rigs[i].Waching)
-                                        {
-                                            switch (Rigs[i].Type)
-                                            {
-                                                case "OMineGuard":
-                                                    {
-                                                        OMG_TCP.StartInformStream(IP);
-                                                    }
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (Statuses.Count < n) { Scanned--; return; }
-                                        Statuses[i] = RigStatus.offline;
-                                    }
-                                }
-                                Thread.Sleep(PingCheckDelay * 1000);
-                            }
-                        });
-                    }
-                    await Task.Delay(100);
-                }
-            });
-        }
-
-        public RigInform RigInform { get; set; }
-        private void OMGInformSent(string IP, OMG_TCP.RootObject RO)
-        {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (!IPs.Contains(IP))
-            {
-                OMG_TCP.StopInformStream(IP);
-                return;
-            }
-            else
-            {
-                RigInform = new RigInform(IP, RO);
-            }
-        }
-    }
-    public struct RigInform
-    {
-        public RigInform(string ip, OMG_TCP.RootObject ro)
-        {
-            IP = ip;
-            RO = ro;
-        }
-
-        public string IP;
-        public OMG_TCP.RootObject RO;
+        #endregion
     }
 }

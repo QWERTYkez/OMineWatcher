@@ -2,9 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:OMineWatcher.Classes">
-    
+
     <local:BoolInverceConverter x:Key="BoolInverceConverter" />
     <local:RigStatusToBrushConverter x:Key="RigStatusToBrushConverter" />
+    <local:SelectedIndexToVisibilityConverter x:Key="SelectedIndexToVisibilityConverter" />
     <local:ObjectExistToVisibilityConverter x:Key="ObjectExistToVisibilityConverter" />
     <local:ObjectExistToVisibilityConverterReverce x:Key="ObjectExistToVisibilityConverterReverce" />
     <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
