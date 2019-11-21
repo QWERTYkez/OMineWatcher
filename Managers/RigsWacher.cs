@@ -319,38 +319,41 @@ namespace OMineWatcher.Managers
         private static List<bool> WachdogStatuses = new List<bool>();
         private static void ActivateWachdog(int i)
         {
-            WachdogStatuses[i] = true;
-            Task.Run(async () =>
+            if (!WachdogStatuses[i])
             {
-                int n = 0;
-                while (n < WachdogDelay)
+                WachdogStatuses[i] = true;
+                Task.Run(async () =>
                 {
+                    int n = 0;
+                    while (n < WachdogDelay)
+                    {
+                        if (WachdogStatuses[i] && InternetConnection)
+                        {
+                            await Task.Delay(1000);
+                            n++;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
                     if (WachdogStatuses[i] && InternetConnection)
                     {
-                        await Task.Delay(1000);
-                        n++;
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                if (WachdogStatuses[i] && InternetConnection)
-                {
-                    UserInformer.SendMSG(Settings.Rigs[i].Name, "Ping: Worker offline");
-                    EndWach(i);
+                        UserInformer.SendMSG(Settings.Rigs[i].Name, "Ping: Worker offline");
+                        EndWach(i);
 
-                    while (WachdogStatuses[i] && InternetConnection)
-                    {
-                        eWeReboot(i);
+                        while (WachdogStatuses[i] && InternetConnection)
+                        {
+                            eWeReboot(i);
 
-                        await Task.Delay(1000 *
-                            (Settings.Rigs[i].eWeDelayTimeout != null ?
-                            Settings.Rigs[i].eWeDelayTimeout.Value :
-                            Settings.GenSets.eWeDelayTimeout));
+                            await Task.Delay(1000 *
+                                (Settings.Rigs[i].eWeDelayTimeout != null ?
+                                Settings.Rigs[i].eWeDelayTimeout.Value :
+                                Settings.GenSets.eWeDelayTimeout));
+                        }
                     }
-                }
-            });
+                });
+            }
         }
         private static void EndWach(int i)
         {
