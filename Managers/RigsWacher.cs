@@ -255,7 +255,6 @@ namespace OMineWatcher.Managers
 
                         await Task.Delay(new TimeSpan(0, 0, HiveOSRequestDelay));
                     }
-                    return;
             EndHiveWach:
                     HiveWach[i] = false;
                 });
