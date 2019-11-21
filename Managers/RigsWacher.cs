@@ -328,6 +328,7 @@ namespace OMineWatcher.Managers
                     if (WachdogStatuses[i] && InternetConnection)
                     {
                         await Task.Delay(1000);
+                        n++;
                     }
                     else
                     {
