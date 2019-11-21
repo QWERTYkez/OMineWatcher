@@ -189,7 +189,10 @@ namespace OMineWatcher.Managers
                         else
                         {
                             RigStatusChanged?.Invoke(i, RigStatus.offline);
-                            ActivateWachdog(i);
+                            if (Settings.Rigs[i].Waching)
+                            {
+                                ActivateWachdog(i);
+                            }
                         }
                     }
                     await Task.Delay(PingCheckDelay * 1000);
