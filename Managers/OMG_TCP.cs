@@ -315,6 +315,7 @@ namespace OMineWatcher.Managers
                                     try
                                     {
                                         RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                        OMGInformSent?.Invoke(i, RO);
                                     }
                                     catch { }
                                     Thread.Sleep(50);
