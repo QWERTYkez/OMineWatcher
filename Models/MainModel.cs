@@ -42,20 +42,13 @@ namespace OMineWatcher.Models
         #endregion
 
         #region Commands
-        public void cmd_StopWach(string ip)
+        public void cmd_StopWach(int i)
         {
-            OMG_TCP.StopInformStream(ip);
+            OMG_TCP.StopInformStream(i);
         }
         public void cmd_SaveRigs(List<Settings.Rig> rigs)
         {
             Settings.Rigs = rigs;
-
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            List<string> newIPs = (from r in rigs select r.IP).ToList();
-            foreach (string ip in (IPs.Except(newIPs))) // удаленные IPs
-            {
-                OMG_TCP.StopInformStream(ip);
-            }
 
             while (rigs.Count != Statuses.Count)
             {

@@ -48,11 +48,10 @@ namespace OMineWatcher.ViewModels
         }
         private void RigInform()
         {
-            string ip = _model.RigInform.IP;
             OMG_TCP.RootObject ro = _model.RigInform.RO;
             foreach (RigViewModel rvm in RVMs)
             {
-                if (ip == rvm.IP)
+                if (_model.RigInform.Index == rvm.Index)
                 {
                     if (ro.Indication != null)
                     {

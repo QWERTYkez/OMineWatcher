@@ -32,43 +32,29 @@ namespace OMineWatcher.Managers
             StartRigsScanning();
         }
 
-        private static void OMGRigWorks(string IP)
+        private static void OMGRigWorks(int i)
         {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (IPs.Contains(IP))
+            if (i < PingBlocks.Count)
             {
-                int n = IPs.IndexOf(IP);
-                RigStatusChanged?.Invoke(n, RigStatus.works);
-                PingBlocks[n] = true;
+                RigStatusChanged?.Invoke(i, RigStatus.works);
+                PingBlocks[i] = true;
             }
         }
-        private static void OMGRigInactive(string IP)
+        private static void OMGRigInactive(int i)
         {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (IPs.Contains(IP))
+            if (i < PingBlocks.Count)
             {
-                int n = IPs.IndexOf(IP);
-                PingBlocks[n] = false;
+                PingBlocks[i] = false;
 
                 OMG_TCP.RootObject ro = new OMG_TCP.RootObject();
-
                 ro.RigInactive = true;
 
-                OMGInformSent(IP, ro);
+                OMGInformSent(i, ro);
             }
         }
-        private static void OMGInformSent(string IP, OMG_TCP.RootObject RO)
+        private static void OMGInformSent(int i, OMG_TCP.RootObject RO)
         {
-            List<string> IPs = (from r in Settings.Rigs select r.IP).ToList();
-            if (!IPs.Contains(IP))
-            {
-                OMG_TCP.StopInformStream(IP);
-                return;
-            }
-            else
-            {
-                SendInform?.Invoke(new RigInform(IP, RO));
-            }
+            SendInform?.Invoke(new RigInform(i, RO));
         }
 
         private static void AddToAllStatuses()
@@ -144,7 +130,7 @@ namespace OMineWatcher.Managers
                         }
                         if (type == "OMineGuard")
                         {
-                            OMG_TCP.StopInformStream(Settings.Rigs[i].IP);
+                            OMG_TCP.StopInformStream(i);
                             PingBlocks[i] = false;
                         }
                         type = Settings.Rigs[i].Type;
@@ -171,7 +157,7 @@ namespace OMineWatcher.Managers
                                         RigStatusChanged?.Invoke(i, RigStatus.online);
                                         if (Settings.Rigs[i].Waching)
                                         {
-                                            OMG_TCP.StartInformStream(IP);
+                                            OMG_TCP.StartInformStream(IP, i);
                                         }
                                     }
                                     break;
@@ -219,7 +205,7 @@ namespace OMineWatcher.Managers
 
                         if (mi != null)
                         {
-                            SendInform?.Invoke(new RigInform(Settings.Rigs[i].IP,
+                            SendInform?.Invoke(new RigInform(i,
                                 new OMG_TCP.RootObject
                                 {
                                     Indication = true,
@@ -245,7 +231,7 @@ namespace OMineWatcher.Managers
                         }
                         else
                         {
-                            SendInform?.Invoke(new RigInform(Settings.Rigs[i].IP,
+                            SendInform?.Invoke(new RigInform(i,
                                 new OMG_TCP.RootObject
                                 {
                                     Indication = false
@@ -375,13 +361,13 @@ namespace OMineWatcher.Managers
     }
     public struct RigInform
     {
-        public RigInform(string ip, OMG_TCP.RootObject ro)
+        public RigInform(int i, OMG_TCP.RootObject ro)
         {
-            IP = ip;
+            Index = i;
             RO = ro;
         }
 
-        public string IP;
+        public int Index;
         public OMG_TCP.RootObject RO;
     }
     public enum RigStatus

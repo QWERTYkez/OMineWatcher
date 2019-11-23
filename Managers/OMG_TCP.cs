@@ -287,57 +287,53 @@ namespace OMineWatcher.Managers
         #endregion
 
         #region GetInformStream
-        public static event Action<string> OMGInformStreamLost;
-        public static event Action<string> OMGInformStreamReceived;
-        public static event Action<string, RootObject> OMGInformSent;
-        private static Dictionary<string, bool> RigsInformState = new Dictionary<string, bool>();
-        public static void StartInformStream(string IP)
+        public static event Action<int> OMGInformStreamLost;
+        public static event Action<int> OMGInformStreamReceived;
+        public static event Action<int, RootObject> OMGInformSent;
+        private static List<bool> RigsInformState = new List<bool>();
+        public static void StartInformStream(string IP, int i)
         {
-            if (RigsInformState.ContainsKey(IP))
+            while (i >= RigsInformState.Count)
             {
-                if (RigsInformState[IP])
-                    return;
-                else
-                    RigsInformState[IP] = true;
+                RigsInformState.Add(false);
             }
-            else
-                RigsInformState.Add(IP, true);
-            Task.Run(() =>
+            if (!RigsInformState[i])
             {
-                try
+                RigsInformState[i] = true;
+                Task.Run(() =>
                 {
-                    using (TcpClient client = new TcpClient(IP, 2111))
+                    try
                     {
-                        if (client.Connected) OMGInformStreamReceived?.Invoke(IP);
-                        using (NetworkStream stream = client.GetStream())
+                        using (TcpClient client = new TcpClient(IP, 2111))
                         {
-                            RootObject RO;
-                            while (client.Connected && RigsInformState[IP])
+                            if (client.Connected) OMGInformStreamReceived?.Invoke(i);
+                            using (NetworkStream stream = client.GetStream())
                             {
-                                try
+                                RootObject RO;
+                                while (client.Connected && RigsInformState[i] && Settings.Rigs[i].IP == IP)
                                 {
-                                    RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
-                                    OMGInformSent?.Invoke(IP, RO);
+                                    try
+                                    {
+                                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                    }
+                                    catch { }
+                                    Thread.Sleep(50);
                                 }
-                                catch { }
-                                Thread.Sleep(50);
+                                StopInformStream(i);
                             }
-                            RigsInformState[IP] = false;
-                            OMGInformStreamLost?.Invoke(IP);
                         }
                     }
-                }
-                catch
-                {
-                    RigsInformState[IP] = false;
-                    OMGInformStreamLost?.Invoke(IP);
-                }
-            });
+                    catch { StopInformStream(i); }
+                });
+            }
         }
-        public static void StopInformStream(string IP)
+        public static void StopInformStream(int i)
         {
-            if (RigsInformState.ContainsKey(IP))
-                RigsInformState[IP] = false;
+            if (i < RigsInformState.Count)
+            {
+                RigsInformState[i] = false;
+                OMGInformStreamLost?.Invoke(i);
+            }
         }
         #endregion
     }

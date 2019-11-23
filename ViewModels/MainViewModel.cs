@@ -352,7 +352,7 @@ namespace OMineWatcher.ViewModels
                 if (i != Watch.Count)
                 {
                     Rigs[i].Waching = Watch[i];
-                    if (!Rigs[i].Waching) _model.cmd_StopWach(Rigs[i].IP);
+                    if (!Rigs[i].Waching) _model.cmd_StopWach(i);
                     _model.cmd_SaveRigs(Rigs.ToList());
                     {
                         if (Watch[i])
