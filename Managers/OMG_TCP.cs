@@ -13,7 +13,7 @@ namespace OMineWatcher.Managers
         #region OMGcontrol
         public static event Action OMGcontrolLost;
         public static event Action OMGcontrolReceived;
-        public static event Action<RootObject> OMGsent;
+        public static event Action<OMGRootObject> OMGsent;
 
         public static bool OMGconnection;
         public static void OMGcontrolDisconnect()
@@ -51,42 +51,42 @@ namespace OMineWatcher.Managers
 
                         Task.Run(() =>
                         {
-                            RootObject RO;
+                            OMGRootObject RO;
                             try
                             {
-                                RO = JsonConvert.DeserializeObject<RootObject>(result[2]);
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[2]);
                                 OMGsent?.Invoke(RO);
                             }
                             catch { }
                             try
                             {
-                                RO = new RootObject();
+                                RO = new OMGRootObject();
                                 RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
                                 OMGsent?.Invoke(RO);
                             }
                             catch { }
                             try
                             {
-                                RO = JsonConvert.DeserializeObject<RootObject>(result[0]);
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[0]);
                                 OMGsent?.Invoke(RO);
                             }
                             catch { }
                             try
                             {
-                                RO = JsonConvert.DeserializeObject<RootObject>(result[3]);
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[3]);
                                 OMGsent?.Invoke(RO);
                             }
                             catch { }
                             try
                             {
-                                RO = JsonConvert.DeserializeObject<RootObject>(result[4]);
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[4]);
                                 OMGsent?.Invoke(RO);
                                 OMGsent?.Invoke(RO);
                             }
                             catch { }
                             try
                             {
-                                RO = JsonConvert.DeserializeObject<RootObject>(result[5]);
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[5]);
                                 RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
                                 OMGsent?.Invoke(RO);
                             }
@@ -105,12 +105,12 @@ namespace OMineWatcher.Managers
                         {
                             using (NetworkStream stream = client.GetStream())
                             {
-                                RootObject RO;
+                                OMGRootObject RO;
                                 while (client.Connected && OMGconnection)
                                 {
                                     try
                                     {
-                                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
+                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(OMGreadMSG(stream));
                                         OMGsent?.Invoke(RO);
                                     }
                                     catch { }
@@ -136,9 +136,10 @@ namespace OMineWatcher.Managers
             int count = stream.Read(msg, 0, msg.Length);
             return Encoding.Default.GetString(msg, 0, count);
         }
-        private static object key = new object();
+
 
         // обратная связь
+        private static object key = new object();
         public static void SendMSG(object body, MSGtype type)
         {
             Task.Run(() =>
@@ -176,166 +177,176 @@ namespace OMineWatcher.Managers
                 }
             });
         }
-        public enum MSGtype
-        {
-            Profile,
-            RunConfig,
-            ApplyClock,
-            StartProcess,
-            KillProcess,
-            ShowMinerLog
-        }
+        
         #endregion
+    }
 
-        #region JSON classes
-        public class RootObject
+    #region OMG classes
+    public class OMGRootObject
+    {
+        public Profile Profile { get; set; }
+        public OC? Overclock { get; set; }
+        public DC? DefClock { get; set; }
+        public string Logging { get; set; }
+        public double[] Hashrates { get; set; }
+        public int[] Temperatures { get; set; }
+        public bool? Indication { get; set; }
+        public List<string> Miners { get; set; }
+        public Dictionary<string, int[]> Algoritms { get; set; }
+        public string WachdogInfo { get; set; }
+        public string LowHWachdog { get; set; }
+        public string IdleWachdog { get; set; }
+        public string ShowMLogTB { get; set; }
+
+        public bool? RigInactive;
+    }
+
+    #region Profile
+    public class Profile
+    {
+        public string RigName;
+        public bool Autostart;
+        public long? StartedID;
+        public string StartedProcess;
+        public int? Digits;
+        public List<bool> GPUsSwitch;
+        public List<Config> ConfigsList;
+        public List<Overclock> ClocksList;
+        public InformManager Informer;
+        public double? LogTextSize;
+
+        public int TimeoutWachdog;
+        public int TimeoutIdle;
+        public int TimeoutLH;
+    }
+    public class Config
+    {
+        public Config()
         {
-            public Profile Profile { get; set; }
-            public OC? Overclock { get; set; }
-            public DC? DefClock { get; set; }
-            public string Logging { get; set; }
-            public double[] Hashrates { get; set; }
-            public int[] Temperatures { get; set; }
-            public bool? Indication { get; set; }
-            public List<string> Miners { get; set; }
-            public Dictionary<string, int[]> Algoritms { get; set; }
-            public string WachdogInfo { get; set; }
-            public string LowHWachdog { get; set; }
-            public string IdleWachdog { get; set; }
-            public string ShowMLogTB { get; set; }
-
-            public bool? RigInactive;
+            Name = "Новый конфиг";
+            Algoritm = "";
+            Pool = "";
+            Wallet = "";
+            Params = "";
+            MinHashrate = 0;
+            ID = DateTime.UtcNow.ToBinary();
         }
 
-        #region Profile
-        public class Profile
+        public string Name;
+        public string Algoritm;
+        public int? Miner;
+        public string Pool;
+        public string Port;
+        public string Wallet;
+        public string Params;
+        public long? ClockID;
+        public double MinHashrate;
+        public long ID;
+    }
+    public class Overclock
+    {
+        public Overclock()
         {
-            public string RigName;
-            public bool Autostart;
-            public long? StartedID;
-            public string StartedProcess;
-            public int? Digits;
-            public List<bool> GPUsSwitch;
-            public List<Config> ConfigsList;
-            public List<Overclock> ClocksList;
-            public InformManager Informer;
-            public double? LogTextSize;
-
-            public int TimeoutWachdog;
-            public int TimeoutIdle;
-            public int TimeoutLH;
+            Name = "Новый разгон";
+            ID = DateTime.UtcNow.ToBinary();
         }
-        public class Config
+
+        public string Name;
+        public int[] PowLim;
+        public int[] CoreClock;
+        public int[] MemoryClock;
+        public int[] FanSpeed;
+        public long ID;
+    }
+    public class InformManager
+    {
+        public bool VkInform;
+        public string VKuserID;
+    }
+    #endregion
+    public struct OC
+    {
+        public int[] MSI_PowerLimits;
+        public int[] MSI_CoreClocks;
+        public int[] MSI_MemoryClocks;
+        public int[] MSI_FanSpeeds;
+    }
+    public struct DC
+    {
+        public int[] PowerLimits;
+        public int[] CoreClocks;
+        public int[] MemoryClocks;
+        public int[] FanSpeeds;
+    }
+
+    public enum MSGtype
+    {
+        Profile,
+        RunConfig,
+        ApplyClock,
+        StartProcess,
+        KillProcess,
+        ShowMinerLog
+    }
+    #endregion
+    public abstract class OMGconnector
+    {
+        public static string OMGreadMSG(NetworkStream stream)
         {
-            public Config()
+            byte[] msg = new byte[4];
+            stream.Read(msg, 0, msg.Length);
+            int MSGlength = BitConverter.ToInt32(msg, 0);
+
+            stream.Write(new byte[] { 1 }, 0, 1);
+
+            msg = new byte[MSGlength];
+            int count = stream.Read(msg, 0, msg.Length);
+            return Encoding.Default.GetString(msg, 0, count);
+        }
+    }
+    public class OMGinformer : OMGconnector
+    {
+        public event Action StreamEnd;
+        public event Action StreamStart;
+        public event Action<OMGRootObject> SentInform;
+        public bool Streaming { get; private set; } = false;
+
+        public void StartInformStream(string IP)
+        {
+            if (!Streaming)
             {
-                Name = "Новый конфиг";
-                Algoritm = "";
-                Pool = "";
-                Wallet = "";
-                Params = "";
-                MinHashrate = 0;
-                ID = DateTime.UtcNow.ToBinary();
-            }
-
-            public string Name;
-            public string Algoritm;
-            public int? Miner;
-            public string Pool;
-            public string Port;
-            public string Wallet;
-            public string Params;
-            public long? ClockID;
-            public double MinHashrate;
-            public long ID;
-        }
-        public class Overclock
-        {
-            public Overclock()
-            {
-                Name = "Новый разгон";
-                ID = DateTime.UtcNow.ToBinary();
-            }
-
-            public string Name;
-            public int[] PowLim;
-            public int[] CoreClock;
-            public int[] MemoryClock;
-            public int[] FanSpeed;
-            public long ID;
-        }
-        public class InformManager
-        {
-            public bool VkInform;
-            public string VKuserID;
-        }
-        #endregion
-        public struct OC
-        {
-            public int[] MSI_PowerLimits;
-            public int[] MSI_CoreClocks;
-            public int[] MSI_MemoryClocks;
-            public int[] MSI_FanSpeeds;
-        }
-        public struct DC
-        {
-            public int[] PowerLimits;
-            public int[] CoreClocks;
-            public int[] MemoryClocks;
-            public int[] FanSpeeds;
-        }
-        #endregion
-
-        #region GetInformStream
-        public static event Action<int> OMGInformStreamLost;
-        public static event Action<int> OMGInformStreamReceived;
-        public static event Action<int, RootObject> OMGInformSent;
-        private static List<bool> RigsInformState = new List<bool>();
-        public static void StartInformStream(string IP, int i)
-        {
-            while (i >= RigsInformState.Count)
-            {
-                RigsInformState.Add(false);
-            }
-            if (!RigsInformState[i])
-            {
-                RigsInformState[i] = true;
+                Streaming = true;
                 Task.Run(() =>
                 {
                     try
                     {
                         using (TcpClient client = new TcpClient(IP, 2111))
                         {
-                            if (client.Connected) OMGInformStreamReceived?.Invoke(i);
+                            if (client.Connected) StreamStart?.Invoke();
                             using (NetworkStream stream = client.GetStream())
                             {
-                                RootObject RO;
-                                while (client.Connected && RigsInformState[i] && Settings.Rigs[i].IP == IP)
+                                OMGRootObject RO;
+                                while (client.Connected && Streaming)
                                 {
                                     try
                                     {
-                                        RO = JsonConvert.DeserializeObject<RootObject>(OMGreadMSG(stream));
-                                        OMGInformSent?.Invoke(i, RO);
+                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(OMGreadMSG(stream));
+                                        SentInform?.Invoke(RO);
                                     }
                                     catch { }
                                     Thread.Sleep(50);
                                 }
-                                StopInformStream(i);
+                                StreamEnd?.Invoke();
                             }
                         }
                     }
-                    catch { StopInformStream(i); }
+                    catch { StreamEnd?.Invoke(); }
                 });
             }
         }
-        public static void StopInformStream(int i)
+        public void StopInformStream()
         {
-            if (i < RigsInformState.Count)
-            {
-                RigsInformState[i] = false;
-                OMGInformStreamLost?.Invoke(i);
-            }
+            Streaming = false;
         }
-        #endregion
     }
 }

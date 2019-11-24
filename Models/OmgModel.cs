@@ -1,12 +1,7 @@
-﻿using System;
+﻿using OMineWatcher.Managers;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using OMG = OMineWatcher.Managers.OMG_TCP;
 
 namespace OMineWatcher.Models
 {
@@ -20,16 +15,16 @@ namespace OMineWatcher.Models
 
         public OmgModel()
         {
-            OMG.OMGsent += OMGsent;
+            OMG_TCP.OMGsent += OMGsent;
         }
 
-        private OMG.Profile CurrProf;
-        public OMG.Profile Profile { get; set; }
+        private Profile CurrProf;
+        public Profile Profile { get; set; }
         public List<string> Miners { get; set; }
-        public OMG.DC DefClock { get; set; }
+        public DC DefClock { get; set; }
         public Dictionary<string, int[]> Algoritms { get; set; }
         public string Loggong { get; set; }
-        public OMG.OC OC { get; set; }
+        public OC OC { get; set; }
         public double[] Hashrates { get; set; }
         public int[] Temperatures { get; set; }
         public string WachdogInfo { get; set; }
@@ -37,16 +32,16 @@ namespace OMineWatcher.Models
         public string IdleWachdog { get; set; }
         public string ShowMLogTB { get; set; }
         public bool? Indicator { get; set; }
-        private void OMGsent(OMG.RootObject RO)
+        private void OMGsent(OMGRootObject RO)
         {
             if (RO.Miners != null) Miners = RO.Miners;
             if (RO.Algoritms != null) Algoritms = RO.Algoritms;
-            if (RO.DefClock != null) DefClock = (OMG.DC)RO.DefClock;
+            if (RO.DefClock != null) DefClock = (DC)RO.DefClock;
             if (RO.Hashrates != null) Hashrates = RO.Hashrates; 
             if (RO.Temperatures != null) Temperatures = RO.Temperatures; 
             if (RO.Indication != null) Indicator = RO.Indication; 
             if (RO.Logging != null) Loggong = RO.Logging; 
-            if (RO.Overclock != null) OC = (OMG.OC)RO.Overclock; 
+            if (RO.Overclock != null) OC = (OC)RO.Overclock; 
             if (RO.Profile != null) ProcessingProfile(RO.Profile); 
             if (RO.WachdogInfo != null) WachdogInfo = RO.WachdogInfo; 
             if (RO.LowHWachdog != null) LowHWachdog = RO.LowHWachdog; 
@@ -54,7 +49,7 @@ namespace OMineWatcher.Models
             if (RO.ShowMLogTB != null) ShowMLogTB = RO.ShowMLogTB; 
         }
 
-        private void ProcessingProfile(OMG.Profile prof)
+        private void ProcessingProfile(Profile prof)
         {
             if (CurrProf == null)
             {
@@ -64,36 +59,36 @@ namespace OMineWatcher.Models
         }
 
         #region Commands
-        public void cmd_SaveProfile(OMG.Profile prof)
+        public void cmd_SaveProfile(Profile prof)
         {
             CurrProf = prof;
-            OMG.SendMSG(CurrProf, OMG.MSGtype.Profile);
+            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
         }
-        public void cmd_RunProfile(OMG.Profile prof, int index)
+        public void cmd_RunProfile(Profile prof, int index)
         {
             CurrProf = prof;
-            OMG.SendMSG(CurrProf, OMG.MSGtype.Profile);
-            OMG.SendMSG(CurrProf.ConfigsList[index].ID, OMG.MSGtype.RunConfig);
+            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
+            OMG_TCP.SendMSG(CurrProf.ConfigsList[index].ID, MSGtype.RunConfig);
         }
-        public void cmd_ApplyClock(OMG.Profile prof, int index)
+        public void cmd_ApplyClock(Profile prof, int index)
         {
             CurrProf = prof;
-            OMG.SendMSG(CurrProf, OMG.MSGtype.Profile);
-            OMG.SendMSG(CurrProf.ClocksList[index].ID, OMG.MSGtype.ApplyClock);
+            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
+            OMG_TCP.SendMSG(CurrProf.ClocksList[index].ID, MSGtype.ApplyClock);
         }
         public void cmd_ShowMinerLog()
         {
-            OMG.SendMSG(true, OMG.MSGtype.ShowMinerLog);
+            OMG_TCP.SendMSG(true, MSGtype.ShowMinerLog);
         }
         public void cmd_SwitchProcess()
         {
             if ((bool)Indicator)
             {
-                OMG.SendMSG(true, OMG.MSGtype.KillProcess);
+                OMG_TCP.SendMSG(true, MSGtype.KillProcess);
             }
             else
             {
-                OMG.SendMSG(true, OMG.MSGtype.StartProcess);
+                OMG_TCP.SendMSG(true, MSGtype.StartProcess);
             }
         }
         #endregion

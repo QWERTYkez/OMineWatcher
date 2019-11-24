@@ -24,42 +24,15 @@ namespace OMineWatcher.Managers
         {
             InternetConnectionWacher.InternetConnectionLost += () => { InternetConnection = false; };
             InternetConnectionWacher.InternetConnectionRestored += () => { InternetConnection = true; };
-            OMG_TCP.OMGInformSent += OMGInformSent;
-            OMG_TCP.OMGInformStreamReceived += OMGRigWorks;
-            OMG_TCP.OMGInformStreamLost += OMGRigInactive;
             RigStatusChanged += ChangeStatus;
             foreach (Settings.Rig r in Settings.Rigs) AddToAllStatuses();
             StartRigsScanning();
         }
 
-        private static void OMGRigWorks(int i)
-        {
-            if (i < PingBlocks.Count)
-            {
-                RigStatusChanged?.Invoke(i, RigStatus.works);
-                PingBlocks[i] = true;
-            }
-        }
-        private static void OMGRigInactive(int i)
-        {
-            if (i < PingBlocks.Count)
-            {
-                PingBlocks[i] = false;
-
-                OMG_TCP.RootObject ro = new OMG_TCP.RootObject();
-                ro.RigInactive = true;
-
-                OMGInformSent(i, ro);
-            }
-        }
-        private static void OMGInformSent(int i, OMG_TCP.RootObject RO)
-        {
-            SendInform?.Invoke(new RigInform(i, RO));
-        }
-
         private static void AddToAllStatuses()
         {
             Statuses.Add(RigStatus.offline);
+            OMGWach.Add(false);
             HiveWach.Add(false);
             WachdogStatuses.Add(false);
             PingBlocks.Add(false);
@@ -69,6 +42,7 @@ namespace OMineWatcher.Managers
         private static void RemoveInAllStatuses()
         {
             Statuses.RemoveAt(Statuses.Count - 1);
+            OMGWach.RemoveAt(OMGWach.Count - 1);
             HiveWach.RemoveAt(HiveWach.Count - 1);
             WachdogStatuses.RemoveAt(WachdogStatuses.Count - 1);
             PingBlocks.RemoveAt(PingBlocks.Count - 1);
@@ -130,7 +104,7 @@ namespace OMineWatcher.Managers
                         }
                         if (type == "OMineGuard")
                         {
-                            OMG_TCP.StopInformStream(i);
+                            OMGWach[i] = false; ;
                             PingBlocks[i] = false;
                         }
                         type = Settings.Rigs[i].Type;
@@ -157,7 +131,7 @@ namespace OMineWatcher.Managers
                                         RigStatusChanged?.Invoke(i, RigStatus.online);
                                         if (Settings.Rigs[i].Waching)
                                         {
-                                            OMG_TCP.StartInformStream(IP, i);
+                                            OMGstartWach(i);
                                         }
                                     }
                                     break;
@@ -188,6 +162,55 @@ namespace OMineWatcher.Managers
             });
         }
 
+        #region WachMethods
+        private static void RigWorks(int i)
+        {
+            if (i < PingBlocks.Count)
+            {
+                RigStatusChanged?.Invoke(i, RigStatus.works);
+                PingBlocks[i] = true;
+            }
+        }
+        private static void RigInactive(int i)
+        {
+            if (i < PingBlocks.Count)
+            {
+                PingBlocks[i] = false;
+
+                OMGRootObject ro = new OMGRootObject();
+                ro.RigInactive = true;
+
+                RigInformSent(i, ro);
+            }
+        }
+        private static void RigInformSent(int i, OMGRootObject RO)
+        {
+            SendInform?.Invoke(new RigInform(i, RO));
+        }
+        #endregion
+        #region OMG
+        private static List<bool> OMGWach = new List<bool>();
+        private static void OMGstartWach(int i)
+        {
+            if (!OMGWach[i])
+            {
+                OMGWach[i] = true;
+                Task.Run(async () => 
+                {
+                    OMGinformer omg = new OMGinformer();
+
+                    omg.StreamStart += () => RigWorks(i);
+                    omg.StreamEnd += () => { OMGWach[i] = false; RigInactive(i); omg = null; };
+                    omg.SentInform += RO => RigInformSent(i, RO);
+
+                    omg.StartInformStream(Settings.Rigs[i].IP);
+
+                    while (OMGWach[i]) await Task.Delay(500);
+                    omg.StopInformStream();
+                });
+            }
+        }
+        #endregion
         #region HiveOS
         private static List<bool> HiveWach = new List<bool>();
         private static void HiveStartWach(int i)
@@ -206,7 +229,7 @@ namespace OMineWatcher.Managers
                         if (mi != null)
                         {
                             SendInform?.Invoke(new RigInform(i,
-                                new OMG_TCP.RootObject
+                                new OMGRootObject
                                 {
                                     Indication = true,
                                     Hashrates = mi.Value.Hashrates,
@@ -232,7 +255,7 @@ namespace OMineWatcher.Managers
                         else
                         {
                             SendInform?.Invoke(new RigInform(i,
-                                new OMG_TCP.RootObject
+                                new OMGRootObject
                                 {
                                     Indication = false
                                 }));
@@ -361,14 +384,14 @@ namespace OMineWatcher.Managers
     }
     public struct RigInform
     {
-        public RigInform(int i, OMG_TCP.RootObject ro)
+        public RigInform(int i, OMGRootObject ro)
         {
             Index = i;
             RO = ro;
         }
 
         public int Index;
-        public OMG_TCP.RootObject RO;
+        public OMGRootObject RO;
     }
     public enum RigStatus
     {

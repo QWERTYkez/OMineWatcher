@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace OMineWatcher.Models
@@ -42,10 +41,6 @@ namespace OMineWatcher.Models
         #endregion
 
         #region Commands
-        public void cmd_StopWach(int i)
-        {
-            OMG_TCP.StopInformStream(i);
-        }
         public void cmd_SaveRigs(List<Settings.Rig> rigs)
         {
             Settings.Rigs = rigs;

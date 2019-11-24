@@ -1,12 +1,8 @@
-﻿using System;
+﻿using OMineWatcher.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using OMineWatcher.Models;
-using PropertyChanged;
 
 namespace OMineWatcher.ViewModels
 {
@@ -30,7 +26,7 @@ namespace OMineWatcher.ViewModels
             IniBaseSettingsCommands();
         }
 
-        private Managers.OMG_TCP.Profile Profile;
+        private Managers.Profile Profile;
         private Dictionary<string, int[]> Algs;
         private List<string> MinersList;
         public int GPUs { get; set; }
@@ -48,7 +44,7 @@ namespace OMineWatcher.ViewModels
             int m = l.Max();
             if (GPUs != m) GPUs = m;
         }
-        public Managers.OMG_TCP.DC DefClock { get; set; }
+        public Managers.DC DefClock { get; set; }
         private void ModelChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -261,7 +257,7 @@ namespace OMineWatcher.ViewModels
                     Params = Profile.ConfigsList[SelectedConfigIndex].Params;
                     if (Profile.ConfigsList[SelectedConfigIndex].ClockID != null)
                     {
-                        foreach (Managers.OMG_TCP.Overclock c in Profile.ClocksList)
+                        foreach (Managers.Overclock c in Profile.ClocksList)
                         {
                             if (c.ID == Profile.ConfigsList[SelectedConfigIndex].ClockID)
                             {
@@ -315,7 +311,7 @@ namespace OMineWatcher.ViewModels
             });
             PlusConfig = new RelayCommand(obj =>
             {
-                Profile.ConfigsList.Add(new Managers.OMG_TCP.Config());
+                Profile.ConfigsList.Add(new Managers.Config());
                 ConfigsNames = from i in Profile.ConfigsList select i.Name;
                 _model.cmd_SaveProfile(Profile);
                 SelectedConfigIndex = ConfigsNames.Count() - 1;
@@ -476,7 +472,7 @@ namespace OMineWatcher.ViewModels
 
             PlusOverclock = new RelayCommand(obj =>
             {
-                Profile.ClocksList.Add(new Managers.OMG_TCP.Overclock());
+                Profile.ClocksList.Add(new Managers.Overclock());
                 OverclocksNames = from i in Profile.ClocksList select i.Name;
                 _model.cmd_SaveProfile(Profile);
                 SelectedOverclockIndex = OverclocksNames.Count() - 1;
