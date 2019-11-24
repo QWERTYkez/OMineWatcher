@@ -15,7 +15,7 @@ namespace OMineWatcher.Models
 
         public OmgModel()
         {
-            OMG_TCP.OMGsent += OMGsent;
+            OMGcontroller.SentInform += OMGsent;
         }
 
         private Profile CurrProf;
@@ -62,33 +62,33 @@ namespace OMineWatcher.Models
         public void cmd_SaveProfile(Profile prof)
         {
             CurrProf = prof;
-            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
+            OMGcontroller.SendSetting(CurrProf, MSGtype.Profile);
         }
         public void cmd_RunProfile(Profile prof, int index)
         {
             CurrProf = prof;
-            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
-            OMG_TCP.SendMSG(CurrProf.ConfigsList[index].ID, MSGtype.RunConfig);
+            OMGcontroller.SendSetting(CurrProf, MSGtype.Profile);
+            OMGcontroller.SendSetting(CurrProf.ConfigsList[index].ID, MSGtype.RunConfig);
         }
         public void cmd_ApplyClock(Profile prof, int index)
         {
             CurrProf = prof;
-            OMG_TCP.SendMSG(CurrProf, MSGtype.Profile);
-            OMG_TCP.SendMSG(CurrProf.ClocksList[index].ID, MSGtype.ApplyClock);
+            OMGcontroller.SendSetting(CurrProf, MSGtype.Profile);
+            OMGcontroller.SendSetting(CurrProf.ClocksList[index].ID, MSGtype.ApplyClock);
         }
         public void cmd_ShowMinerLog()
         {
-            OMG_TCP.SendMSG(true, MSGtype.ShowMinerLog);
+            OMGcontroller.SendSetting(true, MSGtype.ShowMinerLog);
         }
         public void cmd_SwitchProcess()
         {
             if ((bool)Indicator)
             {
-                OMG_TCP.SendMSG(true, MSGtype.KillProcess);
+                OMGcontroller.SendSetting(true, MSGtype.KillProcess);
             }
             else
             {
-                OMG_TCP.SendMSG(true, MSGtype.StartProcess);
+                OMGcontroller.SendSetting(true, MSGtype.StartProcess);
             }
         }
         #endregion

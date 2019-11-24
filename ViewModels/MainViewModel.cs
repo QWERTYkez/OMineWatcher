@@ -29,8 +29,8 @@ namespace OMineWatcher.ViewModels
             _model.Statuses.CollectionChanged += (sender, e) => Indicators = _model.Statuses.ToList();
             _model.InitializeModel();
 
-            OMG_TCP.OMGcontrolReceived += () => OMGcontrolReceived();
-            OMG_TCP.OMGcontrolLost += () => OMGcontrolLost();
+            OMGcontroller.ControlStart += () => OMGcontrolReceived();
+            OMGcontroller.ControlEnd += () => OMGcontrolLost();
 
             InitializeRigsControlCommands();
             InitializeIndicatorsAndTumblers();
@@ -412,8 +412,8 @@ namespace OMineWatcher.ViewModels
 
         private void InitializeOMGSwitchConnectCommand()
         {
-            OMGconnect = new RelayCommand(obj => OMG_TCP.ConnectToOMG(RigIP));
-            OMGdisconnect = new RelayCommand(obj => OMG_TCP.OMGcontrolDisconnect());
+            OMGconnect = new RelayCommand(obj => OMGcontroller.StartControl(RigIP));
+            OMGdisconnect = new RelayCommand(obj => OMGcontroller.StopControl());
         }
         public UserControl OmgControlView { get; set; }
         private void OMGcontrolLost()

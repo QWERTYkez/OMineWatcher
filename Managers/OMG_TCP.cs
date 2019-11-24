@@ -8,123 +8,9 @@ using System.Threading.Tasks;
 
 namespace OMineWatcher.Managers
 {
-    public class OMG_TCP
+    public abstract class OMGconnector
     {
-        #region OMGcontrol
-        public static event Action OMGcontrolLost;
-        public static event Action OMGcontrolReceived;
-        public static event Action<OMGRootObject> OMGsent;
-
-        public static bool OMGconnection;
-        public static void OMGcontrolDisconnect()
-        {
-            OMGconnection = false;
-        }
-        private static TcpClient OMGcontrolClient;
-        private static NetworkStream OMGcontrolStream;
-        public static void ConnectToOMG(string IP)
-        {
-            if (OMGconnection) return;
-            OMGconnection = true;
-            Task.Run(() =>
-            {
-                try
-                {
-                    OMGcontrolClient = new TcpClient(IP, 2112);
-                }
-                catch { OMGconnection = false; return; }
-
-                if (OMGcontrolClient.Connected) OMGcontrolReceived?.Invoke();
-                OMGcontrolStream = OMGcontrolClient.GetStream();
-
-                try
-                {
-                    string[] result = new string[6];
-                    if (OMGconnection)
-                    {
-                        result[0] = OMGreadMSG(OMGcontrolStream); // Profile
-                        result[1] = OMGreadMSG(OMGcontrolStream); // Algoritms
-                        result[2] = OMGreadMSG(OMGcontrolStream); // Miners
-                        result[3] = OMGreadMSG(OMGcontrolStream); // DefClock
-                        result[4] = OMGreadMSG(OMGcontrolStream); // Indication
-                        result[5] = OMGreadMSG(OMGcontrolStream); // Log
-
-                        Task.Run(() =>
-                        {
-                            OMGRootObject RO;
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[2]);
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = new OMGRootObject();
-                                RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[0]);
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[3]);
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[4]);
-                                OMGsent?.Invoke(RO);
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[5]);
-                                RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
-                                OMGsent?.Invoke(RO);
-                            }
-                            catch { }
-                        });
-                    }
-                    else { OMGcontrolLost?.Invoke(); }
-                }
-                catch { }
-
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        using (TcpClient client = new TcpClient(IP, 2113))
-                        {
-                            using (NetworkStream stream = client.GetStream())
-                            {
-                                OMGRootObject RO;
-                                while (client.Connected && OMGconnection)
-                                {
-                                    try
-                                    {
-                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(OMGreadMSG(stream));
-                                        OMGsent?.Invoke(RO);
-                                    }
-                                    catch { }
-                                    Thread.Sleep(50);
-                                }
-                                OMGcontrolLost?.Invoke();
-                            }
-                        }
-                    }
-                    catch { OMGcontrolLost?.Invoke(); }
-                });
-            });
-        }
-        private static string OMGreadMSG(NetworkStream stream)
+        protected private static string ReadMessage(NetworkStream stream)
         {
             byte[] msg = new byte[4];
             stream.Read(msg, 0, msg.Length);
@@ -137,16 +23,14 @@ namespace OMineWatcher.Managers
             return Encoding.Default.GetString(msg, 0, count);
         }
 
-
-        // обратная связь
         private static object key = new object();
-        public static void SendMSG(object body, MSGtype type)
+        protected private static void SendMessage(TcpClient client, NetworkStream stream, object body, MSGtype type)
         {
             Task.Run(() =>
             {
-                if (OMGcontrolClient != null)
+                if (client != null)
                 {
-                    if (OMGcontrolClient.Connected)
+                    if (client.Connected)
                     {
                         lock (key)
                         {
@@ -166,22 +50,184 @@ namespace OMineWatcher.Managers
                             byte[] Message = Encoding.Default.GetBytes(msg);
                             byte[] Header = BitConverter.GetBytes(Message.Length);
 
-                            OMGcontrolStream.Write(Header, 0, Header.Length);
+                            stream.Write(Header, 0, Header.Length);
 
                             byte[] b = new byte[1];
-                            OMGcontrolStream.Read(b, 0, b.Length);
+                            stream.Read(b, 0, b.Length);
 
-                            OMGcontrolStream.Write(Message, 0, Message.Length);
+                            stream.Write(Message, 0, Message.Length);
                         }
                     }
                 }
             });
         }
-        
-        #endregion
     }
+    public class OMGcontroller : OMGconnector
+    {
+        public static event Action ControlEnd;
+        public static event Action ControlStart;
+        public static event Action<OMGRootObject> SentInform;
+        public static bool OMGconnection { get; private set; } = false;
 
-    #region OMG classes
+        private static TcpClient OMGcontrolClient;
+        private static NetworkStream OMGcontrolStream;
+        public static void StartControl(string IP)
+        {
+            if (OMGconnection) return;
+            OMGconnection = true;
+            Task.Run(() =>
+            {
+                try
+                {
+                    OMGcontrolClient = new TcpClient(IP, 2112);
+                }
+                catch { OMGconnection = false; return; }
+
+                if (OMGcontrolClient.Connected) ControlStart?.Invoke();
+                OMGcontrolStream = OMGcontrolClient.GetStream();
+
+                try
+                {
+                    string[] result = new string[6];
+                    if (OMGconnection)
+                    {
+                        result[0] = ReadMessage(OMGcontrolStream); // Profile
+                        result[1] = ReadMessage(OMGcontrolStream); // Algoritms
+                        result[2] = ReadMessage(OMGcontrolStream); // Miners
+                        result[3] = ReadMessage(OMGcontrolStream); // DefClock
+                        result[4] = ReadMessage(OMGcontrolStream); // Indication
+                        result[5] = ReadMessage(OMGcontrolStream); // Log
+
+                        Task.Run(() =>
+                        {
+                            OMGRootObject RO;
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[2]);
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = new OMGRootObject();
+                                RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[0]);
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[3]);
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[4]);
+                                SentInform?.Invoke(RO);
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                            try
+                            {
+                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[5]);
+                                RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
+                                SentInform?.Invoke(RO);
+                            }
+                            catch { }
+                        });
+                    }
+                    else { ControlEnd?.Invoke(); }
+                }
+                catch { }
+
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        using (TcpClient client = new TcpClient(IP, 2113))
+                        {
+                            using (NetworkStream stream = client.GetStream())
+                            {
+                                OMGRootObject RO;
+                                while (client.Connected && OMGconnection)
+                                {
+                                    try
+                                    {
+                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(ReadMessage(stream));
+                                        SentInform?.Invoke(RO);
+                                    }
+                                    catch { }
+                                    Thread.Sleep(50);
+                                }
+                                ControlEnd?.Invoke();
+                            }
+                        }
+                    }
+                    catch { ControlEnd?.Invoke(); }
+                });
+            });
+        }
+        public static void SendSetting(object body, MSGtype type)
+        {
+            SendMessage(OMGcontrolClient, OMGcontrolStream, body, type);
+        }
+        public static void StopControl()
+        {
+            OMGconnection = false;
+        }
+    }
+    public class OMGinformer : OMGconnector
+    {
+        public event Action StreamEnd;
+        public event Action StreamStart;
+        public event Action<OMGRootObject> SentInform;
+        public bool Streaming { get; private set; } = false;
+
+        public void StartInformStream(string IP)
+        {
+            if (!Streaming)
+            {
+                Streaming = true;
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        using (TcpClient client = new TcpClient(IP, 2111))
+                        {
+                            if (client.Connected) StreamStart?.Invoke();
+                            using (NetworkStream stream = client.GetStream())
+                            {
+                                OMGRootObject RO;
+                                while (client.Connected && Streaming)
+                                {
+                                    try
+                                    {
+                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(ReadMessage(stream));
+                                        SentInform?.Invoke(RO);
+                                    }
+                                    catch { }
+                                    Thread.Sleep(50);
+                                }
+                                StreamEnd?.Invoke();
+                            }
+                        }
+                    }
+                    catch { StreamEnd?.Invoke(); }
+                });
+            }
+        }
+        public void StopInformStream()
+        {
+            Streaming = false;
+        }
+    }
+    #region OMG support classes
     public class OMGRootObject
     {
         public Profile Profile { get; set; }
@@ -289,64 +335,4 @@ namespace OMineWatcher.Managers
         ShowMinerLog
     }
     #endregion
-    public abstract class OMGconnector
-    {
-        public static string OMGreadMSG(NetworkStream stream)
-        {
-            byte[] msg = new byte[4];
-            stream.Read(msg, 0, msg.Length);
-            int MSGlength = BitConverter.ToInt32(msg, 0);
-
-            stream.Write(new byte[] { 1 }, 0, 1);
-
-            msg = new byte[MSGlength];
-            int count = stream.Read(msg, 0, msg.Length);
-            return Encoding.Default.GetString(msg, 0, count);
-        }
-    }
-    public class OMGinformer : OMGconnector
-    {
-        public event Action StreamEnd;
-        public event Action StreamStart;
-        public event Action<OMGRootObject> SentInform;
-        public bool Streaming { get; private set; } = false;
-
-        public void StartInformStream(string IP)
-        {
-            if (!Streaming)
-            {
-                Streaming = true;
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        using (TcpClient client = new TcpClient(IP, 2111))
-                        {
-                            if (client.Connected) StreamStart?.Invoke();
-                            using (NetworkStream stream = client.GetStream())
-                            {
-                                OMGRootObject RO;
-                                while (client.Connected && Streaming)
-                                {
-                                    try
-                                    {
-                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(OMGreadMSG(stream));
-                                        SentInform?.Invoke(RO);
-                                    }
-                                    catch { }
-                                    Thread.Sleep(50);
-                                }
-                                StreamEnd?.Invoke();
-                            }
-                        }
-                    }
-                    catch { StreamEnd?.Invoke(); }
-                });
-            }
-        }
-        public void StopInformStream()
-        {
-            Streaming = false;
-        }
-    }
 }
