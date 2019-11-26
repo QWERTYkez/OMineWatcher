@@ -365,7 +365,7 @@ namespace OMineWatcher.Views
             List<Grid> dt = DetaledTemperatures;
             {
                 dt[dt.Count - 1] = null;
-                dt.RemoveAt(DetaledTemperatures.Count - 1);
+                dt.RemoveAt(dt.Count - 1);
             }
             DetaledTemperatures = dt;
             Dispatcher.Invoke(() => { DetaledTemperaturesControl.ItemsSource = DetaledTemperatures; });

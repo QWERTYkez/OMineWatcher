@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OMineWatcher.Managers
 {
-    static class UserInformer
+    public static class UserInformer
     {
         public static void SendMSG(string sender, string msg)
         {
