@@ -121,17 +121,17 @@ namespace OMineWatcher.Views
                                     GPUs.Children.Add(Lb);
                                 }
                             }
-                            SetLabels(InfPowerLimits, "InfPowerLimits", n);
+                            SetLabels(InfPowerLimits, "InfPowerLimits", "InfPLsLengthA", "InfPLsLengthB", n);
                             SetTextBoxes(PowerLimits, "PowerLimits", n);
-                            SetLabels(InfCoreClocks, "InfCoreClocks", n);
+                            SetLabels(InfCoreClocks, "InfCoreClocks", "InfCoresLengthA", "InfCoresLengthB", n);
                             SetTextBoxes(CoreClocks, "CoreClocks", n);
-                            SetLabels(InfMemoryClocks, "InfMemoryClocks", n);
+                            SetLabels(InfMemoryClocks, "InfMemoryClocks", "InfMemorysLengthA", "InfMemorysLengthB", n);
                             SetTextBoxes(MemoryClocks, "MemoryClocks", n);
-                            SetLabels(InfoFanSpeeds, "InfFanSpeeds", n);
+                            SetLabels(InfoFanSpeeds, "InfFanSpeeds", "InfFansLengthA", "InfFansLengthB", n);
                             SetTextBoxes(FanSpeeds, "FanSpeeds", n);
-                            SetLabels(InfTemps, "InfTemperatures", n);
+                            SetLabels(InfTemps, "InfTemperatures", "InfTempsLengthA", "InfTempsLengthB", n);
                             SetLabels(LogTemperatures, "InfTemperatures", n, "0°C");
-                            SetLabels(InfHashrates, "InfHashrates", n, "0.00");
+                            SetLabels(InfHashrates, "InfHashrates", "InfHashesLengthA", "InfHashesLengthB", n, "0.00");
                             SetLabels(LogHashrates, "InfHashrates", n, "0.00");
                         }
                         break;
@@ -145,39 +145,85 @@ namespace OMineWatcher.Views
             },
             null);
         }
-        private void SetLabels(StackPanel SP, string prop, int length)
+        private void SetLabels(StackPanel SP, string prop, string LengthsA, string LengthsB, int length)
         {
             SP.Children.Clear();
             for (int i = 0; i < length; i++)
             {
-                Label Lb = new Label
+                Grid GRD = new Grid();
                 {
-                    Height = 26,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    FontFamily = new FontFamily("Consolas"),
-                    FontSize = 14
-                };
-                Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
-                SP.Children.Add(Lb);
+                    Grid GRDD = new Grid();
+                    {
+                        ColumnDefinition cdA = new ColumnDefinition();
+                        cdA.SetBinding(ColumnDefinition.WidthProperty, $"{LengthsA}[{i}]");
+                        GRDD.ColumnDefinitions.Add(cdA);
+
+                        ColumnDefinition cdB = new ColumnDefinition();
+                        cdB.SetBinding(ColumnDefinition.WidthProperty, $"{LengthsB}[{i}]");
+                        GRDD.ColumnDefinitions.Add(cdB);
+                    }
+                    {
+                        Grid grd = new Grid { Background = new SolidColorBrush(Color.FromArgb(30, 255, 255, 255)) };
+                        Grid.SetColumn(grd, 0);
+
+                        GRDD.Children.Add(grd);
+                    }
+
+                    Label Lb = new Label
+                    {
+                        Height = 26,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        FontFamily = new FontFamily("Consolas"),
+                        FontSize = 14
+                    };
+                    Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
+
+                    GRD.Children.Add(GRDD);
+                    GRD.Children.Add(Lb);
+                }
+                SP.Children.Add(GRD);
             }
         }
-        private void SetLabels(StackPanel SP, string prop, int length, string format)
+        private void SetLabels(StackPanel SP, string prop, string LengthsA, string LengthsB, int length, string format)
         {
             SP.Children.Clear();
             for (int i = 0; i < length; i++)
             {
-                Label Lb = new Label
+                Grid GRD = new Grid();
                 {
-                    Height = 26,
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    VerticalContentAlignment = VerticalAlignment.Center,
-                    FontFamily = new FontFamily("Consolas"),
-                    FontSize = 14,
-                    ContentStringFormat = format
-                };
-                Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
-                SP.Children.Add(Lb);
+                    Grid GRDD = new Grid();
+                    {
+                        ColumnDefinition cdA = new ColumnDefinition();
+                        cdA.SetBinding(ColumnDefinition.WidthProperty, $"{LengthsA}[{i}]");
+                        GRDD.ColumnDefinitions.Add(cdA);
+
+                        ColumnDefinition cdB = new ColumnDefinition();
+                        cdB.SetBinding(ColumnDefinition.WidthProperty, $"{LengthsB}[{i}]");
+                        GRDD.ColumnDefinitions.Add(cdB);
+                    }
+                    {
+                        Grid grd = new Grid { Background = new SolidColorBrush(Color.FromArgb(30, 255, 255, 255)) };
+                        Grid.SetColumn(grd, 0);
+
+                        GRDD.Children.Add(grd);
+                    }
+
+                    Label Lb = new Label
+                    {
+                        Height = 26,
+                        HorizontalContentAlignment = HorizontalAlignment.Center,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        FontFamily = new FontFamily("Consolas"),
+                        FontSize = 14,
+                        ContentStringFormat = format
+                    };
+                    Lb.SetBinding(Label.ContentProperty, $"{prop}[{i}]");
+
+                    GRD.Children.Add(GRDD);
+                    GRD.Children.Add(Lb);
+                }
+                SP.Children.Add(GRD);
             }
         }
         private void SetLabels(WrapPanel WP, string prop, int length, string format)
