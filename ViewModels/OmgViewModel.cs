@@ -92,38 +92,18 @@ namespace OMineWatcher.ViewModels
                         if (InfPowerLimits != _model.OC.MSI_PowerLimits)
                         {
                             InfPowerLimits = _model.OC.MSI_PowerLimits;
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfPowerLimits, ref glA, ref glB);
-                            InfPLsLengthA = glA;
-                            InfPLsLengthB = glB;
                         }
                         if (InfCoreClocks != _model.OC.MSI_CoreClocks)
                         {
                             InfCoreClocks = _model.OC.MSI_CoreClocks;
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfCoreClocks, ref glA, ref glB);
-                            InfCoresLengthA = glA;
-                            InfCoresLengthB = glB;
                         }
                         if (InfMemoryClocks != _model.OC.MSI_MemoryClocks)
                         {
                             InfMemoryClocks = _model.OC.MSI_MemoryClocks;
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfMemoryClocks, ref glA, ref glB);
-                            InfMemorysLengthA = glA;
-                            InfMemorysLengthB = glB;
                         }
                         if (InfFanSpeeds != _model.OC.MSI_FanSpeeds)
                         {
                             InfFanSpeeds = _model.OC.MSI_FanSpeeds;
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfFanSpeeds, ref glA, ref glB);
-                            InfFansLengthA = glA;
-                            InfFansLengthB = glB;
                         }
 
                         ResetGPUs();
@@ -140,11 +120,6 @@ namespace OMineWatcher.ViewModels
                         {
                             InfHashrates = _model.Hashrates;
                             TotalHashrate = _model.Hashrates.Sum();
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfHashrates, ref glA, ref glB);
-                            InfHashesLengthA = glA;
-                            InfHashesLengthB = glB;
                         }
                     }
                     break;
@@ -153,11 +128,6 @@ namespace OMineWatcher.ViewModels
                         if (InfTemperatures != _model.Temperatures)
                         {
                             InfTemperatures = _model.Temperatures;
-                            GridLength[] glA = null;
-                            GridLength[] glB = null;
-                            SetGridLength(InfTemperatures, ref glA, ref glB);
-                            InfTempsLengthA = glA;
-                            InfTempsLengthB = glB;
                         }
                     }
                     break;
@@ -199,38 +169,6 @@ namespace OMineWatcher.ViewModels
                     }
                     break;
             }
-        }
-        private static void SetGridLength(int[] vals, ref GridLength[] grdls_A, ref GridLength[] grdls_B)
-        {
-            if (vals.Length > 0)
-            {
-                double mx = vals.Max();
-                grdls_A = new GridLength[vals.Length];
-                grdls_B = new GridLength[vals.Length];
-                for (int i = 0; i < vals.Length; i++)
-                {
-                    double cr = vals[i];
-                    grdls_A[i] = new GridLength(cr / mx, GridUnitType.Star);
-                    grdls_B[i] = new GridLength((mx - cr) / mx, GridUnitType.Star);
-                }
-            }
-            else { grdls_A = null; grdls_B = null; }
-        }
-        private static void SetGridLength(double[] vals, ref GridLength[] grdls_A, ref GridLength[] grdls_B)
-        {
-            if (vals.Length > 0)
-            {
-                double mx = vals.Max();
-                grdls_A = new GridLength[vals.Length];
-                grdls_B = new GridLength[vals.Length];
-                for (int i = 0; i < vals.Length; i++)
-                {
-                    double cr = vals[i];
-                    grdls_A[i] = new GridLength(cr / mx, GridUnitType.Star);
-                    grdls_B[i] = new GridLength((mx - cr) / mx, GridUnitType.Star);
-                }
-            }
-            else { grdls_A = null; grdls_B = null; }
         }
 
         public bool Indication { get; set; } = false;
@@ -452,29 +390,11 @@ namespace OMineWatcher.ViewModels
         public RelayCommand FanSpeedsOff { get; set; }
 
         public int[] InfPowerLimits { get; set; }
-        public GridLength[] InfPLsLengthA { get; set; }
-        public GridLength[] InfPLsLengthB { get; set; }
-
         public int[] InfCoreClocks { get; set; }
-        public GridLength[] InfCoresLengthA { get; set; }
-        public GridLength[] InfCoresLengthB { get; set; }
-
         public int[] InfMemoryClocks { get; set; }
-        public GridLength[] InfMemorysLengthA { get; set; }
-        public GridLength[] InfMemorysLengthB { get; set; }
-
         public int[] InfFanSpeeds { get; set; }
-        public GridLength[] InfFansLengthA { get; set; }
-        public GridLength[] InfFansLengthB { get; set; }
-
         public int[] InfTemperatures { get; set; }
-        public GridLength[] InfTempsLengthA { get; set; }
-        public GridLength[] InfTempsLengthB { get; set; }
-
         public double[] InfHashrates { get; set; }
-        public GridLength[] InfHashesLengthA { get; set; }
-        public GridLength[] InfHashesLengthB { get; set; }
-
         public double TotalHashrate { get; set; }
 
         private List<int> ArrayToList(int[] source)
