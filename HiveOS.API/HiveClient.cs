@@ -146,8 +146,8 @@ namespace HiveOS.API
             catch { return null; }
 
             WorkerInfoRO1 ro = JsonConvert.DeserializeObject<WorkerInfoRO1>(response);
-            int[] Hashrates = new int[] { };
-            int[] Temperatures = new int[] { };
+            int?[] Hashrates = new int?[] { };
+            int?[] Temperatures = new int?[] { };
             if (ro.miners_stats != null) { Hashrates = ro.miners_stats.hashrates[0].hashes; }
             if (ro.gpu_stats != null) { Temperatures = (from g in ro.gpu_stats orderby g.bus_number select g.temp).ToArray(); }
 
@@ -207,17 +207,17 @@ namespace HiveOS.API
     public class GpuStat
     {
         public int bus_number { get; set; }
-        public int temp { get; set; }
+        public int? temp { get; set; }
     }
     public class hashrates
     {
-        public int[] hashes { get; set; }
+        public int?[] hashes { get; set; }
     }
     public struct MinerInfo
     {
-        public MinerInfo(int[] hashes, int[] temps)
+        public MinerInfo(int?[] hashes, int?[] temps)
         {
-            Hashrates = new double[hashes.Length];
+            Hashrates = new double?[hashes.Length];
             for (int i = 0; i < hashes.Length; i++)
             {
                 Hashrates[i] = Convert.ToDouble(hashes[i]) / 1000;
@@ -225,8 +225,8 @@ namespace HiveOS.API
             Temperatures = temps;
         }
 
-        public double[] Hashrates;
-        public int[] Temperatures;
+        public double?[] Hashrates;
+        public int?[] Temperatures;
     }
     #endregion
     public struct AuthenticationStatus

@@ -12,10 +12,7 @@
     d:DesignHeight="500"
     d:DesignWidth="1100"
     mc:Ignorable="d">
-    <UserControl.DataContext>
-        <vm:OmgViewModel />
-    </UserControl.DataContext>
-    <TabControl>
+    <TabControl x:Name="TABCON" Background="Transparent">
         <TabItem Header="Конфигурации майнинга">
             <Grid>
                 <Grid.RowDefinitions>
@@ -45,14 +42,15 @@
                     HorizontalAlignment="Center">
                     <Label
                         Margin="0,0,20,0"
+                        VerticalAlignment="Center"
                         FontSize="16"
                         FontWeight="Bold">
                         Имя рига:
                     </Label>
                     <TextBox
-                        Width="400"
+                        Width="500"
                         VerticalAlignment="Center"
-                        FontSize="16"
+                        FontSize="22"
                         FontWeight="Bold"
                         Text="{Binding RigName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         TextAlignment="Center">
@@ -87,7 +85,7 @@
                     </Label>
                     <Border
                         VerticalAlignment="Bottom"
-                        BorderBrush="{StaticResource MSI.Border}"
+                        BorderBrush="Gray"
                         BorderThickness="1"
                         Visibility="{Binding Path=GPUsSwitch, Converter={StaticResource ObjectExistToVisibilityConverter}}">
                         <WrapPanel
@@ -165,6 +163,7 @@
                                 <Button
                                     Grid.Column="3"
                                     Margin="0,0,2,2"
+                                    Click="StartProfile"
                                     Command="{Binding StartConfig}"
                                     Content="start" />
                             </Grid>
@@ -284,7 +283,7 @@
                             FontSize="14"
                             FontWeight="Bold"
                             IsEnabled="{Binding SelectedConfigIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}"
-                            Text="{Binding MinHashrate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            Text="{Binding MinHashrate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                     <Label
                         Grid.Row="2"
@@ -442,7 +441,7 @@
                     Grid.Column="1"
                     Margin="-1"
                     Padding="3"
-                    BorderBrush="{StaticResource MSI.Border}"
+                    BorderBrush="Gray"
                     BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -475,7 +474,7 @@
                     Margin="-1"
                     Padding="3"
                     VerticalAlignment="Top"
-                    BorderBrush="{StaticResource MSI.Border}"
+                    BorderBrush="Gray"
                     BorderThickness="1">
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -489,8 +488,10 @@
                                 <ColumnDefinition Width="2" />
                                 <ColumnDefinition Width="*" MinWidth="45" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="2" />
                                 <ColumnDefinition Width="*" MinWidth="45" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="2" />
                                 <ColumnDefinition Width="*" MinWidth="45" />
@@ -508,38 +509,43 @@
 
                             <Border
                                 Grid.Row="1"
-                                Grid.ColumnSpan="17"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                Grid.ColumnSpan="25"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
                                 Grid.Column="1"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
                                 Grid.Column="4"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
-                                Grid.Column="7"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                Grid.Column="8"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
-                                Grid.Column="10"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                Grid.Column="12"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
-                                Grid.Column="13"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                Grid.Column="12"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Border
                                 Grid.RowSpan="3"
                                 Grid.Column="15"
-                                BorderBrush="{StaticResource MSI.Border}"
+                                BorderBrush="Gray"
+                                BorderThickness="1" />
+                            <Border
+                                Grid.RowSpan="3"
+                                Grid.Column="17"
+                                BorderBrush="Gray"
                                 BorderThickness="1" />
                             <Label
                                 Grid.Row="0"
@@ -568,7 +574,7 @@
                             <StackPanel
                                 Grid.Row="0"
                                 Grid.Column="5"
-                                Grid.ColumnSpan="2"
+                                Grid.ColumnSpan="3"
                                 HorizontalAlignment="Center">
                                 <Label Content="Core Clock" />
                                 <Styles:Tumbler IsChecked="{Binding Path=CoreClocks, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
@@ -584,8 +590,8 @@
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="0"
-                                Grid.Column="8"
-                                Grid.ColumnSpan="2"
+                                Grid.Column="9"
+                                Grid.ColumnSpan="3"
                                 HorizontalAlignment="Center">
                                 <Label Content="Memory Clock" />
                                 <Styles:Tumbler IsChecked="{Binding Path=MemoryClocks, Mode=OneWay, Converter={StaticResource ListIntExistToBool}}" IsEnabled="{Binding SelectedOverclockIndex, Mode=OneWay, Converter={StaticResource SelectedIndexToboolConverter}}">
@@ -601,7 +607,7 @@
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="0"
-                                Grid.Column="11"
+                                Grid.Column="13"
                                 Grid.ColumnSpan="2"
                                 HorizontalAlignment="Center">
                                 <Label Content="Fan Speed" />
@@ -619,13 +625,13 @@
 
                             <Label
                                 Grid.Row="0"
-                                Grid.Column="14"
+                                Grid.Column="16"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Content="Temp" />
                             <Label
                                 Grid.Row="0"
-                                Grid.Column="16"
+                                Grid.Column="18"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Content="Hashrate" />
@@ -650,29 +656,37 @@
                                 Grid.Row="2"
                                 Grid.Column="6" />
                             <StackPanel
-                                x:Name="MemoryClocks"
+                                x:Name="InfOHMCoreClocks"
                                 Grid.Row="2"
-                                Grid.Column="8" />
+                                Grid.Column="7" />
                             <StackPanel
-                                x:Name="InfMemoryClocks"
+                                x:Name="MemoryClocks"
                                 Grid.Row="2"
                                 Grid.Column="9" />
                             <StackPanel
-                                x:Name="FanSpeeds"
+                                x:Name="InfMemoryClocks"
+                                Grid.Row="2"
+                                Grid.Column="10" />
+                            <StackPanel
+                                x:Name="InfOHMMemoryClocks"
                                 Grid.Row="2"
                                 Grid.Column="11" />
                             <StackPanel
-                                x:Name="InfoFanSpeeds"
+                                x:Name="FanSpeeds"
                                 Grid.Row="2"
-                                Grid.Column="12" />
+                                Grid.Column="13" />
                             <StackPanel
-                                x:Name="InfTemps"
+                                x:Name="InfoFanSpeeds"
                                 Grid.Row="2"
                                 Grid.Column="14" />
                             <StackPanel
-                                x:Name="InfHashrates"
+                                x:Name="InfTemps"
                                 Grid.Row="2"
                                 Grid.Column="16" />
+                            <StackPanel
+                                x:Name="InfHashrates"
+                                Grid.Row="2"
+                                Grid.Column="18" />
 
                         </Grid>
                     </ScrollViewer>
@@ -686,7 +700,7 @@
                     Margin="-1"
                     Padding="3"
                     VerticalAlignment="Bottom"
-                    BorderBrush="{StaticResource MSI.Border}"
+                    BorderBrush="Gray"
                     BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -914,23 +928,29 @@
                             Margin="0,0,5,0"
                             VerticalAlignment="Center"
                             FontSize="14"
-                            IsChecked="{Binding LogAutoscroll, Mode=TwoWay}">
+                            IsChecked="{Binding LogAutoscroll, Mode=TwoWay}" />
+                        <Label
+                            Margin="5,0,5,0"
+                            Content="ShowMinerLog"
+                            FontSize="14"
+                            Foreground="White" />
+                        <Styles:Tumbler IsChecked="False">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Checked">
-                                    <i:InvokeCommandAction Command="{Binding SetLogFontSize}" />
+                                    <i:InvokeCommandAction Command="{Binding MinerLogShow}" />
                                 </i:EventTrigger>
                                 <i:EventTrigger EventName="Unchecked">
-                                    <i:InvokeCommandAction Command="{Binding SetLogFontSize}" />
+                                    <i:InvokeCommandAction Command="{Binding MinerLogHide}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </CheckBox>
-                        <Button
+                        </Styles:Tumbler>
+                        <!--<Button
                             Margin="5,0,5,0"
                             VerticalAlignment="Center"
                             Command="{Binding ShowMinerLog}"
                             FontSize="14">
                             ShowMinerLog
-                        </Button>
+                        </Button>-->
                         <Button
                             Margin="5,0,5,0"
                             VerticalAlignment="Center"
@@ -1089,7 +1109,7 @@
                     <Border
                         Margin="-1"
                         Padding="3"
-                        BorderBrush="{StaticResource MSI.Border}"
+                        BorderBrush="Gray"
                         BorderThickness="1">
                         <WrapPanel HorizontalAlignment="Right">
                             <Label Foreground="White">VK Informer:</Label>
@@ -1107,6 +1127,8 @@
                             <TextBox
                                 Width="200"
                                 Margin="10,0,0,0"
+                                VerticalContentAlignment="Center"
+                                FontSize="14"
                                 Text="{Binding VKUserID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="TextChanged">
@@ -1119,7 +1141,7 @@
                     <Border
                         Margin="-1"
                         Padding="3"
-                        BorderBrush="{StaticResource MSI.Border}"
+                        BorderBrush="Gray"
                         BorderThickness="1">
                         <WrapPanel HorizontalAlignment="Center">
                             <Label Foreground="White">Telegram Informer:</Label>
@@ -1141,6 +1163,8 @@
                             <TextBox
                                 Width="200"
                                 Margin="10,0,0,0"
+                                VerticalContentAlignment="Center"
+                                FontSize="14"
                                 IsEnabled="False"
                                 Text="{Binding TelegramUserID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                 <i:Interaction.Triggers>
@@ -1153,6 +1177,6 @@
                     </Border>
                 </StackPanel>
             </Grid>
-        </TabItem>,fnfhtqrb
+        </TabItem>
     </TabControl>
 </UserControl>

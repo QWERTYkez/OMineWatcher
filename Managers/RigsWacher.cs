@@ -177,8 +177,10 @@ namespace OMineWatcher.Managers
             {
                 PingBlocks[i] = false;
 
-                OMGRootObject ro = new OMGRootObject();
-                ro.RigInactive = true;
+                OMGRootObject ro = new OMGRootObject
+                {
+                    RigInactive = true
+                };
 
                 RigInformSent(i, ro);
             }
@@ -223,7 +225,7 @@ namespace OMineWatcher.Managers
                 {
                     while (HiveWach[i] && InternetConnection)
                     {
-                        MinerInfo? mi = HiveClient.GetWorkerInfo((int)Settings.Rigs[i].HiveFarmID,
+                        var mi = HiveClient.GetWorkerInfo((int)Settings.Rigs[i].HiveFarmID,
                                                         (int)Settings.Rigs[i].HiveWorkerID);
 
                         if (mi != null)
@@ -232,8 +234,8 @@ namespace OMineWatcher.Managers
                                 new OMGRootObject
                                 {
                                     Indication = true,
-                                    Hashrates = mi.Value.Hashrates,
-                                    Temperatures = mi.Value.Temperatures
+                                    InfHashrates = mi.Value.Hashrates,
+                                    InfTemperatures = mi.Value.Temperatures
                                 }));
 
                             // low hashrate wachdog

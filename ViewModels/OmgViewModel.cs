@@ -1,8 +1,10 @@
 ﻿using OMineWatcher.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace OMineWatcher.ViewModels
@@ -15,62 +17,66 @@ namespace OMineWatcher.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
-        readonly OmgModel _model = new OmgModel();
+        public OmgModel _model;
         public OmgViewModel()
         {
-            _model.PropertyChanged += ModelChanged;
-
             IniConfigsCommands();
             IniConfigCommands();
             IniOverclockCommands();
             IniLogCommands();
             IniBaseSettingsCommands();
+
+            Task.Run(() =>
+            {
+                _model = new OmgModel();
+                _model.PropertyChanged += ModelChanged;
+                _model.IniModel();
+            });
         }
 
         private Managers.Profile Profile;
         private Dictionary<string, int[]> Algs;
         private List<string> MinersList;
         public int GPUs { get; set; }
-        public void ResetGPUs()
-        {
-            int[] l = new int[]
-            {
-                (InfPowerLimits != null? InfPowerLimits.Length : 0),
-                (InfCoreClocks != null? InfCoreClocks.Length : 0),
-                (InfMemoryClocks != null? InfMemoryClocks.Length : 0),
-                (InfFanSpeeds != null? InfFanSpeeds.Length : 0),
-                (InfTemperatures != null? InfTemperatures.Length : 0),
-                GPUsCountSelected
-            };
-            int m = l.Max();
-            if (GPUs != m) GPUs = m;
-        }
-        public Managers.DC DefClock { get; set; }
+
         private void ModelChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case "Profile":
                     {
-                        Profile = _model.Profile;
-                        GPUsSwitch = Profile.GPUsSwitch;
-                        if (Profile.GPUsSwitch != null)
+                        if (_model.Profile != null)
                         {
-                            GPUsCountSelected = _model.Profile.GPUsSwitch.Count;
+                            Profile = _model.Profile;
+
+                            LogFontSize = Profile.LogTextSize;
+                            GPUsSwitch = Profile.GPUsSwitch;
+                            RigName = Profile.RigName;
+                            AutoRun = Profile.Autostart;
+                            ConfigsNames = from i in Profile.ConfigsList select i.Name;
+                            List<string> CL = (from i in Profile.ClocksList select i.Name).ToList();
+                            CL.Insert(0, "---");
+                            ConfigOverclocks = CL;
+                            OverclocksNames = from i in Profile.ClocksList select i.Name;
+                            WachdogTimer = Profile.TimeoutWachdog;
+                            IdleTimeout = Profile.TimeoutIdle;
+                            LHTimeout = Profile.TimeoutLH;
+
+                            VKInformer = Profile.Informer.VkInform;
+                            VKUserID = Profile.Informer.VKuserID;
                         }
-                        else { GPUsCountSelected = 0; }
-                        RigName = Profile.RigName;
-                        AutoRun = Profile.Autostart;
-                        ConfigsNames = from i in Profile.ConfigsList select i.Name;
-                        List<string> CL = (from i in Profile.ClocksList select i.Name).ToList();
-                        CL.Insert(0, "---");
-                        ConfigOverclocks = CL;
-                        OverclocksNames = from i in Profile.ClocksList select i.Name;
-                        WachdogTimer = Profile.TimeoutWachdog;
-                        IdleTimeout = Profile.TimeoutIdle;
-                        LHTimeout = Profile.TimeoutLH;
                         break;
                     }
+                case "GPUs": { GPUs = _model.GPUs; break; }
+                case "InfPowerLimits": { InfPowerLimits = _model.InfPowerLimits; break; }
+                case "InfCoreClocks": { InfCoreClocks = _model.InfCoreClocks; break; }
+                case "InfMemoryClocks": { InfMemoryClocks = _model.InfMemoryClocks; break; }
+                case "InfOHMCoreClocks": { InfOHMCoreClocks = _model.InfOHMCoreClocks; break; }
+                case "InfOHMMemoryClocks": { InfOHMMemoryClocks = _model.InfOHMMemoryClocks; break; }
+                case "InfFanSpeeds": { InfFanSpeeds = _model.InfFanSpeeds; break; }
+                case "InfTemperatures": { InfTemperatures = _model.InfTemperatures; break; }
+                case "InfHashrates": { InfHashrates = _model.InfHashrates; break; }
+                case "TotalHashrate": { TotalHashrate = _model.TotalHashrate; break; }
                 case "Miners":
                     {
                         MinersList = _model.Miners;
@@ -87,48 +93,12 @@ namespace OMineWatcher.ViewModels
                         Log += _model.Loggong;
                     }
                     break;
-                case "OC":
-                    {
-                        if (InfPowerLimits != _model.OC.MSI_PowerLimits)
-                        {
-                            InfPowerLimits = _model.OC.MSI_PowerLimits;
-                        }
-                        if (InfCoreClocks != _model.OC.MSI_CoreClocks)
-                        {
-                            InfCoreClocks = _model.OC.MSI_CoreClocks;
-                        }
-                        if (InfMemoryClocks != _model.OC.MSI_MemoryClocks)
-                        {
-                            InfMemoryClocks = _model.OC.MSI_MemoryClocks;
-                        }
-                        if (InfFanSpeeds != _model.OC.MSI_FanSpeeds)
-                        {
-                            InfFanSpeeds = _model.OC.MSI_FanSpeeds;
-                        }
-
-                        ResetGPUs();
-                    }
-                    break;
                 case "DefClock":
                     {
-                        DefClock = _model.DefClock;
-                    }
-                    break;
-                case "Hashrates":
-                    {
-                        if (InfHashrates != _model.Hashrates)
-                        {
-                            InfHashrates = _model.Hashrates;
-                            TotalHashrate = _model.Hashrates.Sum();
-                        }
-                    }
-                    break;
-                case "Temperatures":
-                    {
-                        if (InfTemperatures != _model.Temperatures)
-                        {
-                            InfTemperatures = _model.Temperatures;
-                        }
+                        DefPowerLimits = _model.DefClock.PowerLimits;
+                        DefCoreClocks = _model.DefClock.CoreClocks;
+                        DefMemoryClocks = _model.DefClock.MemoryClocks;
+                        DefFanSpeeds = _model.DefClock.FanSpeeds;
                     }
                     break;
                 case "WachdogInfo":
@@ -149,15 +119,9 @@ namespace OMineWatcher.ViewModels
                         SetTimersVisibility();
                     }
                     break;
-                case "ShowMLogTB":
-                    {
-                        ShowMLogTB = _model.ShowMLogTB;
-                        SetTimersVisibility();
-                    }
-                    break;
                 case "Indicator":
                     {
-                        Indication = (bool)_model.Indicator;
+                        Indication = _model.Indicator;
                         if (Indication)
                         {
                             SwitchProcessButtonText = "KillProcess";
@@ -191,17 +155,17 @@ namespace OMineWatcher.ViewModels
             SetRigName = new RelayCommand(obj =>
             {
                 Profile.RigName = RigName;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetAutoRun = new RelayCommand(obj =>
             {
                 Profile.Autostart = AutoRun;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetGPUsSwitch = new RelayCommand(obj =>
             {
                 Profile.GPUsSwitch = GPUsSwitch;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
         }
         private void SaveProfile()
@@ -332,7 +296,7 @@ namespace OMineWatcher.ViewModels
             {
                 Profile.ConfigsList.Add(new Managers.Config());
                 ConfigsNames = from i in Profile.ConfigsList select i.Name;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
                 SelectedConfigIndex = ConfigsNames.Count() - 1;
             });
             MinusConfig = new RelayCommand(obj =>
@@ -342,7 +306,7 @@ namespace OMineWatcher.ViewModels
                     Profile.ConfigsList.RemoveAt(SelectedConfigIndex);
                     ConfigsNames = from i in Profile.ConfigsList select i.Name;
                     SelectedConfigIndex = -1;
-                    _model.cmd_SaveProfile(Profile);
+                    _model.CMD_SaveProfile(Profile);
                 }
             });
             SaveConfig = new RelayCommand(obj =>
@@ -350,7 +314,7 @@ namespace OMineWatcher.ViewModels
                 if (SelectedConfigIndex > -1)
                 {
                     SaveProfile();
-                    _model.cmd_SaveProfile(Profile);
+                    _model.CMD_SaveProfile(Profile);
                 }
             });
             StartConfig = new RelayCommand(obj =>
@@ -358,7 +322,7 @@ namespace OMineWatcher.ViewModels
                 if (SelectedConfigIndex > -1)
                 {
                     SaveProfile();
-                    _model.cmd_RunProfile(Profile, SelectedConfigIndex);
+                    _model.CMD_RunProfile(Profile, SelectedConfigIndex);
                 }
             });
         }
@@ -373,11 +337,16 @@ namespace OMineWatcher.ViewModels
         public RelayCommand SaveOverclock { get; set; }
         public RelayCommand ApplyOverclock { get; set; }
 
+        private int[] DefPowerLimits;
+        private int[] DefCoreClocks;
+        private int[] DefMemoryClocks;
+        private int[] DefFanSpeeds;
+
         public string OverclockName { get; set; }
-        public List<int> PowerLimits { get; set; }
-        public List<int> CoreClocks { get; set; }
-        public List<int> MemoryClocks { get; set; }
-        public List<int> FanSpeeds { get; set; }
+        public int[] PowerLimits { get; set; }
+        public int[] CoreClocks { get; set; }
+        public int[] MemoryClocks { get; set; }
+        public int[] FanSpeeds { get; set; }
 
         public RelayCommand PowerLimitsOn { get; set; }
         public RelayCommand CoreClocksOn { get; set; }
@@ -389,20 +358,16 @@ namespace OMineWatcher.ViewModels
         public RelayCommand MemoryClocksOff { get; set; }
         public RelayCommand FanSpeedsOff { get; set; }
 
-        public int[] InfPowerLimits { get; set; }
-        public int[] InfCoreClocks { get; set; }
-        public int[] InfMemoryClocks { get; set; }
-        public int[] InfFanSpeeds { get; set; }
-        public int[] InfTemperatures { get; set; }
-        public double[] InfHashrates { get; set; }
-        public double TotalHashrate { get; set; }
+        public int?[] InfPowerLimits { get; set; }
+        public int?[] InfCoreClocks { get; set; }
+        public int?[] InfMemoryClocks { get; set; }
+        public int?[] InfOHMCoreClocks { get; set; }  //
+        public int?[] InfOHMMemoryClocks { get; set; }  //
+        public int?[] InfFanSpeeds { get; set; }
+        public int?[] InfTemperatures { get; set; }
+        public double?[] InfHashrates { get; set; }
+        public double? TotalHashrate { get; set; }
 
-        private List<int> ArrayToList(int[] source)
-        {
-            List<int> S = source?.ToList();
-            if (S != null) { while (S.Count < GPUsCountSelected) S.Add(0); }
-            return S;
-        }
         private void IniOverclockCommands()
         {
             SelectOverclock = new RelayCommand(obj =>
@@ -411,10 +376,10 @@ namespace OMineWatcher.ViewModels
                 {
                     OverclockName = Profile.ClocksList[SelectedOverclockIndex].Name;
 
-                    PowerLimits = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].PowLim);
-                    CoreClocks = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].CoreClock);
-                    MemoryClocks = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].MemoryClock);
-                    FanSpeeds = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].FanSpeed);
+                    PowerLimits = Profile.ClocksList[SelectedOverclockIndex].PowLim;
+                    CoreClocks = Profile.ClocksList[SelectedOverclockIndex].CoreClock;
+                    MemoryClocks = Profile.ClocksList[SelectedOverclockIndex].MemoryClock;
+                    FanSpeeds = Profile.ClocksList[SelectedOverclockIndex].FanSpeed;
                 }
                 else
                 {
@@ -430,46 +395,30 @@ namespace OMineWatcher.ViewModels
             PowerLimitsOn = new RelayCommand(obj =>
             {
                 if (Profile.ClocksList[SelectedOverclockIndex].PowLim == null)
-                {
-                    PowerLimits = ArrayToList(DefClock.PowerLimits);
-                }
+                    PowerLimits = DefPowerLimits;
                 else
-                {
-                    PowerLimits = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].PowLim);
-                }
+                    PowerLimits = Profile.ClocksList[SelectedOverclockIndex].PowLim;
             });
             CoreClocksOn = new RelayCommand(obj =>
             {
                 if (Profile.ClocksList[SelectedOverclockIndex].PowLim == null)
-                {
-                    CoreClocks = ArrayToList(DefClock.CoreClocks);
-                }
+                    CoreClocks = DefCoreClocks;
                 else
-                {
-                    CoreClocks = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].CoreClock);
-                }
+                    CoreClocks = Profile.ClocksList[SelectedOverclockIndex].CoreClock;
             });
             MemoryClocksOn = new RelayCommand(obj =>
             {
                 if (Profile.ClocksList[SelectedOverclockIndex].PowLim == null)
-                {
-                    MemoryClocks = ArrayToList(DefClock.MemoryClocks);
-                }
+                    MemoryClocks = DefMemoryClocks;
                 else
-                {
-                    MemoryClocks = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].MemoryClock);
-                }
+                    MemoryClocks = Profile.ClocksList[SelectedOverclockIndex].MemoryClock;
             });
             FanSpeedsOn = new RelayCommand(obj =>
             {
                 if (Profile.ClocksList[SelectedOverclockIndex].PowLim == null)
-                {
-                    FanSpeeds = ArrayToList(DefClock.FanSpeeds);
-                }
+                    FanSpeeds = DefFanSpeeds;
                 else
-                {
-                    FanSpeeds = ArrayToList(Profile.ClocksList[SelectedOverclockIndex].FanSpeed);
-                }
+                    FanSpeeds = Profile.ClocksList[SelectedOverclockIndex].FanSpeed;
             });
 
             PowerLimitsOff = new RelayCommand(obj =>
@@ -493,9 +442,9 @@ namespace OMineWatcher.ViewModels
             {
                 Profile.ClocksList.Add(new Managers.Overclock());
                 OverclocksNames = from i in Profile.ClocksList select i.Name;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
                 SelectedOverclockIndex = OverclocksNames.Count() - 1;
-                
+
             });
             MinusOverclock = new RelayCommand(obj =>
             {
@@ -503,7 +452,7 @@ namespace OMineWatcher.ViewModels
                 {
                     Profile.ClocksList.RemoveAt(SelectedOverclockIndex);
                     OverclocksNames = from i in Profile.ClocksList select i.Name;
-                    _model.cmd_SaveProfile(Profile);
+                    _model.CMD_SaveProfile(Profile);
                     SelectedOverclockIndex = -1;
                 }
             });
@@ -512,7 +461,7 @@ namespace OMineWatcher.ViewModels
                 if (SelectedOverclockIndex > -1)
                 {
                     SaveCLock();
-                    _model.cmd_SaveProfile(Profile);
+                    _model.CMD_SaveProfile(Profile);
                 }
             });
             ApplyOverclock = new RelayCommand(obj =>
@@ -520,7 +469,7 @@ namespace OMineWatcher.ViewModels
                 if (SelectedOverclockIndex > -1)
                 {
                     SaveCLock();
-                    _model.cmd_ApplyClock(Profile, SelectedOverclockIndex);
+                    _model.CMD_ApplyClock(Profile, SelectedOverclockIndex);
                 }
             });
         }
@@ -557,11 +506,11 @@ namespace OMineWatcher.ViewModels
         public string LogHashrate { get; set; }
         public string LogTemperature { get; set; }
         public string LogTotalHash { get; set; }
-        public int LogFontSize { get; set; } = Managers.Settings.GenSets.LogTextSize;
+        public int LogFontSize { get; set; }
         public RelayCommand SetLogFontSize { get; set; }
-        public bool LogAutoscroll { get; set; } = Managers.Settings.GenSets.LogAutoscroll;
-        public RelayCommand SetLogAutoscroll { get; set; }
-        public RelayCommand ShowMinerLog { get; set; }
+        public bool LogAutoscroll { get; set; } = true;
+        public RelayCommand MinerLogShow { get; set; }
+        public RelayCommand MinerLogHide { get; set; }
         public string SwitchProcessButtonText { get; set; } = "Switch Process";
         public RelayCommand SwitchProcess { get; set; }
 
@@ -572,7 +521,7 @@ namespace OMineWatcher.ViewModels
         public object TimersVisibility { get; set; } = null;
         private void SetTimersVisibility()
         {
-            if (WachdogInfo == "" && LowHWachdog == "" && IdleWachdog == "" && ShowMLogTB == "")
+            if (WachdogInfo == "" && LowHWachdog == "" && IdleWachdog == "")
             {
                 TimersVisibility = null;
             }
@@ -586,28 +535,27 @@ namespace OMineWatcher.ViewModels
         {
             SetLogFontSize = new RelayCommand(obj =>
             {
-                Managers.Settings.GenSets.LogTextSize = LogFontSize;
-                Managers.Settings.SaveSettings();
+                Profile.LogTextSize = LogFontSize;
+                _model.CMD_SaveProfile(Profile);
             });
-            SetLogAutoscroll = new RelayCommand(obj =>
+            MinerLogShow = new RelayCommand(obj =>
             {
-                Managers.Settings.GenSets.LogAutoscroll = LogAutoscroll;
-                Managers.Settings.SaveSettings();
+                _model.CMD_MinerLogShow();
             });
-            ShowMinerLog = new RelayCommand(obj => 
+            MinerLogHide = new RelayCommand(obj =>
             {
-                _model.cmd_ShowMinerLog();
+                _model.CMD_MinerLogHide();
             });
             SwitchProcess = new RelayCommand(obj =>
             {
-                _model.cmd_SwitchProcess();
+                _model.CMD_SwitchProcess();
             });
         }
         #endregion
         #region BaseSettings
-        public int WachdogTimer { get; set; }
-        public int IdleTimeout { get; set; }
-        public int LHTimeout { get; set; }
+        public int WachdogTimer { get; set; } = 30;
+        public int IdleTimeout { get; set; } = 300;
+        public int LHTimeout { get; set; } = 30;
         public RelayCommand SetWachdogTimer { get; set; }
         public RelayCommand SetIdleTimeout { get; set; }
         public RelayCommand SetLHTimeout { get; set; }
@@ -630,37 +578,37 @@ namespace OMineWatcher.ViewModels
                 {
                     IdleTimeout = WachdogTimer;
                 }
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetIdleTimeout = new RelayCommand(obj =>
             {
                 Profile.TimeoutIdle = IdleTimeout;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetLHTimeout = new RelayCommand(obj =>
             {
                 Profile.TimeoutLH = LHTimeout;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetVKInformer = new RelayCommand(obj =>
             {
                 Profile.Informer.VkInform = VKInformer;
                 if (!VKInformer) Profile.Informer.VKuserID = "";
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetVKUserID = new RelayCommand(obj =>
             {
                 Profile.Informer.VKuserID = VKUserID;
-                _model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetTelegramInformer = new RelayCommand(obj =>
             {
-                //_model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
             SetTelegramUserID = new RelayCommand(obj =>
             {
 
-                //_model.cmd_SaveProfile(Profile);
+                _model.CMD_SaveProfile(Profile);
             });
         }
         #endregion

@@ -691,7 +691,7 @@ namespace OMineWatcher.ViewModels
                 eWeAccountState = "Подключение";
                 if (await Task.Run(() => eWeLinkClient.AutheWeLink(eWeLogin, eWePasswordReceive)))
                 {
-                    Task.Run(async() =>
+                    _ = Task.Run(async() =>
                     {
                         GenSettings.eWeLogin = eWeLogin;
                         GenSettings.eWePassword = eWePasswordReceive;

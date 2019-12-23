@@ -74,10 +74,10 @@ namespace OMineWatcher.ViewModels
         }
 
         public string RigName { get; set; }
-        public double[] Hashrates { get; set; }
+        public double?[] Hashrates { get; set; }
         public double? Totalhashrate { get; set; }
         public string HashrateType { get; set; }
-        public int[] Temperatures { get; set; }
+        public int?[] Temperatures { get; set; }
         public int? TotalTemperature { get; set; }
 
         public Brush LimeIndicator { get; set; }

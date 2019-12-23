@@ -32,8 +32,8 @@ namespace OMineWatcher.Views
         private RigViewModel _ViewModel;
 
         public int Index { get; set; }
-        private int[] Temperatures = new int[1];
-        private double[] Hashrates;
+        private int?[] Temperatures = new int?[1];
+        private double?[] Hashrates;
         private void RigView_PropertyChanged(object sender, 
             System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -48,7 +48,7 @@ namespace OMineWatcher.Views
                         break;
                     case "Temperatures":
                         {
-                            int[] Temps = _ViewModel.Temperatures;
+                            int?[] Temps = _ViewModel.Temperatures;
 
                             if (Temps == null)
                             {
@@ -158,10 +158,13 @@ namespace OMineWatcher.Views
             public byte Green;
             public byte Blue;
         }
-        private void SetTemperature(DrawingCanvas DC, int curr)
+        private void SetTemperature(DrawingCanvas DC, int? curr)
         {
             int maxdigits = MaxTemp - MinTemp;
-            int currentTemp = curr - MinTemp;
+            int currentTemp;
+            if (curr != null) currentTemp = curr.Value - MinTemp;
+            else { currentTemp = -1; }
+
             if (currentTemp < 0) return;
 
             double DigitSpace = 100.0 / maxdigits;
@@ -202,11 +205,21 @@ namespace OMineWatcher.Views
                 }
             });
         }
-        private void SetTemperature(DrawingCanvas DC, int[] Ccurr)
+        private void SetTemperature(DrawingCanvas DC, int?[] Ccurr)
         {
-            int minT = Ccurr.Min() - MinTemp;
-            int curr = Ccurr.Max();
-
+            int minT;
+            int curr;
+            try
+            {
+                minT = Ccurr.Min().Value - MinTemp;
+                curr = Ccurr.Max().Value;
+            }
+            catch 
+            {
+                minT = -1;
+                curr = -1;
+            }
+            
             int maxdigits = MaxTemp - MinTemp;
             int currentTemp = curr - MinTemp;
             if (currentTemp < 0) return;

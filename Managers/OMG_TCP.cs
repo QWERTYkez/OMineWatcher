@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -23,7 +24,7 @@ namespace OMineWatcher.Managers
             return Encoding.Default.GetString(msg, 0, count);
         }
 
-        private static object key = new object();
+        private static readonly object key = new object();
         protected private static void SendMessage(TcpClient client, NetworkStream stream, object body, MSGtype type)
         {
             Task.Run(() =>
@@ -40,8 +41,7 @@ namespace OMineWatcher.Managers
                                 case MSGtype.Profile: header = "Profile"; break;
                                 case MSGtype.RunConfig: header = "RunConfig"; break;
                                 case MSGtype.ApplyClock: header = "ApplyClock"; break;
-                                case MSGtype.StartProcess: header = "StartProcess"; break;
-                                case MSGtype.KillProcess: header = "KillProcess"; break;
+                                case MSGtype.SwitchProcess: header = "SwitchProcess"; break;
                                 case MSGtype.ShowMinerLog: header = "ShowMinerLog"; break;
                             }
 
@@ -109,8 +109,10 @@ namespace OMineWatcher.Managers
                             catch { }
                             try
                             {
-                                RO = new OMGRootObject();
-                                RO.Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1]);
+                                RO = new OMGRootObject
+                                {
+                                    Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1])
+                                };
                                 SentInform?.Invoke(RO);
                             }
                             catch { }
@@ -209,16 +211,21 @@ namespace OMineWatcher.Managers
                                     try
                                     {
                                         RO = JsonConvert.DeserializeObject<OMGRootObject>(ReadMessage(stream));
-                                        SentInform?.Invoke(RO);
+                                        Task.Run(() => SentInform?.Invoke(RO));
                                     }
                                     catch { }
                                     Thread.Sleep(50);
                                 }
-                                StreamEnd?.Invoke();
+                                Task.Run(() => StreamEnd?.Invoke());
+                                Task.Run(() => SentInform?.Invoke(new OMGRootObject { RigInactive = true }));
                             }
                         }
                     }
-                    catch { StreamEnd?.Invoke(); }
+                    catch 
+                    { 
+                        Task.Run(() => StreamEnd?.Invoke());
+                        Task.Run(() => SentInform?.Invoke(new OMGRootObject { RigInactive = true }));
+                    }
                 });
             }
         }
@@ -231,20 +238,27 @@ namespace OMineWatcher.Managers
     public class OMGRootObject
     {
         public Profile Profile { get; set; }
-        public OC? Overclock { get; set; }
-        public DC? DefClock { get; set; }
+        public DefClock DefClock { get; set; }
         public string Logging { get; set; }
-        public double[] Hashrates { get; set; }
-        public int[] Temperatures { get; set; }
         public bool? Indication { get; set; }
         public List<string> Miners { get; set; }
         public Dictionary<string, int[]> Algoritms { get; set; }
         public string WachdogInfo { get; set; }
         public string LowHWachdog { get; set; }
         public string IdleWachdog { get; set; }
-        public string ShowMLogTB { get; set; }
 
-        public bool? RigInactive;
+        public int? GPUs { get; set; }
+        public int?[] InfPowerLimits { get; set; }
+        public int?[] InfCoreClocks { get; set; }
+        public int?[] InfMemoryClocks { get; set; }
+        public int?[] InfOHMCoreClocks { get; set; }
+        public int?[] InfOHMMemoryClocks { get; set; }
+        public int?[] InfFanSpeeds { get; set; }
+        public int?[] InfTemperatures { get; set; }
+        public double?[] InfHashrates { get; set; }
+        public double? TotalHashrate { get; set; }
+
+        public bool? RigInactive { get; set; }
     }
 
     #region Profile
@@ -254,12 +268,12 @@ namespace OMineWatcher.Managers
         public bool Autostart;
         public long? StartedID;
         public string StartedProcess;
-        public int? Digits;
+        public int Digits;
         public List<bool> GPUsSwitch;
         public List<Config> ConfigsList;
         public List<Overclock> ClocksList;
         public InformManager Informer;
-        public double? LogTextSize;
+        public int LogTextSize;
 
         public int TimeoutWachdog;
         public int TimeoutIdle;
@@ -267,17 +281,6 @@ namespace OMineWatcher.Managers
     }
     public class Config
     {
-        public Config()
-        {
-            Name = "Новый конфиг";
-            Algoritm = "";
-            Pool = "";
-            Wallet = "";
-            Params = "";
-            MinHashrate = 0;
-            ID = DateTime.UtcNow.ToBinary();
-        }
-
         public string Name;
         public string Algoritm;
         public int? Miner;
@@ -286,17 +289,11 @@ namespace OMineWatcher.Managers
         public string Wallet;
         public string Params;
         public long? ClockID;
-        public double MinHashrate;
+        public double? MinHashrate;
         public long ID;
     }
     public class Overclock
     {
-        public Overclock()
-        {
-            Name = "Новый разгон";
-            ID = DateTime.UtcNow.ToBinary();
-        }
-
         public string Name;
         public int[] PowLim;
         public int[] CoreClock;
@@ -310,28 +307,46 @@ namespace OMineWatcher.Managers
         public string VKuserID;
     }
     #endregion
-    public struct OC
-    {
-        public int[] MSI_PowerLimits;
-        public int[] MSI_CoreClocks;
-        public int[] MSI_MemoryClocks;
-        public int[] MSI_FanSpeeds;
-    }
-    public struct DC
+    public class DefClock
     {
         public int[] PowerLimits;
         public int[] CoreClocks;
         public int[] MemoryClocks;
         public int[] FanSpeeds;
     }
-
+    public struct MSIinfo
+    {
+        public int?[] PowerLimits;
+        public int?[] CoreClocks;
+        public int?[] MemoryClocks;
+        public int?[] FanSpeeds;
+    }
+    public struct OHMinfo
+    {
+        public int?[] Temperatures;
+        public int?[] FanSpeeds;
+        public int?[] CoreClocks;
+        public int?[] MemoryClocks;
+    }
+    public struct MinerInfo
+    {
+        public DateTime TimeStamp { get; set; }
+        public double?[] Hashrates;
+        public int?[] Temperatures;
+        public int?[] Fanspeeds;
+        public int?[] ShAccepted;
+        public int? ShTotalAccepted;
+        public int?[] ShRejected;
+        public int? ShTotalRejected;
+        public int?[] ShInvalid;
+        public int? ShTotalInvalid;
+    }
     public enum MSGtype
     {
         Profile,
         RunConfig,
         ApplyClock,
-        StartProcess,
-        KillProcess,
+        SwitchProcess,
         ShowMinerLog
     }
     #endregion

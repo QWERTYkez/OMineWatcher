@@ -53,29 +53,32 @@ namespace OMineWatcher.ViewModels
             {
                 if (_model.RigInform.Index == rvm.Index)
                 {
-                    if (ro.Indication != null)
+                    if (ro != null)
                     {
-                        rvm.SetIndicator((bool)ro.Indication);
-                    }
-                    if (ro.Hashrates != null)
-                    {
-                        rvm.Hashrates = ro.Hashrates;
-                        rvm.Totalhashrate = ro.Hashrates.Sum();
-                        rvm.SetIndicator(true);
-                    }
-                    if (ro.Temperatures != null)
-                    {
-                        rvm.Temperatures = ro.Temperatures;
-                        rvm.TotalTemperature = ro.Temperatures.Max();
-                    }
+                        if (ro.Indication != null)
+                        {
+                            rvm.SetIndicator((bool)ro.Indication);
+                        }
+                        if (ro.InfHashrates != null)
+                        {
+                            rvm.Hashrates = ro.InfHashrates;
+                            rvm.Totalhashrate = ro.InfHashrates.Sum();
+                            rvm.SetIndicator(true);
+                        }
+                        if (ro.InfTemperatures != null)
+                        {
+                            rvm.Temperatures = ro.InfTemperatures;
+                            rvm.TotalTemperature = ro.InfTemperatures.Max();
+                        }
 
-                    if (ro.RigInactive != null)
-                    {
-                        rvm.SetIndicator(false);
-                        rvm.Hashrates = null;
-                        rvm.Totalhashrate = null;
-                        rvm.Temperatures = null;
-                        rvm.TotalTemperature = null;
+                        if (ro.RigInactive != null)
+                        {
+                            rvm.SetIndicator(false);
+                            rvm.Hashrates = null;
+                            rvm.Totalhashrate = null;
+                            rvm.Temperatures = null;
+                            rvm.TotalTemperature = null;
+                        }
                     }
                 }
             }
