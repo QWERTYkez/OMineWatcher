@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xaml.Behaviors;
+using OMineGuardControlLibrary;
+using OMineWatcher.Managers;
 using OMineWatcher.Styles;
 using OMineWatcher.ViewModels;
 using System.Collections.Generic;
@@ -19,10 +21,30 @@ namespace OMineWatcher.Views
         public MainWindow()
         {
             InitializeComponent();
+
+            OMGcontroller.ControlStart += () => Dispatcher.Invoke(() => OMGcontrolReceived());
+            OMGcontroller.ControlEnd += () => Dispatcher.Invoke(() => OMGcontrolLost());
+
             _ViewModel = (MainViewModel)DataContext;
             _ViewModel.PropertyChanged += MainViewModel_PropertyChanged;
             _ViewModel.Watch.CollectionChanged += SetTumblers;
             _ViewModel.InitializeMainViewModel();
+        }
+
+        private void OMGcontrolLost()
+        {
+            OmgControlPresenter.Content = null;
+            OmgControlPresenter.Visibility = Visibility.Collapsed;
+            OmgDisconnectButton.Visibility = Visibility.Collapsed;
+            BaseTabControl.Visibility = Visibility.Visible;
+        }
+        private void OMGcontrolReceived()
+        {
+            OmgControlPresenter.Content = 
+                new View(new Models.OmgModel());
+            OmgControlPresenter.Visibility = Visibility.Visible;
+            OmgDisconnectButton.Visibility = Visibility.Visible;
+            BaseTabControl.Visibility = Visibility.Collapsed;
         }
 
         private void MainViewModel_PropertyChanged(object sender, 

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace OMineWatcher.ViewModels
 {
@@ -28,9 +29,6 @@ namespace OMineWatcher.ViewModels
             _model.PropertyChanged += ModelChanged;
             _model.Statuses.CollectionChanged += (sender, e) => Indicators = _model.Statuses.ToList();
             _model.InitializeModel();
-
-            OMGcontroller.ControlStart += () => OMGcontrolReceived();
-            OMGcontroller.ControlEnd += () => OMGcontrolLost();
 
             InitializeRigsControlCommands();
             InitializeIndicatorsAndTumblers();
@@ -126,7 +124,6 @@ namespace OMineWatcher.ViewModels
                             }
                         });
                         
-
                         VKuserID = GenSettings.VKuserID;
                     } break;
             }
@@ -416,14 +413,6 @@ namespace OMineWatcher.ViewModels
             OMGdisconnect = new RelayCommand(obj => OMGcontroller.StopControl());
         }
         public UserControl OmgControlView { get; set; }
-        private void OMGcontrolLost()
-        {
-            OmgControlView = null;
-        }
-        private void OMGcontrolReceived()
-        {
-            Views.MainWindow.STAContext.Send(obj => { OmgControlView = new Views.OmgView(); }, null);
-        }
         #endregion
         #region HiveWorkerSettings
         public bool HiveWorkerSettingsVisibility { get; set; } = false;

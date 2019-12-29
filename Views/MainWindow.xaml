@@ -19,8 +19,12 @@
         <vm:MainViewModel />
     </Window.DataContext>
     <Grid>
-        <ContentPresenter Content="{Binding OmgControlView}" Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
+        <ContentPresenter
+            x:Name="OmgControlPresenter"
+            Content="{Binding OmgControlView}"
+            Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
         <Button
+            x:Name="OmgDisconnectButton"
             Height="19"
             Margin="2"
             HorizontalAlignment="Right"
@@ -28,7 +32,7 @@
             Command="{Binding OMGdisconnect}"
             Content="Отключиться"
             Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverter}}" />
-        <TabControl Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverterReverce}}">
+        <TabControl x:Name="BaseTabControl" Visibility="{Binding Path=OmgControlView, Converter={StaticResource ObjectExistToVisibilityConverterReverce}}">
             <TabItem Header="Базовый вид">
                 <Grid>
                     <Grid.ColumnDefinitions>

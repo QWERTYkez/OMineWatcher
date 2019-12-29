@@ -1,4 +1,6 @@
-﻿using OMineWatcher.Managers;
+﻿using Newtonsoft.Json;
+using OMineGuardControlLibrary;
+using OMineWatcher.Managers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,24 +9,23 @@ using System.Runtime.CompilerServices;
 
 namespace OMineWatcher.Models
 {
-    public class OmgModel : INotifyPropertyChanged
+    public class OmgModel : IModel
     {
+        public event Action Autostarted;
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName]string prop = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-
-        private Profile CurrProf;
-
         public void IniModel()
         {
             OMGcontroller.SentInform += OMGsent;
         }
 
-        public Profile Profile { get; set; }
+        public IProfile Profile { get; set; }
         public List<string> Miners { get; set; }
-        public DefClock DefClock { get; set; }
+        public IDefClock DefClock { get; set; }
         public Dictionary<string, int[]> Algoritms { get; set; }
 
         public string Loggong { get; set; }
@@ -42,7 +43,10 @@ namespace OMineWatcher.Models
                     (InfMemoryClocks != null? InfMemoryClocks.Length : 0),
                     (InfFanSpeeds != null? InfFanSpeeds.Length : 0),
                     (InfTemperatures != null? InfTemperatures.Length : 0),
-                    CurrProf.GPUsSwitch.Count
+                    (InfOHMCoreClocks != null? InfOHMCoreClocks.Length : 0),
+                    (InfOHMMemoryClocks != null? InfOHMMemoryClocks.Length : 0),
+                    (InfHashrates != null? InfHashrates.Length : 0),
+                    Profile.GPUsSwitch.Count
                 };
                 int m = l.Max();
                 if (GPUs != m)
@@ -62,48 +66,68 @@ namespace OMineWatcher.Models
         public double?[] InfHashrates { get; set; }
         public double? TotalHashrate { get; set; }
 
+        public int?[] ShAccepted { get; set; }
+        public int? ShTotalAccepted { get; set; }
+        public int?[] ShRejected { get; set; }
+        public int? ShTotalRejected { get; set; }
+        public int?[] ShInvalid { get; set; }
+        public int? ShTotalInvalid { get; set; }
+
         public string WachdogInfo { get; set; }
         public string LowHWachdog { get; set; }
         public string IdleWachdog { get; set; }
         public bool Indicator { get; set; } = false;
 
+        private static string CurrentJSON = "";
         private void OMGsent(OMGRootObject RO)
         {
-            if (RO.Algoritms != null) Algoritms = RO.Algoritms;
-            if (RO.DefClock != null) DefClock = RO.DefClock;
+            if(RO.ControlStruct != null) OMGsent(RO.ControlStruct);
+
             if (RO.GPUs != null) GPUs = RO.GPUs.Value;
+
+            if (RO.Profile != null) 
+            {
+                CurrentJSON = JsonConvert.SerializeObject(RO.Profile);
+                Profile = RO.Profile; 
+            }
+            if (RO.Logging != null) Loggong = RO.Logging;
+            if (RO.InfPowerLimits != null) InfPowerLimits = RO.InfPowerLimits;
+            if (RO.InfCoreClocks != null) InfCoreClocks = RO.InfCoreClocks;
+            if (RO.InfMemoryClocks != null) InfMemoryClocks = RO.InfMemoryClocks;
+            if (RO.InfOHMCoreClocks != null) InfOHMCoreClocks = RO.InfOHMCoreClocks;
+            if (RO.InfOHMMemoryClocks != null) InfOHMMemoryClocks = RO.InfOHMMemoryClocks;
+            if (RO.InfFanSpeeds != null) InfFanSpeeds = RO.InfFanSpeeds;
+            if (RO.InfTemperatures != null) InfTemperatures = RO.InfTemperatures;
+            if (RO.InfHashrates != null) InfHashrates = RO.InfHashrates;
+            if (RO.TotalHashrate != null) TotalHashrate = RO.TotalHashrate;
+            if (RO.WachdogInfo != null) WachdogInfo = RO.WachdogInfo;
+            if (RO.LowHWachdog != null) LowHWachdog = RO.LowHWachdog;
             if (RO.IdleWachdog != null) IdleWachdog = RO.IdleWachdog;
-            if (RO.Indication != null) Algoritms = RO.Algoritms;
-            if (RO.InfCoreClocks != null) Algoritms = RO.Algoritms;
-            if (RO.InfFanSpeeds != null) Algoritms = RO.Algoritms;
-            if (RO.InfHashrates != null) Algoritms = RO.Algoritms;
-            if (RO.InfMemoryClocks != null) Algoritms = RO.Algoritms;
-            if (RO.InfOHMCoreClocks != null) Algoritms = RO.Algoritms;
-            if (RO.InfOHMMemoryClocks != null) Algoritms = RO.Algoritms;
-            if (RO.InfPowerLimits != null) Algoritms = RO.Algoritms;
-            if (RO.InfTemperatures != null) Algoritms = RO.Algoritms;
-            if (RO.Logging != null) Algoritms = RO.Algoritms;
-            if (RO.LowHWachdog != null) Algoritms = RO.Algoritms;
-            if (RO.Miners != null) Algoritms = RO.Algoritms;
-            if (RO.Profile != null) Algoritms = RO.Algoritms;
-            if (RO.TotalHashrate != null) Algoritms = RO.Algoritms;
-            if (RO.WachdogInfo != null) Algoritms = RO.Algoritms;
+            if (RO.Indication != null) Indicator = RO.Indication.Value;
+            if (RO.Algoritms != null) Algoritms = RO.Algoritms;
+            if (RO.Miners != null) Miners = RO.Miners;
+            if (RO.DefClock != null) DefClock = RO.DefClock;
         }
 
         #region Commands
-        public void CMD_SaveProfile(Profile prof)
+        public void CMD_SaveProfile(IProfile prof)
         {
-            CurrProf = prof;
-            OMGcontroller.SendSetting(CurrProf, MSGtype.Profile);
+            string newJSON = JsonConvert.SerializeObject(prof);
+            if (newJSON != CurrentJSON)
+            {
+                CurrentJSON = newJSON;
+                Profile = prof;
+                OMGcontroller.SendSetting(Profile, MSGtype.Profile);
+            }
         }
-        public void CMD_RunProfile(Profile prof, int index)
+        public void CMD_RunProfile(IProfile prof, int index)
         {
-            CurrProf = prof;
+            Profile = prof;
             OMGcontroller.SendSetting(new object[] { prof, index }, MSGtype.RunConfig);
         }
-        public void CMD_ApplyClock(Profile prof, int index)
+        public void CMD_ApplyClock(IProfile prof, int index)
         {
-            CurrProf = prof;
+            Profile = prof;
             OMGcontroller.SendSetting(new object[] { prof, index }, MSGtype.ApplyClock);
         }
         public void CMD_MinerLogShow()

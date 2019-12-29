@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using OMineGuardControlLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,17 +13,45 @@ namespace OMineWatcher.Managers
 {
     public abstract class OMGconnector
     {
-        protected private static string ReadMessage(NetworkStream stream)
+        private class ConfigConverter : CustomCreationConverter<IConfig>
         {
-            byte[] msg = new byte[4];
-            stream.Read(msg, 0, msg.Length);
-            int MSGlength = BitConverter.ToInt32(msg, 0);
+            public override IConfig Create(Type objectType)
+            {
+                return new Config();
+            }
+        }
+        private class OverclockConverter : CustomCreationConverter<IOverclock>
+        {
+            public override IOverclock Create(Type objectType)
+            {
+                return new Overclock();
+            }
+        }
+        private static readonly JsonConverter[] Convs = new JsonConverter[]
+        {
+            new ConfigConverter(),
+            new OverclockConverter()
+        };
 
-            stream.Write(new byte[] { 1 }, 0, 1);
+        private static readonly object readkey = new object();
+        protected private static OMGRootObject ReadRootObject(NetworkStream stream)
+        {
+            lock (readkey)
+            {
+                byte[] msg = new byte[4];
+                stream.Read(msg, 0, msg.Length);
+                int MSGlength = BitConverter.ToInt32(msg, 0);
 
-            msg = new byte[MSGlength];
-            int count = stream.Read(msg, 0, msg.Length);
-            return Encoding.Default.GetString(msg, 0, count);
+                stream.Write(new byte[] { 1 }, 0, 1);
+
+                msg = new byte[MSGlength];
+                int count = stream.Read(msg, 0, msg.Length);
+                string message = Encoding.Default.GetString(msg, 0, count);
+
+                Debug.WriteLine(message);
+
+                return JsonConvert.DeserializeObject<OMGRootObject>(message, Convs);
+            }
         }
 
         private static readonly object key = new object();
@@ -67,121 +97,67 @@ namespace OMineWatcher.Managers
         public static event Action ControlEnd;
         public static event Action ControlStart;
         public static event Action<OMGRootObject> SentInform;
-        public static bool OMGconnection { get; private set; } = false;
 
         private static TcpClient OMGcontrolClient;
         private static NetworkStream OMGcontrolStream;
         public static void StartControl(string IP)
         {
-            if (OMGconnection) return;
-            OMGconnection = true;
             Task.Run(() =>
             {
                 try
                 {
                     OMGcontrolClient = new TcpClient(IP, 2112);
                 }
-                catch { OMGconnection = false; return; }
+                catch { return; }
 
                 if (OMGcontrolClient.Connected) ControlStart?.Invoke();
                 OMGcontrolStream = OMGcontrolClient.GetStream();
 
                 try
                 {
-                    string[] result = new string[6];
-                    if (OMGconnection)
-                    {
-                        result[0] = ReadMessage(OMGcontrolStream); // Profile
-                        result[1] = ReadMessage(OMGcontrolStream); // Algoritms
-                        result[2] = ReadMessage(OMGcontrolStream); // Miners
-                        result[3] = ReadMessage(OMGcontrolStream); // DefClock
-                        result[4] = ReadMessage(OMGcontrolStream); // Indication
-                        result[5] = ReadMessage(OMGcontrolStream); // Log
+                    var RO = ReadRootObject(OMGcontrolStream);
+                    Task.Run(() => SentInform?.Invoke(RO));
+                }
+                catch { ControlEnd?.Invoke(); }
 
-                        Task.Run(() =>
+                try
+                {
+                    using (ControlClient = new TcpClient(IP, 2113))
+                    {
+                        using (NetworkStream stream = ControlClient.GetStream())
                         {
                             OMGRootObject RO;
-                            try
+                            while (ControlClient.Connected)
                             {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[2]);
-                                SentInform?.Invoke(RO);
+                                RO = ReadRootObject(stream);
+                                Task.Run(() => SentInform?.Invoke(RO));
                             }
-                            catch { }
-                            try
-                            {
-                                RO = new OMGRootObject
-                                {
-                                    Algoritms = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(result[1])
-                                };
-                                SentInform?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[0]);
-                                SentInform?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[3]);
-                                SentInform?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[4]);
-                                SentInform?.Invoke(RO);
-                                SentInform?.Invoke(RO);
-                            }
-                            catch { }
-                            try
-                            {
-                                RO = JsonConvert.DeserializeObject<OMGRootObject>(result[5]);
-                                RO.Logging = RO.Logging.Replace("\r\n\r\n", "\r\n");
-                                SentInform?.Invoke(RO);
-                            }
-                            catch { }
-                        });
-                    }
-                    else { ControlEnd?.Invoke(); }
-                }
-                catch { }
-
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        using (TcpClient client = new TcpClient(IP, 2113))
-                        {
-                            using (NetworkStream stream = client.GetStream())
-                            {
-                                OMGRootObject RO;
-                                while (client.Connected && OMGconnection)
-                                {
-                                    try
-                                    {
-                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(ReadMessage(stream));
-                                        SentInform?.Invoke(RO);
-                                    }
-                                    catch { }
-                                    Thread.Sleep(50);
-                                }
-                                ControlEnd?.Invoke();
-                            }
+                            ControlEnd?.Invoke();
                         }
                     }
-                    catch { ControlEnd?.Invoke(); }
-                });
+                }
+                catch { ControlEnd?.Invoke(); }
             });
         }
         public static void SendSetting(object body, MSGtype type)
         {
             SendMessage(OMGcontrolClient, OMGcontrolStream, body, type);
         }
+        private static TcpClient ControlClient;
         public static void StopControl()
         {
-            OMGconnection = false;
+            if (OMGcontrolClient != null)
+            {
+                OMGcontrolClient.Close();
+                OMGcontrolClient.Dispose();
+                OMGcontrolClient = null;
+            }
+            if (ControlClient != null)
+            {
+                ControlClient.Close();
+                ControlClient.Dispose();
+                ControlClient = null;
+            }
         }
     }
     public class OMGinformer : OMGconnector
@@ -208,12 +184,8 @@ namespace OMineWatcher.Managers
                                 OMGRootObject RO;
                                 while (client.Connected && Streaming)
                                 {
-                                    try
-                                    {
-                                        RO = JsonConvert.DeserializeObject<OMGRootObject>(ReadMessage(stream));
-                                        Task.Run(() => SentInform?.Invoke(RO));
-                                    }
-                                    catch { }
+                                    RO = ReadRootObject(stream);
+                                    Task.Run(() => SentInform?.Invoke(RO));
                                     Thread.Sleep(50);
                                 }
                                 Task.Run(() => StreamEnd?.Invoke());
@@ -237,6 +209,8 @@ namespace OMineWatcher.Managers
     #region OMG support classes
     public class OMGRootObject
     {
+        public OMGRootObject ControlStruct { get; set; }
+
         public Profile Profile { get; set; }
         public DefClock DefClock { get; set; }
         public string Logging { get; set; }
@@ -262,44 +236,47 @@ namespace OMineWatcher.Managers
     }
 
     #region Profile
-    public class Profile
+    public class Profile : IProfile
     {
-        public string RigName;
-        public bool Autostart;
-        public long? StartedID;
-        public string StartedProcess;
-        public int Digits;
-        public List<bool> GPUsSwitch;
-        public List<Config> ConfigsList;
-        public List<Overclock> ClocksList;
-        public InformManager Informer;
-        public int LogTextSize;
+        public string RigName { get; set; }
+        public bool Autostart { get; set; }
+        public long? StartedID { get; set; }
+        public string StartedProcess { get; set; }
+        public int Digits { get; set; }
+        public List<bool> GPUsSwitch { get; set; } = new List<bool>();
 
-        public int TimeoutWachdog;
-        public int TimeoutIdle;
-        public int TimeoutLH;
+        public List<IConfig> ConfigsList { get; set; } = new List<IConfig>();
+        public List<IOverclock> ClocksList { get; set; } = new List<IOverclock>();
+        public int LogTextSize { get; set; }
+
+        public bool VkInform { get; set; }
+        public string VKuserID { get; set; }
+
+        public int TimeoutWachdog { get; set; }
+        public int TimeoutIdle { get; set; }
+        public int TimeoutLH { get; set; }
     }
-    public class Config
+    public class Config : IConfig
     {
-        public string Name;
-        public string Algoritm;
-        public int? Miner;
-        public string Pool;
-        public string Port;
-        public string Wallet;
-        public string Params;
-        public long? ClockID;
-        public double? MinHashrate;
-        public long ID;
+        public string Name { get; set; }
+        public string Algoritm { get; set; }
+        public int? Miner { get; set; }
+        public string Pool { get; set; }
+        public string Port { get; set; }
+        public string Wallet { get; set; }
+        public string Params { get; set; }
+        public long? ClockID { get; set; }
+        public double MinHashrate { get; set; }
+        public long ID { get; set; }
     }
-    public class Overclock
+    public class Overclock : IOverclock
     {
-        public string Name;
-        public int[] PowLim;
-        public int[] CoreClock;
-        public int[] MemoryClock;
-        public int[] FanSpeed;
-        public long ID;
+        public string Name { get; set; }
+        public int[] PowLim { get; set; }
+        public int[] CoreClock { get; set; }
+        public int[] MemoryClock { get; set; }
+        public int[] FanSpeed { get; set; }
+        public long ID { get; set; }
     }
     public class InformManager
     {
@@ -307,12 +284,12 @@ namespace OMineWatcher.Managers
         public string VKuserID;
     }
     #endregion
-    public class DefClock
+    public class DefClock : IDefClock
     {
-        public int[] PowerLimits;
-        public int[] CoreClocks;
-        public int[] MemoryClocks;
-        public int[] FanSpeeds;
+        public int[] PowerLimits { get; set; }
+        public int[] CoreClocks { get; set; }
+        public int[] MemoryClocks { get; set; }
+        public int[] FanSpeeds { get; set; }
     }
     public struct MSIinfo
     {
