@@ -65,7 +65,6 @@ namespace OMineWatcher.ViewModels
                             }
                         }
                     } break;
-                case "RigInform": { RigInform(); } break;
                 case "GenSettings": {
                         GenSettings = _model.GenSettings;
 

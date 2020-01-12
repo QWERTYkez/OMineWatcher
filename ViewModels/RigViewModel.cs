@@ -1,5 +1,6 @@
 ﻿using OMineWatcher.Managers;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
@@ -16,6 +17,40 @@ namespace OMineWatcher.ViewModels
         public MainViewModel _model = new MainViewModel();
         public RigViewModel(MainViewModel MVM, int index)
         {
+            RigsWacher.SendInform += inf =>
+            {
+                if (inf.Index == this.Index)
+                {
+                    if (inf.RO != null)
+                    {
+                        if (inf.RO.Indication != null)
+                        {
+                            SetIndicator(inf.RO.Indication.Value);
+                        }
+                        if (inf.RO.InfHashrates != null)
+                        {
+                            Hashrates = inf.RO.InfHashrates;
+                            Totalhashrate = inf.RO.InfHashrates.Sum();
+                            SetIndicator(true);
+                        }
+                        if (inf.RO.InfTemperatures != null)
+                        {
+                            Temperatures = inf.RO.InfTemperatures;
+                            TotalTemperature = inf.RO.InfTemperatures.Max();
+                        }
+
+                        if (inf.RO.RigInactive != null)
+                        {
+                            SetIndicator(false);
+                            Hashrates = null;
+                            Totalhashrate = null;
+                            Temperatures = null;
+                            TotalTemperature = null;
+                        }
+                    }
+                }
+            };
+
             Index = index;
             _model = MVM;
             _model.PropertyChanged += ModelChanged;
@@ -33,11 +68,11 @@ namespace OMineWatcher.ViewModels
         {
             RigName = R.Name; IP = R.IP;
 
-            RMaxTemp = R.MaxTemp != null ? (int)R.MaxTemp : -1;
-            RMinTemp = R.MinTemp != null ? (int)R.MinTemp : -1;
+            RMaxTemp = R.MaxTemp != null ? R.MaxTemp.Value : -1;
+            RMinTemp = R.MinTemp != null ? R.MinTemp.Value : -1;
 
-            MaxTempCurr = R.MaxTemp != null ? (int)R.MaxTemp : (int)Settings.GenSets.TotalMaxTemp;
-            MinTempCurr = R.MinTemp != null ? (int)R.MinTemp : (int)Settings.GenSets.TotalMinTemp;
+            MaxTempCurr = R.MaxTemp != null ? R.MaxTemp.Value : Settings.GenSets.TotalMaxTemp;
+            MinTempCurr = R.MinTemp != null ? R.MinTemp.Value : Settings.GenSets.TotalMinTemp;
         }
 
         public int Index { get; set; }

@@ -46,43 +46,7 @@ namespace OMineWatcher.ViewModels
             }
             RVMs = (from r in rvms orderby r.Index select r).ToList();
         }
-        private void RigInform()
-        {
-            OMGRootObject ro = _model.RigInform.RO;
-            foreach (RigViewModel rvm in RVMs)
-            {
-                if (_model.RigInform.Index == rvm.Index)
-                {
-                    if (ro != null)
-                    {
-                        if (ro.Indication != null)
-                        {
-                            rvm.SetIndicator((bool)ro.Indication);
-                        }
-                        if (ro.InfHashrates != null)
-                        {
-                            rvm.Hashrates = ro.InfHashrates;
-                            rvm.Totalhashrate = ro.InfHashrates.Sum();
-                            rvm.SetIndicator(true);
-                        }
-                        if (ro.InfTemperatures != null)
-                        {
-                            rvm.Temperatures = ro.InfTemperatures;
-                            rvm.TotalTemperature = ro.InfTemperatures.Max();
-                        }
 
-                        if (ro.RigInactive != null)
-                        {
-                            rvm.SetIndicator(false);
-                            rvm.Hashrates = null;
-                            rvm.Totalhashrate = null;
-                            rvm.Temperatures = null;
-                            rvm.TotalTemperature = null;
-                        }
-                    }
-                }
-            }
-        }
         private void SetBaseMaxTemp(int t)
         {
             foreach (RigViewModel rvm in RVMs)

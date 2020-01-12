@@ -12,7 +12,6 @@ namespace OMineWatcher.Models
         {
             InternetConnectionWacher.InternetConnectionLost += NullAllStatuses;
             NullAllStatuses();
-            RigsWacher.SendInform += inf => { RigInform = inf; };
             RigsWacher.RigStatusChanged += (i, status) => { Statuses[i] = status; };
         }
         public void InitializeModel()
@@ -37,7 +36,6 @@ namespace OMineWatcher.Models
         public List<Settings.Rig> Rigs { get; set; }
         public Settings._GenSettings GenSettings { get; set; }
         public ObservableCollection<RigStatus?> Statuses { get; set; }
-        public RigInform RigInform { get; set; }
         #endregion
 
         #region Commands
