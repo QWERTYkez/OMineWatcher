@@ -1,0 +1,35 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Styles="clr-namespace:OMineWatcher.Styles"
+    xmlns:local="clr-namespace:OMineWatcher">
+
+    <SolidColorBrush x:Key="Selector.Fill.On" Color="#FFFBFBFB" />
+    <SolidColorBrush x:Key="Selector.Fill.Off" Color="Gray" />
+
+    <ControlTemplate x:Key="SelectorTemplate" TargetType="{x:Type Styles:Selector}">
+        <Grid
+            x:Name="templateRoot"
+            Width="15"
+            Height="23"
+            SnapsToDevicePixels="True">
+            <Polygon
+                x:Name="Selector"
+                Fill="LightPink"
+                Points="0, 2.5, 7, 2.5, 15, 11.5, 7, 20.5, 0, 20.5" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Selector" Property="Fill" Value="{StaticResource Selector.Fill.On}" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="False">
+                <Setter TargetName="Selector" Property="Fill" Value="{StaticResource Selector.Fill.Off}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="Styles:Selector">
+        <Setter Property="Template" Value="{StaticResource SelectorTemplate}" />
+    </Style>
+
+</ResourceDictionary>

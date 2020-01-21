@@ -14,7 +14,7 @@ namespace OMineWatcher.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
-        public MainViewModel _model = new MainViewModel();
+        private MainViewModel _model;
         public RigViewModel(MainViewModel MVM, int index)
         {
             RigsWacher.SendInform += inf =>

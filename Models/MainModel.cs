@@ -18,11 +18,12 @@ namespace OMineWatcher.Models
         {
             Rigs = Settings.Rigs;
             GenSettings = Settings.GenSets;
+            PoolsSets = Settings.Pools;
         }
         private void NullAllStatuses()
         {
             List<RigStatus?> lrs = new List<RigStatus?>();
-            foreach (Settings.Rig r in Settings.Rigs) lrs.Add(null);
+            foreach (var _ in Settings.Rigs) lrs.Add(null);
             Statuses = new ObservableCollection<RigStatus?>(lrs);
         }
 
@@ -36,6 +37,7 @@ namespace OMineWatcher.Models
         public List<Settings.Rig> Rigs { get; set; }
         public Settings._GenSettings GenSettings { get; set; }
         public ObservableCollection<RigStatus?> Statuses { get; set; }
+        public List<PoolSet> PoolsSets { get; set; }
         #endregion
 
         #region Commands
@@ -52,6 +54,11 @@ namespace OMineWatcher.Models
                     Statuses.RemoveAt(Statuses.Count - 1);
                 }
             }
+            Settings.SaveSettings();
+        }
+        public void cmd_SavePools(List<PoolSet> pools)
+        {
+            Settings.Pools = pools;
             Settings.SaveSettings();
         }
         public void cmd_SaveGenSettings(Settings._GenSettings gs)

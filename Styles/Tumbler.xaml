@@ -1,38 +1,53 @@
-﻿<ResourceDictionary 
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:OMineWatcher"
-    xmlns:Styles="clr-namespace:OMineWatcher.Styles">
+    xmlns:Styles="clr-namespace:OMineWatcher.Styles"
+    xmlns:local="clr-namespace:OMineWatcher">
 
-    <SolidColorBrush x:Key="Tumbler.Fill.On" Color="#FF00B000"/>
-    <SolidColorBrush x:Key="Tumbler.Fill.Off" Color="Red"/>
-    <SolidColorBrush x:Key="Tumbler.Fill.Disable" Color="Black"/>
-    <SolidColorBrush x:Key="Tumbler.Fill" Color="White"/>
+    <SolidColorBrush x:Key="Tumbler.Fill.On" Color="#FF00B000" />
+    <SolidColorBrush x:Key="Tumbler.Fill.Off" Color="Red" />
+    <SolidColorBrush x:Key="Tumbler.Fill.Disable" Color="Black" />
+    <SolidColorBrush x:Key="Tumbler.Fill" Color="White" />
 
     <ControlTemplate x:Key="TumbletTemplate" TargetType="{x:Type Styles:Tumbler}">
-        <Grid x:Name="templateRoot" SnapsToDevicePixels="True" Height="23" Width="40">
-            <Rectangle x:Name="Border" Stroke="{StaticResource Tumbler.Fill}" StrokeThickness="1.5" RadiusX="10" RadiusY="10" Margin="0,1"/>
-            <Ellipse x:Name="Toggle" Fill="{StaticResource Tumbler.Fill}" Width="15" Height="15" Margin="3,4" ></Ellipse>
+        <Grid
+            x:Name="templateRoot"
+            Width="40"
+            Height="23"
+            SnapsToDevicePixels="True">
+            <Rectangle
+                x:Name="Border"
+                Margin="0,1"
+                RadiusX="10"
+                RadiusY="10"
+                Stroke="{StaticResource Tumbler.Fill}"
+                StrokeThickness="1.5" />
+            <Ellipse
+                x:Name="Toggle"
+                Width="15"
+                Height="15"
+                Margin="3,4"
+                Fill="{StaticResource Tumbler.Fill}" />
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.On}"/>
-                <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Right"/>
+                <Setter TargetName="Border" Property="Fill" Value="{StaticResource Tumbler.Fill.On}" />
+                <Setter TargetName="Toggle" Property="HorizontalAlignment" Value="Right" />
             </Trigger>
             <Trigger Property="IsChecked" Value="False">
-                <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.Off}"/>
-                <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Left"/>
+                <Setter TargetName="Border" Property="Fill" Value="{StaticResource Tumbler.Fill.Off}" />
+                <Setter TargetName="Toggle" Property="HorizontalAlignment" Value="Left" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Fill" TargetName="Border" Value="{StaticResource Tumbler.Fill.Disable}"/>
-                <Setter Property="HorizontalAlignment" TargetName="Toggle" Value="Center"/>
-                <Setter Property="Opacity" Value="0.2"/>
+                <Setter TargetName="Border" Property="Fill" Value="{StaticResource Tumbler.Fill.Disable}" />
+                <Setter TargetName="Toggle" Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Opacity" Value="0.2" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <Style TargetType="Styles:Tumbler">
-        <Setter Property="Template" Value="{StaticResource TumbletTemplate}"/>
+        <Setter Property="Template" Value="{StaticResource TumbletTemplate}" />
     </Style>
 
 </ResourceDictionary>

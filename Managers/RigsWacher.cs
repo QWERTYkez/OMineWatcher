@@ -75,12 +75,12 @@ namespace OMineWatcher.Managers
             });
         }
 
-        private static List<RigStatus> Statuses = new List<RigStatus>();
+        private static readonly List<RigStatus> Statuses = new List<RigStatus>();
         private static void ChangeStatus(int i, RigStatus status)
         {
             Statuses[i] = status;
         }
-        private static List<bool> PingBlocks = new List<bool>();
+        private static readonly List<bool> PingBlocks = new List<bool>();
         private static void ScanningCurrentRig(int n)
         {
             Task.Run(async () =>
@@ -191,7 +191,7 @@ namespace OMineWatcher.Managers
         }
         #endregion
         #region OMG
-        private static List<bool> OMGWach = new List<bool>();
+        private static readonly List<bool> OMGWach = new List<bool>();
         private static void OMGstartWach(int i)
         {
             if (!OMGWach[i])
@@ -214,7 +214,7 @@ namespace OMineWatcher.Managers
         }
         #endregion
         #region HiveOS
-        private static List<bool> HiveWach = new List<bool>();
+        private static readonly List<bool> HiveWach = new List<bool>();
         private static void HiveStartWach(int i)
         {
             if (!HiveWach[i] && Settings.Rigs[i].HiveFarmID != null)
@@ -276,14 +276,14 @@ namespace OMineWatcher.Managers
         }
 
         // HiveWachdog
-        private static List<HiveStatus> HiveStatuses = new List<HiveStatus>();
+        private static readonly List<HiveStatus> HiveStatuses = new List<HiveStatus>();
         private enum HiveStatus
         {
             Normal,
             LowHashrate,
             WorkerOffline
         }
-        private static List<bool> HiveWachdogs = new List<bool>();
+        private static readonly List<bool> HiveWachdogs = new List<bool>();
         private static void HiveWachdog(int i)
         {
             if (HiveWachdogs[i]) return;
@@ -330,7 +330,7 @@ namespace OMineWatcher.Managers
         #endregion
 
         #region eWeWachdog
-        private static List<bool> WachdogStatuses = new List<bool>();
+        private static readonly List<bool> WachdogStatuses = new List<bool>();
         private static void ActivateWachdog(int i)
         {
             if (!WachdogStatuses[i])

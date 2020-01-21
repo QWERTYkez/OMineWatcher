@@ -4,7 +4,6 @@ using OMineWatcher.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +17,6 @@ namespace OMineWatcher.Views
         public RigView(RigViewModel rvm, int index)
         {
             InitializeComponent();
-            _context = SynchronizationContext.Current;
             DataContext = rvm;
             _ViewModel = rvm;
             Index = index;
@@ -28,8 +26,7 @@ namespace OMineWatcher.Views
 
             BaseTemp.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
         }
-        private SynchronizationContext _context;
-        private RigViewModel _ViewModel;
+        private readonly RigViewModel _ViewModel;
 
         public int Index { get; set; }
         private int?[] Temperatures = new int?[1];
@@ -137,27 +134,6 @@ namespace OMineWatcher.Views
 
         private int MaxTemp = Settings.GenSets.TotalMaxTemp;
         private int MinTemp = Settings.GenSets.TotalMinTemp;
-        private struct Draw
-        {
-            public Draw(double a, double b, byte alpha, byte red, byte green, byte blue)
-            {
-                PointA = a;
-                PointB = b;
-
-                Alpha = alpha;
-                Red = red;
-                Green = green;
-                Blue = blue;
-            }
-
-            public double PointA;
-            public double PointB;
-
-            public byte Alpha;
-            public byte Red;
-            public byte Green;
-            public byte Blue;
-        }
         private void SetTemperature(DrawingCanvas DC, int? curr)
         {
             int maxdigits = MaxTemp - MinTemp;
@@ -175,7 +151,7 @@ namespace OMineWatcher.Views
             byte red = 0;
             byte green = 0;
 
-            List<Draw> Draws = new List<Draw>();
+            var Draws = new List<(double PointA, double PointB, byte Alpha, byte Red, byte Green, byte Blue)>();
 
             for (int i = 0; i < currentTemp && i < maxdigits; i++)
             {
@@ -189,17 +165,17 @@ namespace OMineWatcher.Views
 
                 double center = (DigitSpace / 2) + i * DigitSpace;
 
-                Draws.Add(new Draw(center - DigitHalf, center + DigitHalf, 255, red, green, blue));
+                Draws.Add((center - DigitHalf, center + DigitHalf, 255, red, green, blue));
             }
 
             Dispatcher.InvokeAsync(() =>
             {
                 using (DrawingContext dc = ((DrawingVisual)DC.Visuals[0]).RenderOpen())
                 {
-                    foreach (Draw dr in Draws)
+                    foreach (var (PointA, PointB, Alpha, Red, Green, Blue) in Draws)
                     {
-                        Rect R = new Rect(new Point(dr.PointA, 0), new Point(dr.PointB, 20));
-                        Brush B = new SolidColorBrush(Color.FromArgb(dr.Alpha, dr.Red, dr.Green, dr.Blue));
+                        Rect R = new Rect(new Point(PointA, 0), new Point(PointB, 20));
+                        Brush B = new SolidColorBrush(Color.FromArgb(Alpha, Red, Green, Blue));
                         dc.DrawRectangle(B, null, R);
                     }
                 }
@@ -233,7 +209,7 @@ namespace OMineWatcher.Views
             byte red = 0;
             byte green = 0;
 
-            List<Draw> Draws = new List<Draw>();
+            var Draws = new List<(double PointA, double PointB, byte Alpha, byte Red, byte Green, byte Blue)>();
 
             for (int i = 0; i < currentTemp && i < maxdigits; i++)
             {
@@ -259,17 +235,17 @@ namespace OMineWatcher.Views
 
                 double center = (DigitSpace / 2) + i * DigitSpace;
 
-                Draws.Add(new Draw(center - DigitHalf, center + DigitHalf, alpha, red, green, blue));
+                Draws.Add((center - DigitHalf, center + DigitHalf, alpha, red, green, blue));
             }
 
             Dispatcher.InvokeAsync(() => 
             {
                 using (DrawingContext dc = ((DrawingVisual)DC.Visuals[0]).RenderOpen())
                 {
-                    foreach (Draw dr in Draws)
+                    foreach (var (PointA, PointB, Alpha, Red, Green, Blue) in Draws)
                     {
-                        Rect R = new Rect(new Point(dr.PointA, 0), new Point(dr.PointB, 20));
-                        Brush B = new SolidColorBrush(Color.FromArgb(dr.Alpha, dr.Red, dr.Green, dr.Blue));
+                        Rect R = new Rect(new Point(PointA, 0), new Point(PointB, 20));
+                        Brush B = new SolidColorBrush(Color.FromArgb(Alpha, Red, Green, Blue));
                         dc.DrawRectangle(B, null, R);
                     }
                 }
@@ -308,7 +284,7 @@ namespace OMineWatcher.Views
         }
 
         public List<Grid> DetaledTemperatures { get; set; } = new List<Grid>();
-        private List<DrawingCanvas> DCs = new List<DrawingCanvas>();
+        private readonly List<DrawingCanvas> DCs = new List<DrawingCanvas>();
         private void AddTempLine(int index)
         {
             Dispatcher.Invoke(() => 

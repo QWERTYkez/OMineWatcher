@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OMineWatcher.Pools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,14 @@ namespace OMineWatcher.Managers
                 profile.Rigs = value;
             }
         }
+        public static List<PoolSet> Pools
+        {
+            get { return profile.Pools; }
+            set
+            {
+                profile.Pools = value;
+            }
+        }
         public static _GenSettings GenSets
         {
             get { return profile.GenSets; }
@@ -34,6 +43,7 @@ namespace OMineWatcher.Managers
         private class Profile
         {
             public List<Rig> Rigs { get; set; } = new List<Rig>();
+            public List<PoolSet> Pools { get; set; } = new List<PoolSet>();
             public _GenSettings GenSets { get; set; } = new _GenSettings();
         }
 
@@ -160,5 +170,58 @@ namespace OMineWatcher.Managers
         #endregion
 
         public static string[] RigTypes = new string[] { "---", "OMineGuard", "HiveOS" };
+    }
+
+    public class PoolSet
+    {
+        private string name;
+        private PoolType? pool;
+        private CoinType? coin;
+        private string wallet;
+        private bool wach = false;
+
+        public event Action<string> NameChanged;
+        public event Action<PoolType?> PoolChanged;
+        public event Action<CoinType?> CoinChanged;
+        public event Action<string> WalletChanged;
+        public event Action<bool> WachChanged;
+
+        public string Name { get => name; 
+            set 
+            {
+                name = value;
+                Task.Run(() => NameChanged?.Invoke(value));
+            } 
+        }
+        public PoolType? Pool { get => pool;
+            set 
+            {
+                pool = value;
+                Task.Run(() => PoolChanged?.Invoke(value));
+            }
+        }
+        public CoinType? Coin
+        {
+            get => coin;
+            set
+            {
+                coin = value;
+                Task.Run(() => CoinChanged?.Invoke(value));
+            }
+        }
+        public string Wallet { get => wallet;
+            set 
+            {
+                wallet = value;
+                Task.Run(() => WalletChanged?.Invoke(value));
+            } 
+        }
+        public bool Wach { get => wach;
+            set
+            {
+                wach = value;
+                Task.Run(() => WachChanged?.Invoke(value));
+            }
+        }
     }
 }

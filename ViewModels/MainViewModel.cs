@@ -28,8 +28,8 @@ namespace OMineWatcher.ViewModels
             _model = new MainModel();
             _model.PropertyChanged += ModelChanged;
             _model.Statuses.CollectionChanged += (sender, e) => Indicators = _model.Statuses.ToList();
-            _model.InitializeModel();
 
+            InitializePoolsCommands();
             InitializeRigsControlCommands();
             InitializeIndicatorsAndTumblers();
             InitializeOMGSwitchConnectCommand();
@@ -41,6 +41,8 @@ namespace OMineWatcher.ViewModels
             InitializeInformerCommands();
             InitializeHiveWorkerCommands();
             IniWachdogSettingsCommands();
+
+            _model.InitializeModel();
         }
 
         public ObservableCollection<Settings.Rig> Rigs { get; set; }
@@ -62,6 +64,18 @@ namespace OMineWatcher.ViewModels
                                     AddRigPanel(i);
                                 else
                                     RemoveRigPanel(i);
+                            }
+                        }
+                    } break;
+                case "PoolsSets": 
+                    {
+                        for (int i = 0; i < _model.PoolsSets.Count; i++)
+                        {
+                            Selection.Add(false);
+                            PoolsSets.Add(_model.PoolsSets[i]);
+                            if (_model.PoolsSets[i].Wach)
+                            {
+                                WachPoolStart(i);
                             }
                         }
                     } break;
@@ -93,7 +107,7 @@ namespace OMineWatcher.ViewModels
 
                         Task.Run(() =>
                         {
-                            if (GenSettings.HiveLogin != "" && GenSettings.HiveLogin != null)
+                            if (string.IsNullOrEmpty(GenSettings.HiveLogin) && GenSettings.HiveLogin != null)
                             {
                                 AuthenticationStatus st = HiveClient.HiveAuthentication(
                                     GenSettings.HiveLogin, GenSettings.HivePassword);
@@ -216,7 +230,6 @@ namespace OMineWatcher.ViewModels
                 }
                 SetButtonsEnable();
             });
-
             RigMinus = new RelayCommand(obj => 
             {
                 Rigs.RemoveAt(SelectedRigIndex);
@@ -556,6 +569,91 @@ namespace OMineWatcher.ViewModels
                     CurrentEndOfRangeD = null;
                 }
             });
+        }
+        #endregion
+
+        //pools settings
+        #region pools
+        public List<bool> Selection { get; set; } = new List<bool>();
+        public ObservableCollection<PoolSet> PoolsSets { get; set; } = new ObservableCollection<PoolSet>();
+
+        public RelayCommand AddPool { get; set; }
+        public RelayCommand DeletePools { get; set; }
+        public RelayCommand UpPools { get; set; }
+        public RelayCommand DownPools { get; set; }
+
+        private void InitializePoolsCommands()
+        {
+            AddPool = new RelayCommand(obj =>
+            {
+                Selection.Add(false);
+                PoolsSets.Add(new PoolSet { Name = "New pool" });
+                _model.cmd_SavePools(PoolsSets.ToList());
+            });
+            DeletePools = new RelayCommand(obj => 
+            {
+                for (int i = Selection.Count - 1; i > -1; i--)
+                {
+                    if (Selection[i])
+                    {
+                        Selection.RemoveAt(i);
+                        PoolsSets[i].Wach = false;
+                        PoolsSets.RemoveAt(i);
+
+                        var x = PVMs.Where(pvm => pvm.Index == i).ToList();
+                        if (x.Count > 0)
+                        {
+                            PVs = PVs.Where(pv => pv.Index != i).ToList();
+                            PVMs = PVMs.Where(pvm => pvm.Index != i).ToList();
+                        }
+                    }
+                }
+                _model.cmd_SavePools(PoolsSets.ToList());
+            });
+            UpPools = new RelayCommand(obj =>
+            {
+                for(int i = 1; i < Selection.Count; i++)
+                {
+                    if (Selection[i] && !Selection[i - 1])
+                    {
+                        Selection[i - 1] = true;
+                        Selection[i] = false;
+
+                        PVMs.Where(p => p.Index == i).First().Index = i - 1;
+                        PVMs.Where(p => p.Index == i - 1).First().Index = i;
+
+                        var ps = PoolsSets[i];
+                        PoolsSets.Insert(i - 1, ps);
+                        PoolsSets.RemoveAt(i);
+
+                        SortPoolsViews();
+                    }
+                }
+            });
+            DownPools = new RelayCommand(obj =>
+            {
+                for (int i = Selection.Count - 2; i > -1; i--)
+                {
+                    if (Selection[i] && !Selection[i + 1])
+                    {
+                        Selection[i + 1] = true;
+                        Selection[i] = false;
+
+                        PVMs.Where(p => p.Index == i).First().Index = i + 1;
+                        PVMs.Where(p => p.Index == i + 1).First().Index = i;
+
+                        var ps = PoolsSets[i];
+                        PoolsSets.RemoveAt(i);
+                        PoolsSets.Insert(i + 1, ps);
+
+                        SortPoolsViews();
+                    }
+                }
+            });
+        }
+        public Task PoolsSetsChanged()
+        {
+            return Task.Run(() => _model.cmd_SavePools(PoolsSets.ToList()));
         }
         #endregion
 

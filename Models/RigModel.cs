@@ -1,5 +1,4 @@
-﻿using OMineWatcher.Managers;
-using OMineWatcher.Views;
+﻿using OMineWatcher.Views;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,6 +30,7 @@ namespace OMineWatcher.ViewModels
             {
                 if (rvs[i].Index == RigIndex)
                 {
+                    rvs[i] = null;
                     rvs.RemoveAt(i);
                     break;
                 }
@@ -40,6 +40,7 @@ namespace OMineWatcher.ViewModels
             {
                 if (rvms[i].Index == RigIndex)
                 {
+                    rvms[i] = null;
                     rvms.RemoveAt(i);
                     break;
                 }
