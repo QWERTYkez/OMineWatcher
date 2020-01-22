@@ -117,17 +117,37 @@ namespace OMineWatcher.ViewModels
 
         public Brush LimeIndicator { get; set; }
         public Brush RedIndicator { get; set; } = Brushes.Red;
+        private bool? LastIndicator;
         public void SetIndicator(bool b)
+        {
+            if (LastIndicator != null)
+            {
+                if (LastIndicator.Value != b)
+                {
+                    SetInd(b);
+                    LastIndicator = b;
+                }
+            }
+            else
+            {
+                SetInd(b);
+                LastIndicator = b;
+            }
+            
+        }
+        private void SetInd(bool b)
         {
             if (b)
             {
                 LimeIndicator = Brushes.Lime;
                 RedIndicator = null;
+                UserInformer.AlarmStop();
             }
             else
             {
                 LimeIndicator = null;
                 RedIndicator = Brushes.Red;
+                UserInformer.AlarmStart();
             }
         }
     }

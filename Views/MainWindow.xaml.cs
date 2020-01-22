@@ -290,5 +290,10 @@ namespace OMineWatcher.Views
 
             _ViewModel.PoolsSetsChanged();
         }
+
+        private void StopAlarm(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            UserInformer.AlarmStop();
+        }
     }
 }

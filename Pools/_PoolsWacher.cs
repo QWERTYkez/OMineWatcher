@@ -50,18 +50,18 @@ namespace OMineWatcher.Pools
         {
             Task.Run(() => 
             {
-                var min = new TimeSpan(0, 1, 0);
-                while (true)
+                var min = new TimeSpan(0, 1, 0).TotalSeconds;
+                while (App.Live)
                 {
                     if (InternetConnectionWacher.InternetConnectedState)
                     { try { GetUSD(); } catch { } }
-                    Thread.Sleep(min);
+                    for (int i = 0; i < min; i++) if (App.Live) Thread.Sleep(1000);
                 }
             });
-            Task.Run(() =>
+            var x = Task.Run(() =>
             {
-                var ts = new TimeSpan(0, 5, 0);
-                while (true)
+                var ts = new TimeSpan(0, 5, 0).TotalSeconds;
+                while (App.Live)
                 {
                     if (InternetConnectionWacher.InternetConnectedState)
                     {
@@ -82,7 +82,7 @@ namespace OMineWatcher.Pools
                         }
                         catch { }
                     }
-                    Thread.Sleep(ts);
+                    for (int i = 0; i < ts; i++) if (App.Live) Thread.Sleep(1000);
                 }
             });
         }
@@ -155,6 +155,7 @@ namespace OMineWatcher.Pools
         event Action NoInformationReceived;
         event Action WrongWallet;
         void StopMonitoring();
+        bool Alive { get; }
     }
     
     public struct WorkerStats

@@ -965,6 +965,22 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Grid Visibility="{Binding AlarmButtonVisability}">
+            <Ellipse
+                Width="220"
+                Height="220"
+                Fill="DarkRed" />
+            <Label
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="Тревога!"
+                FontSize="50" />
+            <Ellipse
+                Width="220"
+                Height="220"
+                Fill="#01000000"
+                MouseDown="StopAlarm" />
+        </Grid>
     </Grid>
 
 </Window>

@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:OMineWatcher.Classes">
 
+    <local:MultiplyConverter x:Key="MultiplyConverter" />
     <local:BoolInverceConverter x:Key="BoolInverceConverter" />
     <local:RigStatusToBrushConverter x:Key="RigStatusToBrushConverter" />
     <local:SelectedIndexToVisibilityConverter x:Key="SelectedIndexToVisibilityConverter" />

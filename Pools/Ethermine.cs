@@ -20,7 +20,9 @@ namespace OMineWatcher.Pools
 
         private readonly string Wallet;
         private readonly string Endpoint;
-        private bool Monitoring;
+        private Thread Monitoring;
+        public bool Alive => Monitoring != null;
+
         public event Action<CurrStats> ReceivedСurrentStats;
         public event Action<List<MiningStats>> ReceivedMiningHistory;
         public event Action<List<WorkerStats>> ReceivedWorkersStats;
@@ -39,20 +41,18 @@ namespace OMineWatcher.Pools
                 case CoinType.YEC: Endpoint = "https://api-ycash.flypool.org"; break;
                 case CoinType.ZEC: Endpoint = "https://api-zcash.flypool.org"; break;
             }
-            Task.Run(() => 
+            Monitoring = new Thread(() => 
             {
-                var min = new TimeSpan(0, 1, 0);
-                var sec = new TimeSpan(0, 0, 1);
-                Monitoring = true;
-                while (Monitoring)
+                var min = new TimeSpan(0, 1, 0).TotalSeconds;
+                while (App.Live)
                 {
                     while (InternetConnection)
                     {
                         Task.Run(() =>
                         {
-                            (var status, 
-                            var СurrentStats, 
-                            var MiningHistory, 
+                            (var status,
+                            var СurrentStats,
+                            var MiningHistory,
                             var WorkersStats) = GetStats();
                             if (status == "OK")
                             {
@@ -72,17 +72,31 @@ namespace OMineWatcher.Pools
                             else if (status == "Invalid address")
                             {
                                 WrongWallet?.Invoke();
-                                Monitoring = false;
+                                return;
                             }
                             else Task.Run(() => NoInformationReceived?.Invoke());
                         });
-                        Thread.Sleep(min);
+                        for (int i = 0; i < min; i++)
+                        {
+                            if (App.Live) Thread.Sleep(1000);
+                            else Monitoring = null; return;
+                        }
                     }
-                    Thread.Sleep(sec);
+                    Thread.Sleep(1000);
                 }
             });
+            Monitoring.Start();
         }
-        public void StopMonitoring() => Monitoring = false;
+        public void StopMonitoring()
+        {
+            ReceivedСurrentStats = null;
+            ReceivedMiningHistory = null;
+            ReceivedWorkersStats = null;
+            NoInformationReceived = null;
+            WrongWallet = null;
+            Monitoring?.Abort();
+            Monitoring = null;
+        }
         private (string status, CurrStats? СurrentStats, 
             List<MiningStats> MiningHistory, 
             List<WorkerStats> WorkersStats) GetStats()

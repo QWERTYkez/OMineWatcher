@@ -32,6 +32,8 @@ namespace OMineWatcher.ViewModels
             Index = index;
             Settings = settings;
 
+            WVisibility = Visibility.Collapsed;
+
             Name = Settings.Name;
             PoolType = Settings.Pool;
             CoinType = Settings.Coin;
@@ -44,8 +46,37 @@ namespace OMineWatcher.ViewModels
         }
         public void StartWach()
         {
-            WVisibility = Visibility.Collapsed;
             if (Pool != null) { Pool.StopMonitoring(); Pool = null; }
+            {//очистка
+                MinPayout = null;
+
+                CoinD = null;
+                CoinM = null;
+                СurrencyD = null;
+                СurrencyM = null;
+                СurrencyType = null;
+
+                ActiveWorkers = null;
+                LastSeen = null;
+                Percent = null;
+                Progress = null;
+                HashrateReported = null;
+                HashrateCurrent = null;
+                HashrateAverage = null;
+                Shares = null;
+                Unpaid = null;
+
+                LastHist = null;
+                ReportedHashes = null;
+                CurrentHashes = null;
+                AverageHashes = null;
+
+                WorkersNames = new List<string>();
+                WorkersReported = new List<string>();
+                WorkersCurrent = new List<string>();
+                WorkersShares = new List<string>();
+                WorkersLS = new List<string>();
+            }
             Pool = PoolsWacher.StartWach(Settings);
             if (Pool != null)
             {
@@ -102,7 +133,7 @@ namespace OMineWatcher.ViewModels
                     WorkersNames = workers.Select(w => w.Name).ToList();
                     WorkersReported = workers.Select(w => HashrateConvert(w.Rep, 4)).ToList();
                     WorkersCurrent = workers.Select(w => HashrateConvert(w.Curr, 4)).ToList();
-                    WorkersShares = workers.Select(w => $"{w.ShValid} ({DoubleToStringFormat(((double)w.ShValid * 100 / (double)(w.ShValid + w.ShInvalid + w.ShStale)), 3)}%)").ToList();
+                    WorkersShares = workers.Select(w => $"{w.ShValid} ({RoundDouble(((double)w.ShValid * 100 / (double)(w.ShValid + w.ShInvalid + w.ShStale)), 3)}%)").ToList();
                     WorkersLS = workers.Select(w => w.LastSeen.ToString("HH:mm:ss")).ToList();
 
                     ChangeWisability();
@@ -113,27 +144,34 @@ namespace OMineWatcher.ViewModels
                     Waching = true;
                     Error = null;
                     LastSeen = stats.LastSeen;
-                    Percent = (stats.Unpaid / stats.MinPayout);
-                    Progress = Math.Round(Percent * 1000);
+                    var percent = (stats.Unpaid / stats.MinPayout);
+                    if (Percent != null)
+                    {
+                        if (percent < Percent)
+                        {
+                            Managers.UserInformer.PayoutPlay();
+                        }
+                    }
+                    Percent = percent;
+                    Progress = Math.Round(Percent.Value * 1000);
                     ActiveWorkers = stats.ActiveWorkers;
                     HashrateReported = HashrateConvert(stats.Rep, 4);
                     HashrateCurrent = HashrateConvert(stats.Curr, 4);
-                    Unpaid = DoubleToStringFormat(stats.Unpaid, 4);
+                    Unpaid = RoundDouble(stats.Unpaid, 4);
                     var shpercent = (double)stats.ShValid * 100 /
                         (double)(stats.ShValid + stats.ShInvalid + stats.ShStale);
-                    Shares = $"{stats.ShValid} ({DoubleToStringFormat(shpercent, 3)}%)";
+                    Shares = $"{stats.ShValid} ({RoundDouble(shpercent, 3)}%)";
                     MinPayout = stats.MinPayout;
                 };
                 Pool.WrongWallet += () => { NameColor = Brushes.DarkRed; Error = "Wrong Wallet"; Pool = null; };
 
                 Task.Run(() => 
                 {
-                    var min = new TimeSpan(0, 1, 0);
-                    while (Pool != null)
+                    while (Pool.Alive)
                     {
                         rate = PoolsWacher.GetProfit(Settings.Coin.Value);
                         if (AVG != null) UpdateProfitRate();
-                        Thread.Sleep(min);
+                        Thread.Sleep(5000);
                     }
                 });
             }
@@ -144,18 +182,18 @@ namespace OMineWatcher.ViewModels
             if (rate.coin != null)
             {
                 CoinD = RoundDouble(rate.coin.Value * AVG.Value, 3);
-                CoinM = CoinD * 30;
+                CoinM = RoundDouble(rate.coin.Value * AVG.Value * 30, 3);
             }
             if (rate.RUB != null)
             {
                 СurrencyD = RoundDouble(rate.RUB.Value * AVG.Value, 3);
-                СurrencyM = СurrencyD * 30;
+                СurrencyM = RoundDouble(rate.RUB.Value * AVG.Value * 30, 3);
                 СurrencyType = "RUB";
             }
             else if (rate.USD != null)
             {
                 СurrencyD = RoundDouble(rate.USD.Value * AVG.Value, 3);
-                СurrencyM = СurrencyD * 30;
+                СurrencyM = RoundDouble(rate.USD.Value * AVG.Value * 30, 3);
                 СurrencyType = "USD";
             }
         }
@@ -186,55 +224,15 @@ namespace OMineWatcher.ViewModels
             hash = Math.Round(hash, decimals - 1);
             return $"{hash} {x}h/s";
         }
-        public static string DoubleToStringFormat(double d, int decimals)
-        {
-            if (d >= 10000)
-            {
-                d = Math.Round(d, decimals - 5);
-                return d.ToString();
-            }
-            if (d >= 1000)
-            {
-                d = Math.Round(d, decimals - 4);
-                return d.ToString();
-            }
-            if (d >= 100)
-            {
-                d = Math.Round(d, decimals - 3);
-                return d.ToString();
-            }
-            if (d >= 10)
-            {
-                d = Math.Round(d, decimals - 2);
-                return d.ToString();
-            }
-            d = Math.Round(d, decimals - 1);
-            return d.ToString();
-        }
         public static double RoundDouble(double d, int decimals) 
         {
-            if (d >= 10000)
-            {
-                d = Math.Round(d, decimals - 5);
-                return d;
-            }
-            if (d >= 1000)
-            {
-                d = Math.Round(d, decimals - 4);
-                return d;
-            }
-            if (d >= 100)
-            {
-                d = Math.Round(d, decimals - 3);
-                return d;
-            }
-            if (d >= 10)
-            {
-                d = Math.Round(d, decimals - 2);
-                return d;
-            }
-            d = Math.Round(d, decimals - 1);
-            return d;
+            int x = decimals - 1;
+            if (d >= 10) { x = decimals - 2; }
+            if (d >= 100) { x = decimals - 3; }
+            if (d >= 1000) { x = decimals - 4; }
+            if (d >= 10000) { x = decimals - 5; }
+            if (x > 0) { return Math.Round(d, x); }
+            else { return Math.Round(d, 0); }
         }
 
         public string Name { get; set; }
@@ -243,32 +241,32 @@ namespace OMineWatcher.ViewModels
         public PoolType? PoolType { get; set; }
         public CoinType? CoinType { get; set; }
         public bool Waching { get; set; } = false;
-        public double MinPayout { get; set; }
+        public double? MinPayout { get; set; }
 
         //current
         private (double? coin, double? USD, double? RUB) rate;
-        public double CoinD { get; set; }
-        public double CoinM { get; set; }
-        public double СurrencyD { get; set; }
-        public double СurrencyM { get; set; }
+        public double? CoinD { get; set; }
+        public double? CoinM { get; set; }
+        public double? СurrencyD { get; set; }
+        public double? СurrencyM { get; set; }
         public string СurrencyType { get; set; }
 
-        public int ActiveWorkers { get; set; }
-        public DateTime LastSeen { get; set; }
-        public double Percent { get; set; }
-        public double Progress { get; set; }
+        public int? ActiveWorkers { get; set; }
+        public DateTime? LastSeen { get; set; }
+        public double? Percent { get; set; }
+        public double? Progress { get; set; }
         public string HashrateReported { get; set; }
         public string HashrateCurrent { get; set; }
         public string HashrateAverage { get; set; }
         public string Shares { get; set; }
-        public string Unpaid { get; set; }
+        public double? Unpaid { get; set; }
 
         //history
-        private DateTime LastHist { get; set; }
+        private DateTime? LastHist { get; set; }
         public double Thickness { get; set; } = 4;
         public PointCollection ReportedHashes { get; set; }
         public PointCollection CurrentHashes { get; set; }
-        public double AverageHashes { get; set; } = -50;
+        public double? AverageHashes { get; set; } = -50;
         public double HCwidth { get; set; } = 1000;
         public double HCheight { get; set; } = 100;
 

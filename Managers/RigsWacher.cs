@@ -55,7 +55,7 @@ namespace OMineWatcher.Managers
         {
             Task.Run(async () =>
             {
-                while (true)
+                while (App.Live)
                 {
                     while (Settings.Rigs.Count != Statuses.Count)
                     {
@@ -92,7 +92,7 @@ namespace OMineWatcher.Managers
                 string IP = Settings.Rigs[i].IP;
                 string type = Settings.Rigs[i].Type;
 
-                while (true)
+                while (App.Live)
                 {
                     if (Statuses.Count < n) goto endWach;
                     if (type != Settings.Rigs[i].Type)
@@ -112,6 +112,11 @@ namespace OMineWatcher.Managers
                     if (IP != Settings.Rigs[i].IP)
                     {
                         PingBlocks[i] = false;
+                    }
+                    if (!Settings.Rigs[i].Waching)
+                    {
+                        OMGWach[i] = false;
+                        HiveWach[i] = false;
                     }
                     if (!PingBlocks[i] && InternetConnection)
                     {

@@ -9,8 +9,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace OMineWatcher.ViewModels
 {
@@ -21,6 +21,16 @@ namespace OMineWatcher.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
+
+        public MainViewModel()
+        {
+            UserInformer.AlarmStatus += b => 
+            {
+                if (b) AlarmButtonVisability = Visibility.Visible;
+                else AlarmButtonVisability = Visibility.Collapsed;
+            };
+        }
+        public Visibility AlarmButtonVisability { get; set; } = Visibility.Collapsed;
 
         public MainModel _model;
         public void InitializeMainViewModel()

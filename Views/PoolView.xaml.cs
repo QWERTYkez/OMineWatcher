@@ -11,7 +11,7 @@ namespace OMineWatcher.Views
             InitializeComponent();
 
             this.SizeChanged += PVM.SizeChanged;
-            this.MouseDown += PVM.Click;
+            Shield.MouseDown += PVM.Click;
 
             PVM.Dispatcher = this.Dispatcher;
 

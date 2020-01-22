@@ -22,7 +22,7 @@ namespace OMineWatcher.Managers
             Task.Run(async () => 
             {
                 bool ICSnew;
-                while (true)
+                while (App.Live)
                 {
                     ICSnew = InternetConnetction();
                     if (InternetConnectedState != ICSnew)
