@@ -79,7 +79,7 @@ namespace OMineWatcher.Pools
                         for (int i = 0; i < min; i++)
                         {
                             if (App.Live) Thread.Sleep(1000);
-                            else Monitoring = null; return;
+                            else { Monitoring = null; return; } 
                         }
                     }
                     Thread.Sleep(1000);
