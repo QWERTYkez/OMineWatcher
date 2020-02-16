@@ -44,17 +44,17 @@ namespace OMineWatcher.Classes
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Managers.RigStatus? Type = (Managers.RigStatus?)value;
+            Rigs.RigStatus? Type = (Rigs.RigStatus?)value;
             if (Type != null)
             {
-                Managers.RigStatus type = Type.Value;
+                Rigs.RigStatus type = Type.Value;
                 switch (type)
                 {
-                    case Managers.RigStatus.offline:
+                    case Rigs.RigStatus.offline:
                         return Brushes.Red;
-                    case Managers.RigStatus.online:
+                    case Rigs.RigStatus.online:
                         return Brushes.Yellow;
-                    case Managers.RigStatus.works:
+                    case Rigs.RigStatus.works:
                         return Brushes.Lime;
                 }
             }

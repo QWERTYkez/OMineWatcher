@@ -61,6 +61,10 @@ namespace OMineWatcher.Managers
         }
         public class Rig
         {
+            public event Action WachStart;
+            public event Action WachStop;
+            public event Action IPChanged;
+
             public Rig(int index)
             {
                 Name = "New";
@@ -76,10 +80,36 @@ namespace OMineWatcher.Managers
                 MinTemp = null;
             }
 
+            private bool waching;
+            public bool Waching
+            {
+                get => waching;
+                set
+                {
+                    if (waching != value)
+                    {
+                        waching = value;
+                        if (value) WachStart?.Invoke();
+                        else WachStop?.Invoke();
+                    }
+                }
+            }
+            private string iP;
+            public string IP 
+            { 
+                get => iP; 
+                set
+                {
+                    if (iP != value)
+                    {
+                        iP = value;
+                        IPChanged?.Invoke();
+                    }
+                } 
+            }
+
             public string Name;
-            public string IP;
             public string Type;
-            public bool Waching;
             public long ID { get; private set; }
 
             public string eWeDevice;
@@ -94,6 +124,7 @@ namespace OMineWatcher.Managers
             public int Index;
             public int? MaxTemp;
             public int? MinTemp;
+            
         }
         #endregion
         #region GenSettings

@@ -78,7 +78,7 @@ namespace OMineWatcher.Views
         private void SetIndicators()
         {
             if (Indicators.Count == _ViewModel.Indicators.Count) return;
-            List<Managers.RigStatus?> types = _ViewModel.Indicators;
+            List<Rigs.RigStatus?> types = _ViewModel.Indicators;
             while (Indicators.Count != types.Count)
             {
                 if (Indicators.Count < types.Count)

@@ -2,6 +2,7 @@
 using HiveOS.API;
 using OMineWatcher.Managers;
 using OMineWatcher.Models;
+using OMineWatcher.Rigs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

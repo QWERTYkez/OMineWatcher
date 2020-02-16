@@ -79,7 +79,7 @@ namespace OMineWatcher.Models
         public bool Indicator { get; set; } = false;
 
         private static string CurrentJSON = "";
-        private void OMGsent(OMGRootObject RO)
+        private void OMGsent(RigInform RO)
         {
             if(RO.ControlStruct != null) OMGsent(RO.ControlStruct);
 

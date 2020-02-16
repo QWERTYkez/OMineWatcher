@@ -1,4 +1,5 @@
 ﻿using OMineWatcher.Managers;
+using OMineWatcher.Rigs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

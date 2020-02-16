@@ -34,7 +34,7 @@ namespace OMineWatcher.Managers
         };
 
         private static readonly object readkey = new object();
-        protected private static OMGRootObject ReadRootObject(NetworkStream stream)
+        protected private static RigInform ReadRootObject(NetworkStream stream)
         {
             lock (readkey)
             {
@@ -50,7 +50,7 @@ namespace OMineWatcher.Managers
 
                 Debug.WriteLine(message);
 
-                return JsonConvert.DeserializeObject<OMGRootObject>(message, Convs);
+                return JsonConvert.DeserializeObject<RigInform>(message, Convs);
             }
         }
 
@@ -96,7 +96,7 @@ namespace OMineWatcher.Managers
     {
         public static event Action ControlEnd;
         public static event Action ControlStart;
-        public static event Action<OMGRootObject> SentInform;
+        public static event Action<RigInform> SentInform;
 
         private static TcpClient OMGcontrolClient;
         private static NetworkStream OMGcontrolStream;
@@ -126,7 +126,7 @@ namespace OMineWatcher.Managers
                     {
                         using (NetworkStream stream = ControlClient.GetStream())
                         {
-                            OMGRootObject RO;
+                            RigInform RO;
                             while (ControlClient.Connected)
                             {
                                 RO = ReadRootObject(stream);
@@ -164,7 +164,7 @@ namespace OMineWatcher.Managers
     {
         public event Action StreamEnd;
         public event Action StreamStart;
-        public event Action<OMGRootObject> SentInform;
+        public event Action<RigInform> SentInform;
         public bool Streaming { get; private set; } = false;
 
         public void StartInformStream(string IP)
@@ -181,7 +181,7 @@ namespace OMineWatcher.Managers
                             if (client.Connected) StreamStart?.Invoke();
                             using (NetworkStream stream = client.GetStream())
                             {
-                                OMGRootObject RO;
+                                RigInform RO;
                                 while (client.Connected && Streaming)
                                 {
                                     RO = ReadRootObject(stream);
@@ -189,14 +189,14 @@ namespace OMineWatcher.Managers
                                     Thread.Sleep(50);
                                 }
                                 Task.Run(() => StreamEnd?.Invoke());
-                                Task.Run(() => SentInform?.Invoke(new OMGRootObject { RigInactive = true }));
+                                Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
                             }
                         }
                     }
                     catch 
                     { 
                         Task.Run(() => StreamEnd?.Invoke());
-                        Task.Run(() => SentInform?.Invoke(new OMGRootObject { RigInactive = true }));
+                        Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
                     }
                 });
             }
@@ -205,11 +205,17 @@ namespace OMineWatcher.Managers
         {
             Streaming = false;
         }
+        public void ClearEvents()
+        {
+            StreamStart = null;
+            StreamEnd = null;
+            SentInform = null;
+        }
     }
     #region OMG support classes
-    public class OMGRootObject
+    public class RigInform
     {
-        public OMGRootObject ControlStruct { get; set; }
+        public RigInform ControlStruct { get; set; }
 
         public Profile Profile { get; set; }
         public DefClock DefClock { get; set; }
