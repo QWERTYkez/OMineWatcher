@@ -244,6 +244,8 @@ namespace OMineWatcher.ViewModels
             RigMinus = new RelayCommand(obj => 
             {
                 Rigs[SelectedRigIndex].InformReceivedClear();
+                RemoveRigPanel(Rigs[SelectedRigIndex].Index);
+                /////////////
                 Rigs.RemoveAt(SelectedRigIndex);
                 for (int i = SelectedRigIndex; i < RigsNames.Count(); i++) Rigs[i].Index--;
                 RigsNames = from r in Rigs orderby r.Index select r.Name;

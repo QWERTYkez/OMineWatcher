@@ -60,7 +60,11 @@ namespace OMineWatcher.ViewModels
             SetRig(_model.Rigs[Index]);
             _model.Rigs.CollectionChanged += (s, e) =>
             {
-                SetRig(_model.Rigs.Where(r => r.Index == Index).First());
+                try
+                {
+                    SetRig(_model.Rigs.Where(r => r.Index == Index).First());
+                }
+                catch { }
             };
         }
 
