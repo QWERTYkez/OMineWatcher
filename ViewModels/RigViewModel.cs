@@ -45,9 +45,11 @@ namespace OMineWatcher.ViewModels
 
                     if (inf.RigInactive != null)
                     {
-                        Hashrates = null;
+                        if (Hashrates != null)
+                            Hashrates = new double?[Hashrates.Length];
                         Totalhashrate = null;
-                        Temperatures = null;
+                        if (Temperatures != null)
+                            Temperatures = new int?[Temperatures.Length];
                         TotalTemperature = null;
                     }
                 }
@@ -79,7 +81,7 @@ namespace OMineWatcher.ViewModels
             MinTempCurr = R.MinTemp != null ? R.MinTemp.Value : Settings.GenSets.TotalMinTemp;
         }
 
-        public int Index { get; set; }
+        public int Index;
         public string IP { get; private set; }
         private void ModelChanged(object sender, PropertyChangedEventArgs e)
         {

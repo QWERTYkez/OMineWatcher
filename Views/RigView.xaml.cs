@@ -41,11 +41,6 @@ namespace OMineWatcher.Views
             {
                 switch (e.PropertyName)
                 {
-                    case "Index":
-                        {
-                            //Index = _ViewModel.Index;
-                        }
-                        break;
                     case "Temperatures":
                         {
                             lock (TempKey)
@@ -61,8 +56,7 @@ namespace OMineWatcher.Views
                                     }
                                     return;
                                 }
-
-                                if (Temps != null)
+                                else
                                 {
                                     if (Temps.Length > 0)
                                     {
