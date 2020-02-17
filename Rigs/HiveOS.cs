@@ -23,7 +23,7 @@ namespace OMineWatcher.Rigs
                 if (Config.HiveFarmID.HasValue && Config.HiveWorkerID.HasValue)
                 {
                     Wacher = new HiveOSWacher(this, Config);
-                    Wacher.InformReceived += inf => this.InformReceived?.Invoke(inf);
+                    Wacher.InformReceived += inf => Task.Run(() => this.InformReceived?.Invoke(inf));
                     Wacher.StartWach();
                 }
             }
@@ -36,7 +36,7 @@ namespace OMineWatcher.Rigs
             {
                 Wacher?.RemoveLinks();
                 Wacher = new HiveOSWacher(this, Config);
-                Wacher.InformReceived += inf => this.InformReceived?.Invoke(inf);
+                Wacher.InformReceived += inf => Task.Run(() => this.InformReceived?.Invoke(inf));
                 Wacher.StartWach();
             }
 

@@ -3,6 +3,7 @@ using OMineWatcher.Rigs;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace OMineWatcher.ViewModels
@@ -18,50 +19,48 @@ namespace OMineWatcher.ViewModels
         private MainViewModel _model;
         public RigViewModel(MainViewModel MVM, int index)
         {
-            RigsWacher.SendInform += inf =>
-            {
-                if (inf.Index == this.Index)
-                {
-                    if (inf.RO != null)
-                    {
-                        if (inf.RO.Indication != null)
-                        {
-                            SetIndicator(inf.RO.Indication.Value);
-                        }
-                        if (inf.RO.InfHashrates != null)
-                        {
-                            Hashrates = inf.RO.InfHashrates;
-                            Totalhashrate = inf.RO.InfHashrates.Sum();
-                            SetIndicator(true);
-                        }
-                        if (inf.RO.InfTemperatures != null)
-                        {
-                            Temperatures = inf.RO.InfTemperatures;
-                            TotalTemperature = inf.RO.InfTemperatures.Max();
-                        }
-
-                        if (inf.RO.RigInactive != null)
-                        {
-                            SetIndicator(false);
-                            Hashrates = null;
-                            Totalhashrate = null;
-                            Temperatures = null;
-                            TotalTemperature = null;
-                        }
-                    }
-                }
-            };
-
             Index = index;
             _model = MVM;
+            SetEvents();
             _model.PropertyChanged += ModelChanged;
+        }
+        public void SetEvents()
+        {
+            var rig = _model.Rigs.Where(r => r.Index == Index).First();
+
+            rig.InformReceived += inf => Task.Run(() =>
+            {
+                if (inf != null)
+                {
+                    if (inf.InfHashrates != null)
+                    {
+                        Hashrates = inf.InfHashrates;
+                        Totalhashrate = inf.InfHashrates.Sum();
+                    }
+                    if (inf.InfTemperatures != null)
+                    {
+                        Temperatures = inf.InfTemperatures;
+                        TotalTemperature = inf.InfTemperatures.Max();
+                    }
+
+                    if (inf.RigInactive != null)
+                    {
+                        Hashrates = null;
+                        Totalhashrate = null;
+                        Temperatures = null;
+                        TotalTemperature = null;
+                    }
+                }
+            });
+            SetIndicator(rig.CurrentStatus);
+            rig.Status2Changed += s => Task.Run(() => { SetIndicator(s); });
         }
         public void InitializeRigViewModel()
         {
             SetRig(_model.Rigs[Index]);
             _model.Rigs.CollectionChanged += (s, e) =>
             {
-                SetRig(_model.Rigs[Index]);
+                SetRig(_model.Rigs.Where(r => r.Index == Index).First());
             };
         }
 
@@ -116,39 +115,39 @@ namespace OMineWatcher.ViewModels
         public int?[] Temperatures { get; set; }
         public int? TotalTemperature { get; set; }
 
-        public Brush LimeIndicator { get; set; }
-        public Brush RedIndicator { get; set; } = Brushes.Red;
-        private bool? LastIndicator;
-        public void SetIndicator(bool b)
+        public Brush Indicator { get; set; } = Brushes.Red;
+        private RigStatus? LastStatus;
+        public void SetIndicator(RigStatus s)
         {
-            if (LastIndicator != null)
+            if (LastStatus.HasValue)
             {
-                if (LastIndicator.Value != b)
-                {
-                    SetInd(b);
-                    LastIndicator = b;
-                }
+                if (LastStatus.Value != s) goto SetInd;
+                else return;
             }
-            else
+            else goto SetInd;
+        SetInd:
+            var x = LastStatus;
+            LastStatus = s;
+            switch (s)
             {
-                SetInd(b);
-                LastIndicator = b;
-            }
-            
-        }
-        private void SetInd(bool b)
-        {
-            if (b)
-            {
-                LimeIndicator = Brushes.Lime;
-                RedIndicator = null;
-                UserInformer.AlarmStop();
-            }
-            else
-            {
-                LimeIndicator = null;
-                RedIndicator = Brushes.Red;
-                UserInformer.AlarmStart();
+                case RigStatus.offline:
+                    {
+                        Indicator = Brushes.Red;
+                        if (x == RigStatus.works) UserInformer.AlarmStart();
+                    }
+                    break;
+                case RigStatus.online:
+                    {
+                        Indicator = Brushes.Red;
+                        if (x == RigStatus.works) UserInformer.AlarmStart();
+                    }
+                    break;
+                case RigStatus.works:
+                    {
+                        Indicator = Brushes.Lime;
+                        UserInformer.AlarmStop();
+                    }
+                    break;
             }
         }
     }

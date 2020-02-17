@@ -16,18 +16,21 @@ namespace OMineWatcher.Rigs
             private OMGinformer OMG;
             private void SetEvents()
             {
-                OMG.StreamStart += () =>
+                OMG.StreamStart += () => Task.Run(() =>
                 {
                     ScanningStop();
                     CurrentStatus = RigStatus.works;
-                };
-                OMG.StreamEnd += () =>
+                });
+                OMG.StreamEnd += () => Task.Run(() =>
                 {
                     ScanningStart();
+                    CurrentStatus = RigStatus.online;
                     InformReceived?.Invoke(new RigInform { RigInactive = true });
                     OMG = null;
-                };
-                OMG.SentInform += RO => InformReceived.Invoke(RO);
+                    Waching = false;
+                });
+                OMG.SentInform += RO => 
+                    InformReceived.Invoke(RO);
             }
             private protected override void WachingStert()
             {
@@ -38,12 +41,20 @@ namespace OMineWatcher.Rigs
                     OMG.StartInformStream(Config.IP);
                 });
             }
-            private protected override void WachingStop() => OMG?.StopInformStream();
+            private protected override void WachingStop()
+            {
+                OMG?.StopInformStream();
+                OMG = null;
+                ScanningStart();
+                CurrentStatus = RigStatus.online;
+                InformReceived?.Invoke(new RigInform { RigInactive = true });
+                Waching = false;
+            }
             private protected override void WachingReset()
             {
                 OMG?.ClearEvents();
                 OMG?.StopInformStream();
-                SetEvents();
+                if (OMG != null) SetEvents();
                 OMG?.StartInformStream(Config.IP);
             }
         }

@@ -18,10 +18,13 @@ namespace OMineWatcher.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-        public void IniModel()
+        public void IniModel() { }
+        public OmgModel(OMGcontroller controller)
         {
-            OMGcontroller.SentInform += OMGsent;
+            this.controller = controller;
+            this.controller.SentInform += OMGsent;
         }
+        public OMGcontroller controller;
 
         public IProfile Profile { get; set; }
         public List<string> Miners { get; set; }
@@ -117,30 +120,30 @@ namespace OMineWatcher.Models
             {
                 CurrentJSON = newJSON;
                 Profile = prof;
-                OMGcontroller.SendSetting(Profile, MSGtype.Profile);
+                controller.SendSetting(Profile, MSGtype.Profile);
             }
         }
         public void CMD_RunProfile(IProfile prof, int index)
         {
             Profile = prof;
-            OMGcontroller.SendSetting(new object[] { prof, index }, MSGtype.RunConfig);
+            controller.SendSetting(new object[] { prof, index }, MSGtype.RunConfig);
         }
         public void CMD_ApplyClock(IProfile prof, int index)
         {
             Profile = prof;
-            OMGcontroller.SendSetting(new object[] { prof, index }, MSGtype.ApplyClock);
+            controller.SendSetting(new object[] { prof, index }, MSGtype.ApplyClock);
         }
         public void CMD_MinerLogShow()
         {
-            OMGcontroller.SendSetting(true, MSGtype.ShowMinerLog);
+            controller.SendSetting(true, MSGtype.ShowMinerLog);
         }
         public void CMD_MinerLogHide()
         {
-            OMGcontroller.SendSetting(false, MSGtype.ShowMinerLog);
+            controller.SendSetting(false, MSGtype.ShowMinerLog);
         }
         public void CMD_SwitchProcess()
         {
-            OMGcontroller.SendSetting(true, MSGtype.SwitchProcess);
+            controller.SendSetting(true, MSGtype.SwitchProcess);
         }
         #endregion
     }

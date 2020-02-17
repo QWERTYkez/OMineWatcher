@@ -35,15 +35,22 @@ namespace OMineWatcher.Rigs
         private protected Rig(Settings.Rig Config)
         {
             this.Config = Config;
-            Config.WachStop += () => WachingStop();
-            Config.IPChanged += () => WachingReset();
-
-            Waching = false;
-            ScanningStart();
+            Config.WachStop += () => 
+                Task.Run(() => WachingStop());
+            Config.IPChanged += () => 
+                Task.Run(() => WachingReset());
         }
+        public void BreakLinks()
+        {
+            InformReceived = null;
+            StatusChanged = null;
+            ScanningStop();
+            WachingStop();
+            Config = null;
+        } 
 
-        private bool Waching;
-        private bool Scanning;
+        private bool Waching = false;
+        private bool Scanning = false;
         private void ScanningStop() => Scanning = false;
         private IPStatus Status;
         private RigStatus currentStatus;
@@ -58,7 +65,7 @@ namespace OMineWatcher.Rigs
                 }
             }
         }
-        private void ScanningStart()
+        public void ScanningStart()
         {
             if (Scanning) return;
             Scanning = true;

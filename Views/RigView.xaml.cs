@@ -24,13 +24,16 @@ namespace OMineWatcher.Views
 
             _ViewModel.InitializeRigViewModel();
 
-            BaseTemp.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
+            BaseTempVisual = new DrawingVisual { Effect = new BlurEffect { Radius = 5 } };
+            BaseTemp.AddVisual(BaseTempVisual);
         }
         private readonly RigViewModel _ViewModel;
 
+        private DrawingVisual BaseTempVisual;
         public int Index { get; set; }
         private int?[] Temperatures = new int?[1];
         private double?[] Hashrates;
+        private readonly object TempKey = new object();
         private void RigView_PropertyChanged(object sender, 
             System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -40,56 +43,52 @@ namespace OMineWatcher.Views
                 {
                     case "Index":
                         {
-                            Index = _ViewModel.Index;
+                            //Index = _ViewModel.Index;
                         }
                         break;
                     case "Temperatures":
                         {
-                            int?[] Temps = _ViewModel.Temperatures;
-
-                            if (Temps == null)
+                            lock (TempKey)
                             {
-                                SetTemperature(BaseTemp, -1);
-                                while (DCs.Count > 0)
-                                {
-                                    RemovelastTempLine();
-                                }
-                                return;
-                            }
+                                int?[] Temps = _ViewModel.Temperatures;
 
-                            if (Temps != null)
-                            {
-                                if (Temps.Length > 0)
+                                if (Temps == null)
                                 {
-                                    if (Temps.Max() != Temperatures.Max() || Temps.Min() != Temperatures.Min())
+                                    SetTemperature(BaseTempVisual, -1);
+                                    while (DVs.Count > 0)
                                     {
-                                        SetTemperature(BaseTemp, Temps);
+                                        RemovelastTempLine();
+                                    }
+                                    return;
+                                }
+
+                                if (Temps != null)
+                                {
+                                    if (Temps.Length > 0)
+                                    {
+                                        if (Temps.Max() != Temperatures.Max() || Temps.Min() != Temperatures.Min())
+                                        {
+                                            SetTemperature(BaseTempVisual, Temps);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SetTemperature(BaseTempVisual, -1);
                                     }
                                 }
-                                else
+                                while (DVs.Count != Temps.Length)
                                 {
-                                    SetTemperature(BaseTemp, -1);
+                                    if (DVs.Count < Temps.Length)
+                                        AddTempLine(DVs.Count);
+                                    else
+                                        RemovelastTempLine();
                                 }
-                            }
-                            while (DCs.Count != Temps.Length)
-                            {
-                                if (DCs.Count < Temps.Length)
-                                    AddTempLine(DCs.Count);
-                                else
-                                    RemovelastTempLine();
-                            }
-                            for (int i = 0; i < DCs.Count; i++)
-                            {
-                                if (i >= Temperatures.Length)
+                                for (int i = 0; i < DVs.Count; i++)
                                 {
-                                    SetTemperature(DCs[i], Temps[i]);
+                                    SetTemperature(DVs[i], Temps[i]);
                                 }
-                                else if (Temps[i] != Temperatures[i])
-                                {
-                                    SetTemperature(DCs[i], Temps[i]);
-                                }
+                                Temperatures = Temps;
                             }
-                            Temperatures = Temps;
                         }
                         break;
                     case "Hashrates":
@@ -124,17 +123,17 @@ namespace OMineWatcher.Views
         {
             Task.Run(() => 
             {
-                SetTemperature(BaseTemp, Temperatures);
-                for (int i = 0; i < DCs.Count; i++)
+                SetTemperature(BaseTempVisual, Temperatures);
+                for (int i = 0; i < DVs.Count; i++)
                 {
-                    SetTemperature(DCs[i], Temperatures[i]);
+                    SetTemperature(DVs[i], Temperatures[i]);
                 }
             });
         }
 
         private int MaxTemp = Settings.GenSets.TotalMaxTemp;
         private int MinTemp = Settings.GenSets.TotalMinTemp;
-        private void SetTemperature(DrawingCanvas DC, int? curr)
+        private void SetTemperature(DrawingVisual DV, int? curr)
         {
             int maxdigits = MaxTemp - MinTemp;
             int currentTemp;
@@ -170,7 +169,7 @@ namespace OMineWatcher.Views
 
             Dispatcher.InvokeAsync(() =>
             {
-                using (DrawingContext dc = ((DrawingVisual)DC.Visuals[0]).RenderOpen())
+                using (DrawingContext dc = DV.RenderOpen())
                 {
                     foreach (var (PointA, PointB, Alpha, Red, Green, Blue) in Draws)
                     {
@@ -181,7 +180,7 @@ namespace OMineWatcher.Views
                 }
             });
         }
-        private void SetTemperature(DrawingCanvas DC, int?[] Ccurr)
+        private void SetTemperature(DrawingVisual DV, int?[] Ccurr)
         {
             int minT;
             int curr;
@@ -240,7 +239,7 @@ namespace OMineWatcher.Views
 
             Dispatcher.InvokeAsync(() => 
             {
-                using (DrawingContext dc = ((DrawingVisual)DC.Visuals[0]).RenderOpen())
+                using (DrawingContext dc = DV.RenderOpen())
                 {
                     foreach (var (PointA, PointB, Alpha, Red, Green, Blue) in Draws)
                     {
@@ -283,13 +282,11 @@ namespace OMineWatcher.Views
             }
         }
 
-        public List<Grid> DetaledTemperatures { get; set; } = new List<Grid>();
-        private readonly List<DrawingCanvas> DCs = new List<DrawingCanvas>();
+        private readonly List<DrawingVisual> DVs = new List<DrawingVisual>();
         private void AddTempLine(int index)
         {
             Dispatcher.Invoke(() => 
             {
-                List<Grid> dt = DetaledTemperatures;
                 {
                     Grid grd = new Grid();
                     grd.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(35) });
@@ -319,9 +316,10 @@ namespace OMineWatcher.Views
                                 Height = 20
                             };
 
-                            DC.AddVisual(new DrawingVisual { Effect = new BlurEffect { Radius = 5 } });
+                            var DV = new DrawingVisual { Effect = new BlurEffect { Radius = 5 } };
 
-                            DCs.Add(DC);
+                            DC.AddVisual(DV);
+                            DVs.Add(DV);
                             vb2.Child = DC;
                         }
 
@@ -343,24 +341,19 @@ namespace OMineWatcher.Views
                         grd.Children.Add(vb2);
                         grd.Children.Add(vb3);
                     }
-                    dt.Add(grd);
+                    DetaledTemperaturesControl.Items.Add(grd);
                 }
-                DetaledTemperatures = dt;
-                DetaledTemperaturesControl.ItemsSource = dt;
             });
         }
+        private readonly object DetaledTemperaturesKey = new object();
         private void RemovelastTempLine()
         {
-            List<Grid> dt = DetaledTemperatures;
+            lock (DetaledTemperaturesKey)
             {
-                dt[dt.Count - 1] = null;
-                dt.RemoveAt(dt.Count - 1);
+                var i = DVs.Count - 1;
+                DVs.RemoveAt(i);
+                Dispatcher.Invoke(() => DetaledTemperaturesControl.Items.RemoveAt(i));
             }
-            DetaledTemperatures = dt;
-            Dispatcher.Invoke(() => { DetaledTemperaturesControl.ItemsSource = DetaledTemperatures; });
-            
-            DCs[DCs.Count - 1] = null;
-            DCs.RemoveAt(DCs.Count - 1);
         }
     }
 }

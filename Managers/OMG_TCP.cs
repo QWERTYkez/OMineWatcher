@@ -34,9 +34,9 @@ namespace OMineWatcher.Managers
         };
 
         private static readonly object readkey = new object();
-        protected private static RigInform ReadRootObject(NetworkStream stream)
+        protected private RigInform ReadRootObject(NetworkStream stream)
         {
-            lock (readkey)
+            //lock (readkey)
             {
                 byte[] msg = new byte[4];
                 stream.Read(msg, 0, msg.Length);
@@ -47,8 +47,6 @@ namespace OMineWatcher.Managers
                 msg = new byte[MSGlength];
                 int count = stream.Read(msg, 0, msg.Length);
                 string message = Encoding.Default.GetString(msg, 0, count);
-
-                Debug.WriteLine(message);
 
                 return JsonConvert.DeserializeObject<RigInform>(message, Convs);
             }
@@ -94,13 +92,13 @@ namespace OMineWatcher.Managers
     }
     public class OMGcontroller : OMGconnector
     {
-        public static event Action ControlEnd;
-        public static event Action ControlStart;
-        public static event Action<RigInform> SentInform;
+        public event Action ControlEnd;
+        public event Action ControlStart;
+        public event Action<RigInform> SentInform;
 
-        private static TcpClient OMGcontrolClient;
-        private static NetworkStream OMGcontrolStream;
-        public static void StartControl(string IP)
+        private TcpClient OMGcontrolClient;
+        private NetworkStream OMGcontrolStream;
+        public void StartControl(string IP)
         {
             Task.Run(() =>
             {
@@ -139,12 +137,12 @@ namespace OMineWatcher.Managers
                 catch { ControlEnd?.Invoke(); }
             });
         }
-        public static void SendSetting(object body, MSGtype type)
+        public void SendSetting(object body, MSGtype type)
         {
             SendMessage(OMGcontrolClient, OMGcontrolStream, body, type);
         }
-        private static TcpClient ControlClient;
-        public static void StopControl()
+        private TcpClient ControlClient;
+        public void StopControl()
         {
             if (OMGcontrolClient != null)
             {

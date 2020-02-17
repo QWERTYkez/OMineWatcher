@@ -53,17 +53,7 @@
                             Height="18"
                             Margin="6"
                             VerticalAlignment="Center"
-                            Fill="{Binding LimeIndicator}">
-                            <Ellipse.Effect>
-                                <BlurEffect Radius="10" />
-                            </Ellipse.Effect>
-                        </Ellipse>
-                        <Ellipse
-                            Width="18"
-                            Height="18"
-                            Margin="6"
-                            VerticalAlignment="Center"
-                            Fill="{Binding RedIndicator}">
+                            Fill="{Binding Indicator}">
                             <Ellipse.Effect>
                                 <BlurEffect Radius="10" />
                             </Ellipse.Effect>

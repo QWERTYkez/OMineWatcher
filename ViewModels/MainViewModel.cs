@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -33,10 +34,9 @@ namespace OMineWatcher.ViewModels
         }
         public Visibility AlarmButtonVisability { get; set; } = Visibility.Collapsed;
 
-        public MainModel _model;
+        public MainModel _model = new MainModel();
         public void InitializeMainViewModel()
         {
-            _model = new MainModel();
             _model.PropertyChanged += ModelChanged;
             _model.Statuses.CollectionChanged += (sender, e) => Indicators = _model.Statuses.ToList();
 
@@ -243,6 +243,7 @@ namespace OMineWatcher.ViewModels
             });
             RigMinus = new RelayCommand(obj => 
             {
+                Rigs[SelectedRigIndex].InformReceivedClear();
                 Rigs.RemoveAt(SelectedRigIndex);
                 for (int i = SelectedRigIndex; i < RigsNames.Count(); i++) Rigs[i].Index--;
                 RigsNames = from r in Rigs orderby r.Index select r.Name;
@@ -266,29 +267,33 @@ namespace OMineWatcher.ViewModels
             {
                 int i = SelectedRigIndex;
 
-                for (int n = 0; i < RVMs.Count;)
+                FreezeWatch = true;
                 {
-                    if (RVMs[n].Index == Rigs[i].Index)
-                    {
-                        RVMs[n].Index--;
-                        RVs = (from r in RVs orderby r.Index select r).ToList();
-                        RVMs = (from r in RVMs orderby r.Index select r).ToList();
-                        break;
-                    }
+                    var t = Watch[i];
+                    Watch.RemoveAt(i);
+                    Watch.Insert(i - 1, t);
                 }
-                Rigs[i].Index--;
+                FreezeWatch = false;
 
-                for (int n = 0; i < RVMs.Count;)
                 {
-                    if (RVMs[n].Index == Rigs[i - 1].Index)
-                    {
-                        RVMs[n].Index++;
-                        RVs = (from r in RVs orderby r.Index select r).ToList();
-                        RVMs = (from r in RVMs orderby r.Index select r).ToList();
-                        break;
-                    }
+                    int n1 = 0;
+                    int n2 = 0;
+                    for (int n = 0; n < RVMs.Count; n++)
+                        if (RVMs[n].Index == Rigs[i].Index)
+                        { n1 = n; break; }
+                    for (int n = 0; n < RVMs.Count; n++)
+                        if (RVMs[n].Index == Rigs[i - 1].Index)
+                        { n2 = n; break; }
+                    RVs[n1].Index--;
+                    RVMs[n1].Index--;
+                    Rigs[i].Index--;
+                    RVs[n2].Index++;
+                    RVMs[n2].Index++;
+                    Rigs[i - 1].Index++;
                 }
-                Rigs[i - 1].Index++;
+
+                RVs = RVs.OrderBy(r => r.Index).ToList();
+                RVMs = RVMs.OrderBy(r => r.Index).ToList();
 
                 Rigs = new ObservableCollection<Settings.Rig>(Rigs.OrderBy(r => r.Index));
                 RigsNames = from r in Rigs orderby r.Index select r.Name;
@@ -300,31 +305,34 @@ namespace OMineWatcher.ViewModels
             {
                 int i = SelectedRigIndex;
 
-                for (int n = 0; i < RVMs.Count;)
+                FreezeWatch = true;
                 {
-                    if (RVMs[n].Index == Rigs[i].Index)
-                    {
-                        RVMs[n].Index++;
-                        RVs = null;
-                        RVs = (from r in RVs orderby r.Index select r).ToList();
-                        RVMs = (from r in RVMs orderby r.Index select r).ToList();
-                        break;
-                    }
+                    var t = Watch[i];
+                    Watch.RemoveAt(i);
+                    Watch.Insert(i + 1, t);
                 }
-                Rigs[i].Index++;
+                FreezeWatch = false;
 
-                for (int n = 0; i < RVMs.Count;)
                 {
-                    if (RVMs[n].Index == Rigs[i + 1].Index)
-                    {
-                        RVMs[n].Index--;
-                        RVs = null;
-                        RVs = (from r in RVs orderby r.Index select r).ToList();
-                        RVMs = (from r in RVMs orderby r.Index select r).ToList();
-                        break;
-                    }
+                    int n1 = 0;
+                    int n2 = 0;
+                    for (int n = 0; n < RVMs.Count; n++)
+                        if (RVMs[n].Index == Rigs[i].Index)
+                        { n1 = n; break; }
+                    for (int n = 0; n < RVMs.Count; n++)
+                        if (RVMs[n].Index == Rigs[i + 1].Index)
+                        { n2 = n; break; }
+                    RVs[n1].Index++;
+                    RVMs[n1].Index++;
+                    Rigs[i].Index++;
+                    RVs[n2].Index--;
+                    RVMs[n2].Index--;
+                    Rigs[i + 1].Index--;
                 }
-                Rigs[i + 1].Index--;
+                
+                RVs = RVs.OrderBy(r => r.Index).ToList();
+                RVMs = RVMs.OrderBy(r => r.Index).ToList();
+
                 Rigs = new ObservableCollection<Settings.Rig>(Rigs.OrderBy(r => r.Index));
                 RigsNames = from r in Rigs orderby r.Index select r.Name;
                 SelectedRigIndex = i + 1;
@@ -350,6 +358,16 @@ namespace OMineWatcher.ViewModels
                 SetButtonsEnable();
             });
         }
+        private void debug(string s)
+        {
+            string rvi = "";
+            foreach (var rv in RVs)
+                rvi += rv.Index.ToString();
+            string rvmi = "";
+            foreach (var rvm in RVMs)
+                rvmi += rvm.Index.ToString();
+            Debug.WriteLine($"--{s}--{rvi}--{rvmi}--");
+        }
         private void SetButtonsEnable()
         {
             MinusButtonEnable = (SelectedRigIndex > -1) ? true : false;
@@ -361,6 +379,7 @@ namespace OMineWatcher.ViewModels
         #region Indicators & Tumblers
         public List<RigStatus?> Indicators { get; set; } = new List<RigStatus?>();
 
+        public bool FreezeWatch = false;
         public ObservableCollection<bool> Watch { get; set; } = new ObservableCollection<bool>();
         public RelayCommand SetWach { get; set; }
 
@@ -432,8 +451,8 @@ namespace OMineWatcher.ViewModels
 
         private void InitializeOMGSwitchConnectCommand()
         {
-            OMGconnect = new RelayCommand(obj => OMGcontroller.StartControl(RigIP));
-            OMGdisconnect = new RelayCommand(obj => OMGcontroller.StopControl());
+            OMGconnect = new RelayCommand(obj => _model.controller.StartControl(RigIP));
+            OMGdisconnect = new RelayCommand(obj => _model.controller.StopControl());
         }
         public UserControl OmgControlView { get; set; }
         #endregion

@@ -15,8 +15,6 @@ using System.Windows.Data;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 
-using MXB = Microsoft.Xaml.Behaviors;
-
 namespace OMineWatcher.Views
 {
     public partial class MainWindow : Window
@@ -27,8 +25,8 @@ namespace OMineWatcher.Views
         {
             InitializeComponent();
 
-            OMGcontroller.ControlStart += () => Dispatcher.Invoke(() => OMGcontrolReceived());
-            OMGcontroller.ControlEnd += () => Dispatcher.Invoke(() => OMGcontrolLost());
+            _ViewModel._model.controller.ControlStart += () => Dispatcher.Invoke(() => OMGcontrolReceived());
+            _ViewModel._model.controller.ControlEnd += () => Dispatcher.Invoke(() => OMGcontrolLost());
 
             _ViewModel = (MainViewModel)DataContext;
             _ViewModel.PoolsSets.CollectionChanged += PoolsSets_CollectionChanged;
@@ -47,7 +45,7 @@ namespace OMineWatcher.Views
         private void OMGcontrolReceived()
         {
             OmgControlPresenter.Content = 
-                new View(new Models.OmgModel());
+                new View(new Models.OmgModel(_ViewModel._model.controller));
             OmgControlPresenter.Visibility = Visibility.Visible;
             OmgDisconnectButton.Visibility = Visibility.Visible;
             BaseTabControl.Visibility = Visibility.Collapsed;
@@ -107,10 +105,10 @@ namespace OMineWatcher.Views
         private void SetTumblers(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (Tumblers.Count == _ViewModel.Watch.Count) return;
-            ObservableCollection<bool> watch = _ViewModel.Watch;
-            while (Tumblers.Count != watch.Count)
+            if (_ViewModel.FreezeWatch) return;
+            while (Tumblers.Count != _ViewModel.Watch.Count)
             {
-                if (Tumblers.Count < watch.Count)
+                if (Tumblers.Count < _ViewModel.Watch.Count)
                 {
                     Tumbler T = new Tumbler();
                     SetTriggerToTumbler(T, "Checked", "SetWach", Tumblers.Count);

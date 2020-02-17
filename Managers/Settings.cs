@@ -2,6 +2,7 @@
 using OMineWatcher.Pools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -61,7 +62,19 @@ namespace OMineWatcher.Managers
         }
         public class Rig
         {
-            public event Action WachStart;
+            public event Action<RigInform> InformReceived;
+            public event Action<Rigs.RigStatus> Status2Changed;
+            public void InformReceivedClear()
+            {
+                InformReceived = null;
+                Status2Changed = null;
+            }
+            public event Action<Rigs.RigStatus> StatusChanged;
+            public void StatusChangedClear()
+            {
+                StatusChanged = null;
+            }
+
             public event Action WachStop;
             public event Action IPChanged;
 
@@ -89,8 +102,11 @@ namespace OMineWatcher.Managers
                     if (waching != value)
                     {
                         waching = value;
-                        if (value) WachStart?.Invoke();
-                        else WachStop?.Invoke();
+                        if (!value)
+                        {
+                            WachStop?.Invoke();
+                            InformReceivedClear();
+                        }
                     }
                 }
             }
@@ -107,9 +123,34 @@ namespace OMineWatcher.Managers
                     }
                 } 
             }
+            private string type;
+            public string Type 
+            {
+                get => type;
+                set
+                {
+                    if (type != value)
+                    {
+                        type = value;
+                        this.WachStop = null;
+                        this.IPChanged = null;
+                        rig?.BreakLinks();
+                        rig = OMineWatcher.Rigs.Rig.GetRig(this);
+                        rig.InformReceived += o => Task.Run(() => this.InformReceived?.Invoke(o));
+                        rig.StatusChanged += s => 
+                        {
+                            CurrentStatus = s;
+                            Task.Run(() => this.StatusChanged?.Invoke(s));
+                            Task.Run(() => this.Status2Changed?.Invoke(s));
+                        };
+                        rig.ScanningStart();
+                    }
+                }
+            }
+            public OMineWatcher.Rigs.RigStatus CurrentStatus;
+            private Rigs.Rig rig;
 
             public string Name;
-            public string Type;
             public long ID { get; private set; }
 
             public string eWeDevice;

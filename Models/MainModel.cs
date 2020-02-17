@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace OMineWatcher.Models
 {
@@ -13,14 +14,27 @@ namespace OMineWatcher.Models
         {
             InternetConnectionWacher.InternetConnectionLost += NullAllStatuses;
             NullAllStatuses();
-            RigsWacher.RigStatusChanged += (i, status) => { Statuses[i] = status; };
         }
         public void InitializeModel()
         {
             Rigs = Settings.Rigs;
+            rigs = Rigs;
+            StatusesReset();
             GenSettings = Settings.GenSets;
             PoolsSets = Settings.Pools;
         }
+        public OMGcontroller controller = new OMGcontroller();
+        public void StatusesReset()
+        {
+            for (int i = 0; i < Statuses.Count; i++)
+            {
+                rigs[i].StatusChangedClear();
+                Statuses[i] = rigs[i].CurrentStatus;
+                var x = i;
+                rigs[i].StatusChanged += s => Task.Run(() => Statuses[x] = s);
+            }
+        }
+
         private void NullAllStatuses()
         {
             List<RigStatus?> lrs = new List<RigStatus?>();
@@ -36,6 +50,7 @@ namespace OMineWatcher.Models
         }
 
         public List<Settings.Rig> Rigs { get; set; }
+        private List<Settings.Rig> rigs;
         public Settings._GenSettings GenSettings { get; set; }
         public ObservableCollection<RigStatus?> Statuses { get; set; }
         public List<PoolSet> PoolsSets { get; set; }
@@ -45,6 +60,7 @@ namespace OMineWatcher.Models
         public void cmd_SaveRigs(List<Settings.Rig> rigs)
         {
             Settings.Rigs = rigs;
+            this.rigs = rigs;
 
             while (rigs.Count != Statuses.Count)
             {
@@ -55,6 +71,8 @@ namespace OMineWatcher.Models
                     Statuses.RemoveAt(Statuses.Count - 1);
                 }
             }
+            StatusesReset();
+
             Settings.SaveSettings();
         }
         public void cmd_SavePools(List<PoolSet> pools)
