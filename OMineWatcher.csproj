@@ -237,9 +237,9 @@
     <Resource Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="eWeLink.API\eWeLink.API.csproj">
-      <Project>{58561cec-3b10-4b20-9548-5ef7872a96ce}</Project>
-      <Name>eWeLink.API</Name>
+    <ProjectReference Include="EwelinkNet\EwelinkNet.csproj">
+      <Project>{a36868d9-0da7-48ae-ba0f-e3dfae689542}</Project>
+      <Name>EwelinkNet</Name>
     </ProjectReference>
     <ProjectReference Include="HiveOS.API\HiveOS.API.csproj">
       <Project>{8c54101e-9d64-48fc-8707-52607f5ae56c}</Project>
