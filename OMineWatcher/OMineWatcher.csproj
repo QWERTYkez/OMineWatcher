@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <StartupObject>OMineWatcher.App</StartupObject>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fody" Version="6.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.2.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EwelinkNet\EwelinkNet.csproj" />
+    <ProjectReference Include="..\HiveOS.API\HiveOS.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OMineGuardControlLibrary">
+      <HintPath>..\packages\OMineGuardControlLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MVVM\Styles\Selectorz.xaml.cs">
+      <DependentUpon>Selectorz.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="MVVM\Styles\Tumbler.xaml.cs">
+      <DependentUpon>Tumbler.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="MVVM\Styles\Brushes.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Button.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\CheckBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\ComboBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Converters.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\GroupBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Label.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Listbox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\PasswordBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Selectorz.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\TabControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\TabItem.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\TextBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Styles\Tumbler.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\RigView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\PoolView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>
