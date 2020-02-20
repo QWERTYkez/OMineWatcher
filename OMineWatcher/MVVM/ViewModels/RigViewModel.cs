@@ -1,6 +1,7 @@
 ﻿using OMineWatcher.Managers;
 using OMineWatcher.Rigs;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -51,11 +52,17 @@ namespace OMineWatcher.MVVM.ViewModels
                         if (Temperatures != null)
                             Temperatures = new int?[Temperatures.Length];
                         TotalTemperature = null;
+
+                        SetIndicator(LastStatus.Value, false);
+                    }
+                    else
+                    {
+                        SetIndicator(LastStatus.Value, true);
                     }
                 }
             });
-            SetIndicator(rig.CurrentStatus);
-            rig.Status2Changed += s => Task.Run(() => { SetIndicator(s); });
+            SetIndicator(rig.CurrentStatus, false);
+            rig.Status2Changed += s => Task.Run(() => { SetIndicator(s, Working); });
         }
         public void InitializeRigViewModel()
         {
@@ -123,11 +130,12 @@ namespace OMineWatcher.MVVM.ViewModels
 
         public Brush Indicator { get; set; } = Brushes.Red;
         private RigStatus? LastStatus;
-        public void SetIndicator(RigStatus s)
+        private bool Working = false;
+        public void SetIndicator(RigStatus s, bool working)
         {
             if (LastStatus.HasValue)
             {
-                if (LastStatus.Value != s) goto SetInd;
+                if (LastStatus.Value != s || Working != working) goto SetInd;
                 else return;
             }
             else goto SetInd;
@@ -139,22 +147,31 @@ namespace OMineWatcher.MVVM.ViewModels
                 case RigStatus.offline:
                     {
                         Indicator = Brushes.Red;
-                        if (x == RigStatus.works) UserInformer.AlarmStart();
+                        UserInformer.AlarmStart(this);
                     }
                     break;
                 case RigStatus.online:
                     {
                         Indicator = Brushes.Red;
-                        if (x == RigStatus.works) UserInformer.AlarmStart();
+                        UserInformer.AlarmStart(this);
                     }
                     break;
                 case RigStatus.works:
                     {
-                        Indicator = Brushes.Lime;
-                        UserInformer.AlarmStop();
+                        if (working)
+                        {
+                            Indicator = Brushes.Lime;
+                            UserInformer.AlarmStop(this);
+                        }
+                        else
+                        {
+                            Indicator = Brushes.Blue;
+                            UserInformer.AlarmStart(this);
+                        }
                     }
                     break;
             }
+            Working = working;
         }
     }
 }

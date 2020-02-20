@@ -141,14 +141,17 @@ namespace OMineWatcher.Rigs
                 try
                 {
                     dev = App.Ewelink.Devices.
-                        Where(d => d.deviceName == Config.eWeDevice).First() 
+                        Where(d => d.name == Config.eWeDevice).First() 
                         as EwelinkNet.Classes.SwitchDevice;
                 }
                 catch { return; }
 
-                dev.TurnOff();
-                Thread.Sleep(3000);
-                dev.TurnOn();
+                if (dev != null)
+                {
+                    dev.TurnOff();
+                    Thread.Sleep(3000);
+                    dev.TurnOn();
+                }
             }
         }
     }

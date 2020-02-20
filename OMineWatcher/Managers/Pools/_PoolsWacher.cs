@@ -155,7 +155,7 @@ namespace OMineWatcher.Managers.Pools
         event Action NoInformationReceived;
         event Action WrongWallet;
         void StopMonitoring();
-        bool Alive { get; }
+        bool Monitoring { get; }
     }
     
     public struct WorkerStats

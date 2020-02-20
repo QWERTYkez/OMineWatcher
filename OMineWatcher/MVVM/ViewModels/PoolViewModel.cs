@@ -167,12 +167,16 @@ namespace OMineWatcher.MVVM.ViewModels
 
                 Task.Run(() => 
                 {
-                    while (Pool.Alive)
+                    try
                     {
-                        rate = PoolsWacher.GetProfit(Settings.Coin.Value);
-                        if (AVG != null) UpdateProfitRate();
-                        Thread.Sleep(5000);
+                        while (Pool.Monitoring)
+                        {
+                            rate = PoolsWacher.GetProfit(Settings.Coin.Value);
+                            if (AVG != null) UpdateProfitRate();
+                            Thread.Sleep(5000);
+                        }
                     }
+                    catch { }
                 });
             }
             else Error = "Wrong Settings";

@@ -20,8 +20,7 @@ namespace OMineWatcher.Managers.Pools
 
         private readonly string Wallet;
         private readonly string Endpoint;
-        private Thread Monitoring;
-        public bool Alive => Monitoring != null;
+        public bool Monitoring { get; private set; } = false;
 
         public event Action<CurrStats> ReceivedСurrentStats;
         public event Action<List<MiningStats>> ReceivedMiningHistory;
@@ -41,51 +40,54 @@ namespace OMineWatcher.Managers.Pools
                 case CoinType.YEC: Endpoint = "https://api-ycash.flypool.org"; break;
                 case CoinType.ZEC: Endpoint = "https://api-zcash.flypool.org"; break;
             }
-            Monitoring = new Thread(() => 
+            if (!Monitoring)
             {
-                var min = new TimeSpan(0, 1, 0).TotalSeconds;
-                while (App.Live)
+                Monitoring = true;
+                Task.Run(() =>
                 {
-                    while (InternetConnection)
+                    var min = new TimeSpan(0, 1, 0).TotalSeconds;
+                    while (App.Live && Monitoring)
                     {
-                        Task.Run(() =>
+                        while (InternetConnection)
                         {
-                            (var status,
-                            var СurrentStats,
-                            var MiningHistory,
-                            var WorkersStats) = GetStats();
-                            if (status == "OK")
+                            Task.Run(() =>
                             {
-                                if (СurrentStats != null)
+                                (var status,
+                                var СurrentStats,
+                                var MiningHistory,
+                                var WorkersStats) = GetStats();
+                                if (status == "OK")
                                 {
-                                    Task.Run(() => ReceivedСurrentStats?.Invoke(СurrentStats.Value));
+                                    if (СurrentStats != null)
+                                    {
+                                        Task.Run(() => ReceivedСurrentStats?.Invoke(СurrentStats.Value));
+                                    }
+                                    if (MiningHistory != null)
+                                    {
+                                        Task.Run(() => ReceivedMiningHistory?.Invoke(MiningHistory));
+                                    }
+                                    if (WorkersStats != null)
+                                    {
+                                        Task.Run(() => ReceivedWorkersStats?.Invoke(WorkersStats));
+                                    }
                                 }
-                                if (MiningHistory != null)
+                                else if (status == "Invalid address")
                                 {
-                                    Task.Run(() => ReceivedMiningHistory?.Invoke(MiningHistory));
+                                    WrongWallet?.Invoke();
+                                    return;
                                 }
-                                if (WorkersStats != null)
-                                {
-                                    Task.Run(() => ReceivedWorkersStats?.Invoke(WorkersStats));
-                                }
-                            }
-                            else if (status == "Invalid address")
+                                else Task.Run(() => NoInformationReceived?.Invoke());
+                            });
+                            for (int i = 0; i < min; i++)
                             {
-                                WrongWallet?.Invoke();
-                                return;
+                                if (App.Live && Monitoring) Thread.Sleep(1000);
+                                else { return; }
                             }
-                            else Task.Run(() => NoInformationReceived?.Invoke());
-                        });
-                        for (int i = 0; i < min; i++)
-                        {
-                            if (App.Live) Thread.Sleep(1000);
-                            else { Monitoring = null; return; } 
                         }
+                        Thread.Sleep(1000);
                     }
-                    Thread.Sleep(1000);
-                }
-            });
-            Monitoring.Start();
+                });
+            }
         }
         public void StopMonitoring()
         {
@@ -94,8 +96,7 @@ namespace OMineWatcher.Managers.Pools
             ReceivedWorkersStats = null;
             NoInformationReceived = null;
             WrongWallet = null;
-            Monitoring?.Abort();
-            Monitoring = null;
+            Monitoring = false;
         }
         private (string status, CurrStats? СurrentStats, 
             List<MiningStats> MiningHistory, 

@@ -29,32 +29,45 @@ namespace OMineWatcher.Managers
             });
         }
 
-        private static Thread Alarm;
+        private static bool Alarm;
         private static readonly object Key = new object();
-        public static void AlarmStart()
+        private static List<object> Annunciators = new List<object>();
+        public static void AlarmStart(object o)
         {
-            lock (Key)
+            if(!Annunciators.Contains(o))
             {
-                if (Alarm == null)
+                Annunciators.Add(o);
+
+                lock (Key)
                 {
-                    Alarm = new Thread(() =>
+                    if (!Alarm)
                     {
-                        while (App.Live)
+                        Alarm = true;
+                        Task.Run(() =>
                         {
-                            using (var sound = new SoundPlayer(Properties.Resources.alarm))
+                            while (App.Live && Alarm)
                             {
-                                sound.PlaySync();
+                                using (var sound = new SoundPlayer(Properties.Resources.alarm))
+                                {
+                                    sound.PlaySync();
+                                }
                             }
-                        }
-                    });
-                    Alarm.Start();
-                    Task.Run(() => AlarmStatus?.Invoke(true));
+                        });
+                        Task.Run(() => AlarmStatus?.Invoke(true));
+                    }
                 }
             }
         }
-        public static void AlarmStop()
+        public static void AlarmStop(object o = null)
         {
-            Alarm?.Abort(); Alarm = null;
+            if (o != null)
+            {
+                Annunciators = Annunciators.Where(a => a != o).ToList();
+                if (Annunciators.Count > 0) return;
+            }
+            else Annunciators = new List<object>();
+
+            Alarm = false;
             Task.Run(() => AlarmStatus?.Invoke(false));
         }
     }

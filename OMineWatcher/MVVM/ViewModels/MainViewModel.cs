@@ -99,6 +99,9 @@ namespace OMineWatcher.MVVM.ViewModels
                         EndOfRange = GenSettings.TotalMaxTemp;
                         EndOfRangeD = GenSettings.TotalMaxTemp;
 
+                        eWeLogin = GenSettings.eWeLogin;
+                        eWePasswordSend = GenSettings.eWePassword;
+
                         Task.Run(() => eWeConnect());
 
                         Task.Run(() =>
@@ -789,7 +792,14 @@ namespace OMineWatcher.MVVM.ViewModels
 
         private void InitializeeWeCommands()
         {
-            eweConnect = new RelayCommand(async obj => eWeConnect());
+            eweConnect = new RelayCommand(obj =>
+            {
+                eWeConnect();
+
+                GenSettings.eWeLogin = eWeLogin;
+                GenSettings.eWePassword = eWePasswordReceive;
+                _model.cmd_SaveGenSettings(GenSettings);
+            });
             eweDisonnect = new RelayCommand(obj =>
             {
                 GenSettings.eWeLogin = null;
@@ -812,7 +822,7 @@ namespace OMineWatcher.MVVM.ViewModels
                 await App.Ewelink.GetCredentials();
                 await App.Ewelink.GetDevices();
 
-                List<string> LST = App.Ewelink.Devices.Select(d => d.deviceName).ToList();
+                List<string> LST = App.Ewelink.Devices.Select(d => d.name).ToList();
                 LST.Insert(0, "---");
                 eWeDevicesNames = LST;
 
