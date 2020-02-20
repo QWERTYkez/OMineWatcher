@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -98,23 +99,7 @@ namespace OMineWatcher.MVVM.ViewModels
                         EndOfRange = GenSettings.TotalMaxTemp;
                         EndOfRangeD = GenSettings.TotalMaxTemp;
 
-                        Task.Run(() => 
-                        {
-                            //if (GenSettings.eWeLogin != "" && GenSettings.eWeLogin != null)
-                            //{
-                            //    eWeLinkClient.SetAuth(GenSettings.eWeLogin, GenSettings.eWePassword);
-                            //    eWeLogin = GenSettings.eWeLogin;
-                            //    eWePasswordSend = GenSettings.eWePassword;
-                            //    eWeAccountState = "Аккаунт подключен";
-                            //    List<_eWelinkDevice> LE = eWeLinkClient.GetDevices();
-                            //    if (LE != null)
-                            //    {
-                            //        List<string> LST = (from x in LE select x.name).ToList();
-                            //        LST.Insert(0, "---");
-                            //        eWeDevicesNames = LST;
-                            //    }
-                            //}
-                        });
+                        Task.Run(() => eWeConnect());
 
                         Task.Run(() =>
                         {
@@ -804,42 +789,43 @@ namespace OMineWatcher.MVVM.ViewModels
 
         private void InitializeeWeCommands()
         {
-            //eweConnect = new RelayCommand(async obj => 
-            //{
-            //    eWeAccountState = "Подключение";
-            //    if (await Task.Run(() => eWeLinkClient.AutheWeLink(eWeLogin, eWePasswordReceive)))
-            //    {
-            //        _ = Task.Run(async() =>
-            //        {
-            //            GenSettings.eWeLogin = eWeLogin;
-            //            GenSettings.eWePassword = eWePasswordReceive;
-            //            _model.cmd_SaveGenSettings(GenSettings);;
-            //            eWeAccountState = "Аккаунт подключен";
+            eweConnect = new RelayCommand(async obj => eWeConnect());
+            eweDisonnect = new RelayCommand(obj =>
+            {
+                GenSettings.eWeLogin = null;
+                GenSettings.eWePassword = null;
+                App.Ewelink = null;
+                _model.cmd_SaveGenSettings(GenSettings);
+                eWeLogin = "";
+                eWePasswordSend = "";
+                eWeAccountState = "Аккаунт не подключен";
+                eWeDevicesNames = null;
+            });
+        }
+        private async void eWeConnect()
+        {
+            eWeAccountState = "Подключение";
 
-            //            List<_eWelinkDevice> LE = await Task.Run(() => eWeLinkClient.GetDevices());
-            //            List<string> LST = (from x in LE select x.name).ToList();
-            //            LST.Insert(0, "---");
-            //            eWeDevicesNames = LST;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        eWeAccountState = "Ошибка";
-            //        await Task.Delay(2000);
-            //        eWeAccountState = "Аккаунт не подключен";
-            //    }
-            //});
-            //eweDisonnect = new RelayCommand(obj =>
-            //{
-            //    GenSettings.eWeLogin = null;
-            //    GenSettings.eWePassword = null;
-            //    eWeLinkClient.RemoveAuth();
-            //    _model.cmd_SaveGenSettings(GenSettings);;
-            //    eWeLogin = "";
-            //    eWePasswordSend = "";
-            //    eWeAccountState = "Аккаунт не подключен";
-            //    eWeDevicesNames = null;
-            //});
+            try
+            {
+                App.Ewelink = new Ewelink(eWeLogin, eWePasswordReceive, "eu");
+                await App.Ewelink.GetCredentials();
+                await App.Ewelink.GetDevices();
+
+                List<string> LST = App.Ewelink.Devices.Select(d => d.deviceName).ToList();
+                LST.Insert(0, "---");
+                eWeDevicesNames = LST;
+
+                eWeAccountState = "Аккаунт подключен";
+            }
+            catch
+            {
+                App.Ewelink = null;
+
+                eWeAccountState = "Ошибка";
+                Thread.Sleep(2000);
+                eWeAccountState = "Аккаунт не подключен";
+            }
         }
         #endregion
         

@@ -1,6 +1,7 @@
 ﻿using EwelinkNet;
 using OMineWatcher.Managers;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -132,11 +133,23 @@ namespace OMineWatcher.Rigs
         }
         private void eWeReboot()
         {
-            //if (Config.eWeDevice != null && eWeLinkClient.ItCanAct)
-            //{
-            //    UserInformer.SendMSG(Config.Name, "eWeReboot");
-            //    eWeLinkClient.RebootDevice(Config.eWeDevice);
-            //}
+            if (Config.eWeDevice != null && App.Ewelink != null)
+            {
+                UserInformer.SendMSG(Config.Name, "eWeReboot");
+
+                EwelinkNet.Classes.SwitchDevice dev = null;
+                try
+                {
+                    dev = App.Ewelink.Devices.
+                        Where(d => d.deviceName == Config.eWeDevice).First() 
+                        as EwelinkNet.Classes.SwitchDevice;
+                }
+                catch { return; }
+
+                dev.TurnOff();
+                Thread.Sleep(3000);
+                dev.TurnOn();
+            }
         }
     }
     public enum RigStatus
