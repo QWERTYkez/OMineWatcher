@@ -348,16 +348,6 @@ namespace OMineWatcher.MVVM.ViewModels
                 SetButtonsEnable();
             });
         }
-        private void debug(string s)
-        {
-            string rvi = "";
-            foreach (var rv in RVs)
-                rvi += rv.Index.ToString();
-            string rvmi = "";
-            foreach (var rvm in RVMs)
-                rvmi += rvm.Index.ToString();
-            Debug.WriteLine($"--{s}--{rvi}--{rvmi}--");
-        }
         private void SetButtonsEnable()
         {
             MinusButtonEnable = (SelectedRigIndex > -1) ? true : false;

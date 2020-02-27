@@ -114,7 +114,7 @@ namespace OMineWatcher.Rigs
         private bool Wachdog = false;
         private void eWeLinkWachdog()
         {
-            if (Wachdog) return;
+            if (Wachdog || eWeRebootiong) return;
             Wachdog = true;
             Task.Run(() =>
             {
@@ -131,27 +131,60 @@ namespace OMineWatcher.Rigs
                 Wachdog = false;
             });
         }
+        private bool eWeRebootiong = false;
         private void eWeReboot()
         {
             if (Config.eWeDevice != null && App.Ewelink != null)
             {
-                UserInformer.SendMSG(Config.Name, "eWeReboot");
-
-                EwelinkNet.Classes.SwitchDevice dev = null;
-                try
+                if (eWeRebootiong) return;
+                eWeRebootiong = true;
+                while (App.Live && eWeRebootiong)
                 {
-                    dev = App.Ewelink.Devices.
-                        Where(d => d.name == Config.eWeDevice).First() 
-                        as EwelinkNet.Classes.SwitchDevice;
-                }
-                catch { return; }
+                    Task.Run(() => 
+                    {
+                        UserInformer.SendMSG(Config.Name, "eWeReboot");
 
-                if (dev != null)
-                {
-                    dev.TurnOff();
-                    Thread.Sleep(3000);
-                    dev.TurnOn();
+                        EwelinkNet.Classes.SwitchDevice dev = null;
+                        try
+                        {
+                            dev = App.Ewelink.Devices.
+                                Where(d => d.name == Config.eWeDevice).First()
+                                as EwelinkNet.Classes.SwitchDevice;
+                        }
+                        catch 
+                        { 
+                            eWeRebootiong = false; 
+                            UserInformer.SendMSG(Config.Name, "eWeReboot error");
+                            return;
+                        }
+
+                        if (dev != null)
+                        {
+                            dev.TurnOff();
+                            Thread.Sleep(5000);
+                            dev.TurnOn();
+                        }
+                        else
+                        {
+                            eWeRebootiong = false; 
+                            UserInformer.SendMSG(Config.Name, "eWeReboot error");
+                            return;
+                        }
+                    });
+
+                    for (int i = 0; i < Config.eWeDelayTimeout; i++)
+                    {
+                        Thread.Sleep(1000);
+                        if (Status == IPStatus.Success || !InternetConnection)
+                        {
+                            eWeRebootiong = false; return;
+                        }  
+                    }
                 }
+
+                
+
+                
             }
         }
     }

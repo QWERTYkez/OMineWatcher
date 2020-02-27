@@ -12,7 +12,7 @@ namespace OMineWatcher.Rigs
 
             public override event Action<RigInform> InformReceived;
 
-            private protected override int WachdogDelay => 30;
+            private protected override int WachdogDelay => 10;
             private OMGinformer OMG;
             private void SetEvents()
             {
@@ -45,8 +45,8 @@ namespace OMineWatcher.Rigs
             {
                 OMG?.StopInformStream();
                 OMG = null;
+                CurrentStatus = RigStatus.offline;
                 ScanningStart();
-                CurrentStatus = RigStatus.online;
                 InformReceived?.Invoke(new RigInform { RigInactive = true });
                 Waching = false;
             }
