@@ -180,7 +180,15 @@ namespace OMineWatcher.Managers
                             using (NetworkStream stream = client.GetStream())
                             {
                                 RigInform RO;
-                                while (client.Connected && Streaming)
+                                Task.Run(() =>
+                                {
+                                    while (App.Live && client.Connected && Streaming)
+                                        Thread.Sleep(200);
+                                    Task.Run(() => StreamEnd?.Invoke());
+                                    Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
+                                    ClearEvents();
+                                });
+                                while (App.Live && client.Connected && Streaming)
                                 {
                                     RO = ReadRootObject(stream);
                                     Task.Run(() => SentInform?.Invoke(RO));
@@ -197,6 +205,7 @@ namespace OMineWatcher.Managers
                         Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
                     }
                 });
+                
             }
         }
         public void StopInformStream()
