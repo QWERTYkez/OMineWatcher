@@ -181,10 +181,6 @@ namespace OMineWatcher.Rigs
                         }  
                     }
                 }
-
-                
-
-                
             }
         }
     }

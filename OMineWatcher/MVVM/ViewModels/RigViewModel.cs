@@ -147,13 +147,13 @@ namespace OMineWatcher.MVVM.ViewModels
                 case RigStatus.offline:
                     {
                         Indicator = Brushes.Red;
-                        UserInformer.AlarmStart(this);
+                        AlarmSwitch(true);
                     }
                     break;
                 case RigStatus.online:
                     {
                         Indicator = Brushes.Red;
-                        UserInformer.AlarmStart(this);
+                        AlarmSwitch(true);
                     }
                     break;
                 case RigStatus.works:
@@ -161,17 +161,31 @@ namespace OMineWatcher.MVVM.ViewModels
                         if (working)
                         {
                             Indicator = Brushes.Lime;
-                            UserInformer.AlarmStop(this);
+                            AlarmSwitch(false);
                         }
                         else
                         {
                             Indicator = Brushes.Blue;
-                            UserInformer.AlarmStart(this);
+                            AlarmSwitch(true);
                         }
                     }
                     break;
             }
             Working = working;
+        }
+        private bool Alarm = false;
+        private void AlarmSwitch(bool b)
+        {
+            if (b && !Alarm)
+            {
+                Alarm = true;
+                UserInformer.AlarmStart(this);
+            }
+            if (!b && Alarm)
+            {
+                Alarm = false;
+                UserInformer.AlarmStop(this);
+            }
         }
     }
 }
