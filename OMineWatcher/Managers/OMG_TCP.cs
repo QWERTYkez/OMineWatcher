@@ -166,6 +166,8 @@ namespace OMineWatcher.Managers
         public event Action StreamStart;
         public event Action<RigInform> SentInform;
         public bool Streaming { get; private set; } = false;
+        public bool OMGAlive { get; private set; } = true;
+        private TcpClient Client2114;
 
         public void StartInformStream(string IP)
         {
@@ -183,47 +185,39 @@ namespace OMineWatcher.Managers
                         Task.Run(() =>
                         {
                             while (App.Live && client.Connected && Streaming)
-                                Thread.Sleep(200);
+                            {
+                                Thread.Sleep(2000);
+                                Task.Run(() =>
+                                {
+                                    try
+                                    {
+                                        Client2114?.Close();
+                                        Client2114?.Dispose();
+                                        Client2114 = new TcpClient(IP, 2114);
+                                        using NetworkStream stream = Client2114.GetStream();
+                                        byte[] data = new byte[1];
+                                        int bytes = stream.Read(data, 0, data.Length);
+                                        OMGAlive = true;
+                                    }
+                                    catch { }
+                                });
+                            }
                             Exit();
                         });
                         Task.Run(() =>
                         {
-                            bool alive = true;
-                            while (App.Live && client.Connected && Streaming && alive)
+                            Thread.Sleep(5000);
+                        asdf:
+                            while (App.Live && client.Connected && Streaming)
                             {
-                                Thread.Sleep(5000);
-                                try
+                                if (!OMGAlive)
                                 {
-                                    using TcpClient client = new TcpClient(IP, 2114);
-                                    using NetworkStream stream = client.GetStream();
-                                    byte[] data = new byte[1];
-                                    int bytes = stream.Read(data, 0, data.Length);
-                                }
-                                catch
-                                {
-                                    Thread.Sleep(1000);
-                                    try
-                                    {
-                                        using TcpClient client = new TcpClient(IP, 2114);
-                                        using NetworkStream stream = client.GetStream();
-                                        byte[] data = new byte[1];
-                                        int bytes = stream.Read(data, 0, data.Length);
-                                    }
-                                    catch
+                                    for (int i = 0; i < 6; i++)
                                     {
                                         Thread.Sleep(1000);
-                                        try
-                                        {
-                                            using TcpClient client = new TcpClient(IP, 2114);
-                                            using NetworkStream stream = client.GetStream();
-                                            byte[] data = new byte[1];
-                                            int bytes = stream.Read(data, 0, data.Length);
-                                        }
-                                        catch
-                                        {
-                                            alive = false;
-                                        }
+                                        if (OMGAlive) goto asdf;
                                     }
+                                    Exit();
                                 }
                             }
                             Exit();
