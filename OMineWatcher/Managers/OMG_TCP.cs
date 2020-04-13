@@ -3,7 +3,6 @@ using Newtonsoft.Json.Converters;
 using OMineGuardControlLibrary;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -168,6 +167,7 @@ namespace OMineWatcher.Managers
         public bool Streaming { get; private set; } = false;
         public bool OMGAlive { get; private set; } = true;
         private TcpClient Client2114;
+        private TcpClient Client;
 
         public void StartInformStream(string IP)
         {
@@ -178,13 +178,13 @@ namespace OMineWatcher.Managers
                 {
                     try
                     {
-                        using TcpClient client = new TcpClient(IP, 2111);
-                        if (client.Connected) StreamStart?.Invoke();
-                        using NetworkStream stream = client.GetStream();
+                        Client = new TcpClient(IP, 2111);
+                        if (Client.Connected) StreamStart?.Invoke();
+                        using NetworkStream stream = Client.GetStream();
                         RigInform RO;
                         Task.Run(() =>
                         {
-                            while (App.Live && client.Connected && Streaming)
+                            while (App.Live && Client.Connected && Streaming)
                             {
                                 Thread.Sleep(2000);
                                 Task.Run(() =>
@@ -212,10 +212,11 @@ namespace OMineWatcher.Managers
                         {
                             Thread.Sleep(5000);
                         asdf:
-                            while (App.Live && client.Connected && Streaming)
+                            while (App.Live && Client.Connected && Streaming)
                             {
-                                if (!OMGAlive)
+                                if (OMGAlive)
                                 {
+                                    OMGAlive = false;
                                     for (int i = 0; i < 6; i++)
                                     {
                                         Thread.Sleep(1000);
@@ -226,7 +227,7 @@ namespace OMineWatcher.Managers
                             }
                             Exit();
                         });
-                        while (App.Live && client.Connected && Streaming)
+                        while (App.Live && Client.Connected && Streaming)
                         {
                             RO = ReadRootObject(stream);
                             Task.Run(() => SentInform?.Invoke(RO));
@@ -251,9 +252,12 @@ namespace OMineWatcher.Managers
         }
         public void Exit()
         {
+            Streaming = false;
+            Client?.Close();
+            Client?.Dispose();
+            Client2114?.Close();
+            Client2114?.Dispose();
             Task.Run(() => StreamEnd?.Invoke());
-            Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
-            ClearEvents();
         }
     }
     #region OMG support classes

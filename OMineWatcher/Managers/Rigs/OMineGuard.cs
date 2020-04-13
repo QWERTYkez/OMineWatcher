@@ -23,10 +23,11 @@ namespace OMineWatcher.Rigs
                 });
                 OMG.StreamEnd += () => Task.Run(() =>
                 {
-                    ScanningStart();
-                    CurrentStatus = RigStatus.online;
-                    InformReceived?.Invoke(new RigInform { RigInactive = true });
+                    OMG?.ClearEvents();
                     OMG = null;
+                    CurrentStatus = RigStatus.offline;
+                    ScanningStart();
+                    InformReceived?.Invoke(new RigInform { RigInactive = true });
                     Waching = false;
                 });
                 OMG.SentInform += RO => 
