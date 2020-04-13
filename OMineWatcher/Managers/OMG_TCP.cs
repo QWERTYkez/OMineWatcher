@@ -194,7 +194,7 @@ namespace OMineWatcher.Managers
                                 Thread.Sleep(5000);
                                 try
                                 {
-                                    using TcpClient client = new TcpClient(IP, 2111);
+                                    using TcpClient client = new TcpClient(IP, 2114);
                                     using NetworkStream stream = client.GetStream();
                                     byte[] data = new byte[1];
                                     int bytes = stream.Read(data, 0, data.Length);
@@ -204,7 +204,7 @@ namespace OMineWatcher.Managers
                                     Thread.Sleep(1000);
                                     try
                                     {
-                                        using TcpClient client = new TcpClient(IP, 2111);
+                                        using TcpClient client = new TcpClient(IP, 2114);
                                         using NetworkStream stream = client.GetStream();
                                         byte[] data = new byte[1];
                                         int bytes = stream.Read(data, 0, data.Length);
@@ -214,25 +214,14 @@ namespace OMineWatcher.Managers
                                         Thread.Sleep(1000);
                                         try
                                         {
-                                            using TcpClient client = new TcpClient(IP, 2111);
+                                            using TcpClient client = new TcpClient(IP, 2114);
                                             using NetworkStream stream = client.GetStream();
                                             byte[] data = new byte[1];
                                             int bytes = stream.Read(data, 0, data.Length);
                                         }
                                         catch
                                         {
-                                            Thread.Sleep(1000);
-                                            try
-                                            {
-                                                using TcpClient client = new TcpClient(IP, 2111);
-                                                using NetworkStream stream = client.GetStream();
-                                                byte[] data = new byte[1];
-                                                int bytes = stream.Read(data, 0, data.Length);
-                                            }
-                                            catch
-                                            {
-                                                alive = false;
-                                            }
+                                            alive = false;
                                         }
                                     }
                                 }
