@@ -199,7 +199,11 @@ namespace OMineWatcher.Managers
                                         int bytes = stream.Read(data, 0, data.Length);
                                         OMGAlive = true;
                                     }
-                                    catch { }
+                                    catch 
+                                    {
+                                        Client2114?.Close();
+                                        Client2114?.Dispose();
+                                    }
                                 });
                             }
                             Exit();
