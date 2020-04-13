@@ -188,24 +188,52 @@ namespace OMineWatcher.Managers
                         });
                         Task.Run(() =>
                         {
-                            IPStatus Status;
-                            using var ping = new Ping();
-                            var ipad = IPAddress.Parse(IP);
-                            var ts = new TimeSpan(0, 0, 30);
-                            bool pingres = true;
-                            while (App.Live && client.Connected && Streaming && pingres)
+                            bool alive = true;
+                            while (App.Live && client.Connected && Streaming && alive)
                             {
-                                Thread.Sleep(ts);
-                                Status = ping.Send(ipad, 1000).Status;
-                                if (Status != IPStatus.Success)
+                                Thread.Sleep(5000);
+                                try
                                 {
-                                    Thread.Sleep(50);
-                                    Status = ping.Send(ipad, 1000).Status;
-                                    if (Status != IPStatus.Success)
+                                    using TcpClient client = new TcpClient(IP, 2111);
+                                    using NetworkStream stream = client.GetStream();
+                                    byte[] data = new byte[1];
+                                    int bytes = stream.Read(data, 0, data.Length);
+                                }
+                                catch
+                                {
+                                    Thread.Sleep(1000);
+                                    try
                                     {
-                                        Thread.Sleep(50);
-                                        if (Status != IPStatus.Success)
-                                            pingres = false;
+                                        using TcpClient client = new TcpClient(IP, 2111);
+                                        using NetworkStream stream = client.GetStream();
+                                        byte[] data = new byte[1];
+                                        int bytes = stream.Read(data, 0, data.Length);
+                                    }
+                                    catch
+                                    {
+                                        Thread.Sleep(1000);
+                                        try
+                                        {
+                                            using TcpClient client = new TcpClient(IP, 2111);
+                                            using NetworkStream stream = client.GetStream();
+                                            byte[] data = new byte[1];
+                                            int bytes = stream.Read(data, 0, data.Length);
+                                        }
+                                        catch
+                                        {
+                                            Thread.Sleep(1000);
+                                            try
+                                            {
+                                                using TcpClient client = new TcpClient(IP, 2111);
+                                                using NetworkStream stream = client.GetStream();
+                                                byte[] data = new byte[1];
+                                                int bytes = stream.Read(data, 0, data.Length);
+                                            }
+                                            catch
+                                            {
+                                                alive = false;
+                                            }
+                                        }
                                     }
                                 }
                             }
