@@ -100,11 +100,9 @@ namespace OMineWatcher.Rigs
         private Settings.Rig Config;
         private void GetPing()
         {
-            using (var ping = new Ping())
-            {
-                try { Status = ping.Send(IPAddress.Parse(Config.IP), PingCheckTimeout).Status; }
-                catch { Status = IPStatus.Unknown; }
-            }
+            using var ping = new Ping();
+            try { Status = ping.Send(IPAddress.Parse(Config.IP), PingCheckTimeout).Status; }
+            catch { Status = IPStatus.Unknown; }
         }
 
         private protected abstract void WachingStert();

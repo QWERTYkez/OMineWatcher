@@ -4,6 +4,8 @@ using OMineGuardControlLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -174,36 +176,50 @@ namespace OMineWatcher.Managers
                 {
                     try
                     {
-                        using (TcpClient client = new TcpClient(IP, 2111))
+                        using TcpClient client = new TcpClient(IP, 2111);
+                        if (client.Connected) StreamStart?.Invoke();
+                        using NetworkStream stream = client.GetStream();
+                        RigInform RO;
+                        Task.Run(() =>
                         {
-                            if (client.Connected) StreamStart?.Invoke();
-                            using (NetworkStream stream = client.GetStream())
+                            while (App.Live && client.Connected && Streaming)
+                                Thread.Sleep(200);
+                            Exit();
+                        });
+                        Task.Run(() =>
+                        {
+                            IPStatus Status;
+                            using var ping = new Ping();
+                            var ipad = IPAddress.Parse(IP);
+                            var ts = new TimeSpan(0, 0, 30);
+                            bool pingres = true;
+                            while (App.Live && client.Connected && Streaming && pingres)
                             {
-                                RigInform RO;
-                                Task.Run(() =>
+                                Thread.Sleep(ts);
+                                Status = ping.Send(ipad, 1000).Status;
+                                if (Status != IPStatus.Success)
                                 {
-                                    while (App.Live && client.Connected && Streaming)
-                                        Thread.Sleep(200);
-                                    Task.Run(() => StreamEnd?.Invoke());
-                                    Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
-                                    ClearEvents();
-                                });
-                                while (App.Live && client.Connected && Streaming)
-                                {
-                                    RO = ReadRootObject(stream);
-                                    Task.Run(() => SentInform?.Invoke(RO));
                                     Thread.Sleep(50);
+                                    Status = ping.Send(ipad, 1000).Status;
+                                    if (Status != IPStatus.Success)
+                                    {
+                                        Thread.Sleep(50);
+                                        if (Status != IPStatus.Success)
+                                            pingres = false;
+                                    }
                                 }
-                                Task.Run(() => StreamEnd?.Invoke());
-                                Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
                             }
+                            Exit();
+                        });
+                        while (App.Live && client.Connected && Streaming)
+                        {
+                            RO = ReadRootObject(stream);
+                            Task.Run(() => SentInform?.Invoke(RO));
+                            Thread.Sleep(50);
                         }
+                        Exit();
                     }
-                    catch 
-                    { 
-                        Task.Run(() => StreamEnd?.Invoke());
-                        Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
-                    }
+                    catch { Exit(); }
                 });
                 
             }
@@ -217,6 +233,12 @@ namespace OMineWatcher.Managers
             StreamStart = null;
             StreamEnd = null;
             SentInform = null;
+        }
+        public void Exit()
+        {
+            Task.Run(() => StreamEnd?.Invoke());
+            Task.Run(() => SentInform?.Invoke(new RigInform { RigInactive = true }));
+            ClearEvents();
         }
     }
     #region OMG support classes
