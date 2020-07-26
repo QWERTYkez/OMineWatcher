@@ -95,6 +95,7 @@ namespace OMineWatcher.Managers.Pools
             switch (ct)
             {
                 case CoinType.ETC: name = "EthereumClassic"; break;
+                case CoinType.ETH: name = "Ethereum"; break;
             }
 
             RootObject ro = null;

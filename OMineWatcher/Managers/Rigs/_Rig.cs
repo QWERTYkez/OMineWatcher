@@ -159,7 +159,7 @@ namespace OMineWatcher.Rigs
                         if (dev != null)
                         {
                             dev.TurnOff();
-                            Thread.Sleep(5000);
+                            Thread.Sleep(8000);
                             dev.TurnOn();
                         }
                         else
