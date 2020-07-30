@@ -1,6 +1,7 @@
 ﻿using EwelinkNet;
 using OMineWatcher.Managers;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;

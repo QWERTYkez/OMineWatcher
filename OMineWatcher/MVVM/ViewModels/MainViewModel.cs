@@ -115,6 +115,7 @@ namespace OMineWatcher.MVVM.ViewModels
                                     HiveLogin = GenSettings.HiveLogin;
                                     HivePasswordSend = GenSettings.HivePassword;
                                     HiveConnection = true;
+                                    App.HiveConnection = true;
                                     HiveAccountState = "Подключение к Hive установлено";
                                     HiveConnectionState = "Подключение к Hive установлено";
 

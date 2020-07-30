@@ -1,6 +1,7 @@
 ﻿using HiveOS.API;
 using OMineWatcher.Managers;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,13 +19,43 @@ namespace OMineWatcher.Rigs
             private protected override int WachdogDelay => 15;
 
             private HiveOSWacher Wacher;
+            private void IniWacher()
+            {
+                Wacher = new HiveOSWacher(this, Config);
+                Wacher.InformReceived += inf => Task.Run(() => this.InformReceived?.Invoke(inf));
+                Wacher.HiveStatusChanged += st => 
+                {
+                    switch (st)
+                    {
+                        case HiveOSWacher.HiveStatus.Normal: 
+                            {
+                                CurrentStatus = RigStatus.works;
+                                ScanningStop();
+                            } 
+                            break;
+                        case HiveOSWacher.HiveStatus.LowHashrate: 
+                            {
+                                CurrentStatus = RigStatus.online;
+                                ScanningStop();
+                            } 
+                            break;
+                        case HiveOSWacher.HiveStatus.WorkerOffline: 
+                            {
+                                CurrentStatus = RigStatus.offline;
+                                ScanningStart();
+                            } 
+                            break;
+                    }
+                };
+                Wacher.StartWach();
+            }
+
+
             private protected override void WachingStert()
             {
                 if (Config.HiveFarmID.HasValue && Config.HiveWorkerID.HasValue)
                 {
-                    Wacher = new HiveOSWacher(this, Config);
-                    Wacher.InformReceived += inf => Task.Run(() => this.InformReceived?.Invoke(inf));
-                    Wacher.StartWach();
+                    IniWacher();
                 }
             }
             private protected override void WachingStop()
@@ -35,9 +66,7 @@ namespace OMineWatcher.Rigs
             private protected override void WachingReset()
             {
                 Wacher?.RemoveLinks();
-                Wacher = new HiveOSWacher(this, Config);
-                Wacher.InformReceived += inf => Task.Run(() => this.InformReceived?.Invoke(inf));
-                Wacher.StartWach();
+                IniWacher();
             }
 
             private class HiveOSWacher
@@ -46,6 +75,7 @@ namespace OMineWatcher.Rigs
                 private const int HiveOSRequestDelay = 10; //sec
 
                 public event Action<RigInform> InformReceived;
+                public event Action<HiveStatus> HiveStatusChanged;
 
                 private HiveOS Rig;
                 private Settings.Rig Config;
@@ -115,6 +145,8 @@ namespace OMineWatcher.Rigs
                         }
                         Task.Run(() =>
                         {
+                            while (!App.HiveConnection) Thread.Sleep(100);
+
                             while (HiveWach && InternetConnection)
                             {
                                 var mi = HiveClient.GetWorkerInfo(Config.HiveFarmID.Value,
@@ -162,8 +194,17 @@ namespace OMineWatcher.Rigs
                     }
                 }
 
-                private HiveStatus CurrentHiveStatus;
-                private enum HiveStatus
+                private HiveStatus currentHiveStatus;
+                private HiveStatus CurrentHiveStatus 
+                {
+                    get => currentHiveStatus;
+                    set
+                    {
+                        currentHiveStatus = value;
+                        HiveStatusChanged.Invoke(value);
+                    }
+                }
+                public enum HiveStatus
                 {
                     Normal,
                     LowHashrate,
