@@ -106,7 +106,7 @@ namespace OMineWatcher.MVVM.ViewModels
 
                         Task.Run(() =>
                         {
-                            if (string.IsNullOrEmpty(GenSettings.HiveLogin) && GenSettings.HiveLogin != null)
+                            if (!string.IsNullOrEmpty(GenSettings.HiveLogin) && !string.IsNullOrEmpty(GenSettings.HivePassword))
                             {
                                 AuthenticationStatus st = HiveClient.HiveAuthentication(
                                     GenSettings.HiveLogin, GenSettings.HivePassword);
