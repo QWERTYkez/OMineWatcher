@@ -185,19 +185,19 @@ namespace OMineWatcher.MVVM.ViewModels
         {
             if (rate.coin != null)
             {
-                CoinD = RoundDouble(rate.coin.Value * AVG.Value, 3);
-                CoinM = RoundDouble(rate.coin.Value * AVG.Value * 30, 3);
+                CoinD = RoundDouble(rate.coin.Value * AVG.Value, 4);
+                CoinM = RoundDouble(rate.coin.Value * AVG.Value * 30, 4);
             }
             if (rate.RUB != null)
             {
-                СurrencyD = RoundDouble(rate.RUB.Value * AVG.Value, 3);
-                СurrencyM = RoundDouble(rate.RUB.Value * AVG.Value * 30, 3);
+                СurrencyD = RoundDouble(rate.RUB.Value * AVG.Value, 4);
+                СurrencyM = RoundDouble(rate.RUB.Value * AVG.Value * 30, 4);
                 СurrencyType = "RUB";
             }
             else if (rate.USD != null)
             {
-                СurrencyD = RoundDouble(rate.USD.Value * AVG.Value, 3);
-                СurrencyM = RoundDouble(rate.USD.Value * AVG.Value * 30, 3);
+                СurrencyD = RoundDouble(rate.USD.Value * AVG.Value, 4);
+                СurrencyM = RoundDouble(rate.USD.Value * AVG.Value * 30, 4);
                 СurrencyType = "USD";
             }
         }
