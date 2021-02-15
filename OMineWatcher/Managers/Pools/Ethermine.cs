@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using OMineWatcher.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,18 +27,41 @@ namespace OMineWatcher.Managers.Pools
         public event Action NoInformationReceived;
         public event Action WrongWallet;
 
+        private readonly long Divider;
+        private readonly bool ReportedVisible;
         public Bitfly(CoinType coin, string wallet)
         {
             Wallet = wallet;
-            switch (coin)
+            Divider = coin switch
             {
-                case CoinType.BEAM: Endpoint = "https://api-beam.flypool.org"; break;
-                case CoinType.ETC: Endpoint = "https://api-etc.ethermine.org"; break;
-                case CoinType.ETH: Endpoint = "https://api.ethermine.org"; break;
-                case CoinType.RVN: Endpoint = "https://api-ravencoin.flypool.org"; break;
-                case CoinType.YEC: Endpoint = "https://api-ycash.flypool.org"; break;
-                case CoinType.ZEC: Endpoint = "https://api-zcash.flypool.org"; break;
-            }
+                CoinType.BEAM => 1000000000000000000,
+                CoinType.ETC => 1000000000000000000,
+                CoinType.ETH => 1000000000000000000,
+                CoinType.RVN => 100000000,
+                CoinType.YEC => 1000000000000000000,
+                CoinType.ZEC => 1000000000000000000,
+                _ => throw new NotImplementedException()
+            };
+            Endpoint = coin switch
+            {
+                CoinType.BEAM => "https://api-beam.flypool.org",
+                CoinType.ETC => "https://api-etc.ethermine.org",
+                CoinType.ETH => "https://api.ethermine.org",
+                CoinType.RVN => "https://api-ravencoin.flypool.org",
+                CoinType.YEC => "https://api-ycash.flypool.org",
+                CoinType.ZEC => "https://api-zcash.flypool.org",
+                _ => throw new NotImplementedException()
+            };
+            ReportedVisible = coin switch
+            {
+                CoinType.BEAM => true,
+                CoinType.ETC => true,
+                CoinType.ETH => true,
+                CoinType.RVN => false,
+                CoinType.YEC => true,
+                CoinType.ZEC => true,
+                _ => throw new NotImplementedException()
+            };
             if (!Monitoring)
             {
                 Monitoring = true;
@@ -104,8 +126,10 @@ namespace OMineWatcher.Managers.Pools
         {
             try
             {
+                var sssss = $"{Endpoint}/miner/{Wallet}/dashboard";
+
                 var request = System.Net.WebRequest.
-                    Create($"{Endpoint}/miner/{Wallet}/dashboard");
+                    Create(sssss);
                 var response = request.GetResponse();
                 string req;
                 using (var stream = response.GetResponseStream())
@@ -124,7 +148,7 @@ namespace OMineWatcher.Managers.Pools
                     var Workers = xxx.data.workers.Select(w => new WorkerStats
                     {
                         Name = w.worker,
-                        Rep = w.reportedHashrate,
+                        Rep = ReportedVisible ? w.reportedHashrate : null,
                         Curr = w.currentHashrate,
                         ShInvalid = w.invalidShares,
                         ShValid = w.validShares,
@@ -134,20 +158,20 @@ namespace OMineWatcher.Managers.Pools
                     var Current = new CurrStats
                     {
                         Curr = xxx.data.currentStatistics.currentHashrate,
-                        Rep = xxx.data.currentStatistics.reportedHashrate,
+                        Rep = ReportedVisible ? xxx.data.currentStatistics.reportedHashrate : null,
                         ShInvalid = xxx.data.currentStatistics.invalidShares,
                         ShValid = xxx.data.currentStatistics.validShares,
                         ShStale = xxx.data.currentStatistics.staleShares,
                         LastSeen = new DateTime(1970, 1, 1).
                             AddSeconds(xxx.data.currentStatistics.lastSeen).AddHours(h),
-                        Unpaid = xxx.data.currentStatistics.unpaid / 1000000000000000000,
+                        Unpaid = xxx.data.currentStatistics.unpaid / Divider,
                         ActiveWorkers = xxx.data.currentStatistics.activeWorkers,
-                        MinPayout = xxx.data.settings.minPayout / 1000000000000000000
+                        MinPayout = xxx.data.settings.minPayout / Divider
                     };
                     var His = xxx.data.statistics.Select(st => new MiningStats
                     {
                         Curr = st.currentHashrate,
-                        Rep = st.reportedHashrate,
+                        Rep = ReportedVisible ? st.reportedHashrate : null,
                         ShInvalid = st.invalidShares,
                         ShValid = st.validShares,
                         ShStale = st.staleShares,

@@ -42,6 +42,32 @@
                         <ItemsControl ItemsSource="{Binding RVs}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1">
+                        <Grid
+                            x:Name="TotalProfitGRD"
+                            Margin="5"
+                            Visibility="{Binding TotalProfitGRDvisability}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label
+                                Grid.Column="0"
+                                HorizontalAlignment="Center"
+                                Content="Total profit:"
+                                FontSize="{Binding FontSizeBig}"
+                                FontWeight="Bold" />
+                            <WrapPanel Grid.Column="1" HorizontalAlignment="Center">
+                                <Label Content="Day:" FontSize="{Binding FontSizeSmall}" />
+                                <Label Content="{Binding СurrencyD}" FontSize="{Binding FontSizeSmall}" />
+                                <Label Content="RUB" FontSize="{Binding FontSizeSmall}" />
+                            </WrapPanel>
+                            <WrapPanel Grid.Column="2" HorizontalAlignment="Center">
+                                <Label Content="Month:" FontSize="{Binding FontSizeSmall}" />
+                                <Label Content="{Binding СurrencyM}" FontSize="{Binding FontSizeSmall}" />
+                                <Label Content="RUB" FontSize="{Binding FontSizeSmall}" />
+                            </WrapPanel>
+                        </Grid>
                         <ItemsControl ItemsSource="{Binding PVs}" />
                     </StackPanel>
                 </Grid>

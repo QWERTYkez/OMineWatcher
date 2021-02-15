@@ -21,6 +21,20 @@ namespace OMineWatcher.MVVM.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
+        public static readonly List<PoolViewModel> PVMs= new List<PoolViewModel>();
+        private static event Action CurrencyUpdated;
+        public static event Action<int, double, double> AllCurrencyUpdated;
+        public static event Action<double, double> FontSizeChanged;
+        static PoolViewModel()
+        {
+            CurrencyUpdated += () =>
+            {
+                AllCurrencyUpdated?.Invoke(PVMs.Where(pvm => pvm.СurrencyD.HasValue).Count(),
+                    RoundDouble(PVMs.Sum(p => p.СurrencyD.HasValue ? p.rate.RUB.Value * p.AVG.Value : 0), 4),
+                    RoundDouble(PVMs.Sum(p => p.СurrencyD.HasValue ? p.rate.RUB.Value * p.AVG.Value : 0) * 30, 4));
+            };
+        }
+
         public int Index { get; set; }
         public Dispatcher Dispatcher { get; set; }
         private IPool Pool { get; set; }
@@ -43,6 +57,8 @@ namespace OMineWatcher.MVVM.ViewModels
             Settings.CoinChanged += coin => { CoinType = coin; StartWach(); };
             Settings.WalletChanged += wallet => StartWach();
             Settings.WachChanged += wach => { if (!wach) { Pool?.StopMonitoring(); Pool = null; } };
+
+            PVMs.Add(this);
         }
         public void StartWach()
         {
@@ -94,7 +110,7 @@ namespace OMineWatcher.MVVM.ViewModels
                         LastHist = histT;
                     }
 
-                    var reps = hist.Select(h => h.Rep).ToList();
+                    var reps = hist.Where(h => h.Rep.HasValue).Select(h => h.Rep.Value).ToList();
                     var curs = hist.Select(h => h.Curr).ToList();
 
                     var all = reps.Concat(curs);
@@ -108,10 +124,13 @@ namespace OMineWatcher.MVVM.ViewModels
 
                     var CurrPoints = new List<Point>();
                     var RepPoints = new List<Point>();
-                    for (int i = 0; i < hist.Count; i++)
+                    for (int i = 0; i < curs.Count; i++)
+                    {
+                        CurrPoints.Add(new Point(i * HCwidth / (hist.Count - 1), HCheight * (curs[i] - min) / delta));
+                    }
+                    for (int i = 0; i < reps.Count; i++)
                     {
                         RepPoints.Add(new Point(i * HCwidth / (hist.Count - 1), HCheight * (reps[i] - min) / delta));
-                        CurrPoints.Add(new Point(i * HCwidth / (hist.Count - 1), HCheight * (curs[i] - min) / delta));
                     }
                     Dispatcher.InvokeAsync(() => 
                     {
@@ -131,7 +150,7 @@ namespace OMineWatcher.MVVM.ViewModels
                     Error = null;
 
                     WorkersNames = workers.Select(w => w.Name).ToList();
-                    WorkersReported = workers.Select(w => HashrateConvert(w.Rep, 4)).ToList();
+                    WorkersReported = workers.Select(w => w.Rep.HasValue ? HashrateConvert(w.Rep.Value, 4) : "-").ToList();
                     WorkersCurrent = workers.Select(w => HashrateConvert(w.Curr, 4)).ToList();
                     WorkersShares = workers.Select(w => $"{w.ShValid} ({RoundDouble(((double)w.ShValid * 100 / (double)(w.ShValid + w.ShInvalid + w.ShStale)), 3)}%)").ToList();
                     WorkersLS = workers.Select(w => w.LastSeen.ToString("HH:mm:ss")).ToList();
@@ -155,7 +174,7 @@ namespace OMineWatcher.MVVM.ViewModels
                     Percent = percent;
                     Progress = Math.Round(Percent.Value * 1000);
                     ActiveWorkers = stats.ActiveWorkers;
-                    HashrateReported = HashrateConvert(stats.Rep, 4);
+                    HashrateReported = stats.Rep.HasValue ? HashrateConvert(stats.Rep.Value, 4) : "-";
                     HashrateCurrent = HashrateConvert(stats.Curr, 4);
                     Unpaid = RoundDouble(stats.Unpaid, 4);
                     var shpercent = (double)stats.ShValid * 100 /
@@ -193,6 +212,7 @@ namespace OMineWatcher.MVVM.ViewModels
                 СurrencyD = RoundDouble(rate.RUB.Value * AVG.Value, 4);
                 СurrencyM = RoundDouble(rate.RUB.Value * AVG.Value * 30, 4);
                 СurrencyType = "RUB";
+                CurrencyUpdated?.Invoke();
             }
             else if (rate.USD != null)
             {
@@ -301,6 +321,7 @@ namespace OMineWatcher.MVVM.ViewModels
         {
             FontSizeBig = e.NewSize.Width / 32;
             FontSizeSmall = FontSizeBig * 14 / 16;
+            FontSizeChanged?.Invoke(FontSizeSmall, FontSizeBig);
         }
     }
 }

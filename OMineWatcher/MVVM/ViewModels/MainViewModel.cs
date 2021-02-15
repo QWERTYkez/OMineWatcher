@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -32,7 +31,26 @@ namespace OMineWatcher.MVVM.ViewModels
                 if (b) AlarmButtonVisability = Visibility.Visible;
                 else AlarmButtonVisability = Visibility.Collapsed;
             };
+
+            PoolViewModel.FontSizeChanged += (d1, d2) => 
+            { 
+                FontSizeSmall = d1; FontSizeBig = d2; 
+            };
+            PoolViewModel.AllCurrencyUpdated += (i, cD, cM) =>
+            {
+                if (i > 1) TotalProfitGRDvisability = Visibility.Visible;
+                else TotalProfitGRDvisability = Visibility.Collapsed;
+
+                СurrencyD = cD; СurrencyM = cM;
+            };
         }
+        //Total Profit
+        public Visibility TotalProfitGRDvisability { get; set; } = Visibility.Collapsed;
+        public double СurrencyD { get; set; } = 0;
+        public double СurrencyM { get; set; } = 0;
+        public double FontSizeBig { get; set; } = 16;
+        public double FontSizeSmall { get; set; } = 14;
+
         public Visibility AlarmButtonVisability { get; set; } = Visibility.Collapsed;
 
         public MainModel _model = new MainModel();
@@ -101,8 +119,8 @@ namespace OMineWatcher.MVVM.ViewModels
 
                         eWeLogin = GenSettings.eWeLogin;
                         eWePasswordSend = GenSettings.eWePassword;
-
-                        Task.Run(() => eWeConnect());
+                        if(!String.IsNullOrEmpty(eWeLogin) && !String.IsNullOrEmpty(eWePasswordSend))
+                            Task.Run(() => eWeConnect());
 
                         Task.Run(() =>
                         {

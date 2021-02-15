@@ -91,12 +91,13 @@ namespace OMineWatcher.Managers.Pools
 
         public static (double? coin, double? USD, double? RUB) GetProfit(CoinType ct)
         {
-            string name = "";
-            switch (ct)
+            string name = ct switch
             {
-                case CoinType.ETC: name = "EthereumClassic"; break;
-                case CoinType.ETH: name = "Ethereum"; break;
-            }
+                CoinType.ETC => "EthereumClassic",
+                CoinType.ETH => "Ethereum",
+                CoinType.RVN => "Ravencoin",
+                _ => ""
+            };
 
             RootObject ro = null;
             try { ro = Profits.Where(x => x.name == name).First(); } catch { return (null, null, null); }
@@ -162,7 +163,7 @@ namespace OMineWatcher.Managers.Pools
     public struct WorkerStats
     {
         public string Name;
-        public double Rep;
+        public double? Rep;
         public double Curr;
         public int ShInvalid;
         public int ShValid;
@@ -172,7 +173,7 @@ namespace OMineWatcher.Managers.Pools
     public struct CurrStats
     {
         public double Curr;
-        public double Rep;
+        public double? Rep;
         public int ShInvalid;
         public int ShValid;
         public int ShStale;
@@ -184,7 +185,7 @@ namespace OMineWatcher.Managers.Pools
     public struct MiningStats
     {
         public double Curr;
-        public double Rep;
+        public double? Rep;
         public int ShInvalid;
         public int ShValid;
         public int ShStale;
