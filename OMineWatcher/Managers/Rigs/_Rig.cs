@@ -123,7 +123,9 @@ namespace OMineWatcher.Rigs
                     Thread.Sleep(1000);
                 }
                 if (Status == IPStatus.Success || !InternetConnection) goto EndWachdog;
-                UserInformer.SendMSG(Config.Name, "Ping: Worker offline");
+                if (UserInformer.Alarm)
+                    UserInformer.SendMSG(Config.Name, "Ping: Worker offline");
+
                 WachingStop();
                 eWeReboot();
             EndWachdog:

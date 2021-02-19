@@ -54,7 +54,7 @@ namespace OMineWatcher.Managers
             });
         }
 
-        private static bool Alarm;
+        public static bool Alarm { get; private set; } = false;
         private static readonly object Key = new object();
         private static List<object> Annunciators = new List<object>();
         public static void AlarmStart(object o)
