@@ -172,12 +172,8 @@ namespace OMineWatcher.Managers.Pools
                     {
                         Curr = st.currentHashrate,
                         Rep = ReportedVisible ? st.reportedHashrate : null,
-                        ShInvalid = st.invalidShares,
-                        ShValid = st.validShares,
-                        ShStale = st.staleShares,
                         Time = new DateTime(1970, 1, 1).
-                            AddSeconds(st.time).AddHours(h),
-                        ActiveWorkers = st.activeWorkers
+                            AddSeconds(st.time).AddHours(h)
                     }).ToList();
                     return (xxx.status, Current, His, Workers);
                 }

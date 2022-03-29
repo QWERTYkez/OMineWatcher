@@ -11,7 +11,7 @@ namespace OMineWatcher.Managers.Pools
 {
     public static class PoolsWacher
     {
-        public static PoolType[] PoolTypes = new PoolType[] { PoolType.Bitfly };
+        public static PoolType[] PoolTypes = new PoolType[] { PoolType.Bitfly, PoolType._2Miners };
         public static Dictionary<PoolType, CoinType[]> Coins = new Dictionary<PoolType, CoinType[]>
         {
             { 
@@ -26,6 +26,18 @@ namespace OMineWatcher.Managers.Pools
                     CoinType.YEC,
                     CoinType.ZEC
                 } 
+            },
+            {
+                PoolType._2Miners,
+
+                new CoinType[]
+                {
+                    CoinType.BEAM,
+                    CoinType.ETC,
+                    CoinType.ETH,
+                    CoinType.RVN,
+                    CoinType.ZEC
+                }
             }
         };
 
@@ -38,6 +50,7 @@ namespace OMineWatcher.Managers.Pools
                     switch (ps.Pool)
                     {
                         case PoolType.Bitfly: return new Bitfly(ps.Coin.Value, ps.Wallet);
+                        case PoolType._2Miners: return new _2Miners(ps.Coin.Value, ps.Wallet);
                         default: return null;
                     }
                 }
@@ -143,11 +156,12 @@ namespace OMineWatcher.Managers.Pools
 
     public enum PoolType
     {
-        Bitfly
+        Bitfly,
+        _2Miners
     }
     public enum CoinType
     {
-        BEAM, ETC, ETH, RVN, YEC, ZEC,
+        BEAM, ETC, ETH, RVN, YEC, ZEC, BTG
     }
     public interface IPool
     {
@@ -186,10 +200,6 @@ namespace OMineWatcher.Managers.Pools
     {
         public double Curr;
         public double? Rep;
-        public int ShInvalid;
-        public int ShValid;
-        public int ShStale;
         public DateTime Time;
-        public int ActiveWorkers;
     }
 }

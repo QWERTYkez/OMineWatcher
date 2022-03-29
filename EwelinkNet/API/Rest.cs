@@ -22,7 +22,7 @@ namespace EwelinkNet.API
             var body = JsonConvert.SerializeObject(payload);
             var signature = CryptoHelper.MakeAuthorizationSign(body);
 
-            var request = new RestRequest("/user/login", Method.POST);
+            var request = new RestRequest("/user/login", Method.Post);
             request.AddParameter("application/json; charset=utf-8", body, ParameterType.RequestBody);
             request.AddHeader("Authorization", $"Sign {signature}");
             request.RequestFormat = DataFormat.Json;
@@ -36,7 +36,7 @@ namespace EwelinkNet.API
         {
             var client = new RestClient(url);
 
-            var request = new RestRequest("/user/device", Method.GET);
+            var request = new RestRequest("/user/device", Method.Get);
 
             request.AddQueryParameter("lang", "en");
             request.AddQueryParameter("getTags", "1");

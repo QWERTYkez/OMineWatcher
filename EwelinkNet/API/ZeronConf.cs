@@ -14,7 +14,7 @@ namespace EwelinkNet.API
         public static async Task<string> UpdateDevice(string url, string deviceId, string deviceKey, string selfApiKey, object @params)
         {
             var client = new RestClient(url);
-            var request = new RestRequest("/switch", Method.POST);
+            var request = new RestRequest("/switch", Method.Post);
 
             var payload = new ZeroConfUpdatePayload(deviceId, deviceKey, selfApiKey, JsonConvert.SerializeObject(@params));
             var body = JsonConvert.SerializeObject(payload);
