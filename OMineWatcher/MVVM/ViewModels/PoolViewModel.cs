@@ -62,7 +62,12 @@ namespace OMineWatcher.MVVM.ViewModels
         }
         public void StartWach()
         {
-            if (Pool != null) { Pool.StopMonitoring(); Pool = null; }
+            if (Pool != null) 
+            { 
+                Pool.StopMonitoring();
+                Pool = null;
+
+            }
             {//очистка
                 MinPayout = null;
 
@@ -99,6 +104,13 @@ namespace OMineWatcher.MVVM.ViewModels
                 Pool.NoInformationReceived += () => { NameColor = Brushes.DarkRed; Waching = false; };
                 Pool.ReceivedMiningHistory += hist =>
                 {
+                    if (hist.Count < 1)
+                    {
+                        ChartGridLength = new GridLength(0, GridUnitType.Star);
+                        EmptyGridLength = new GridLength(1440, GridUnitType.Star);
+                        return;
+                    }
+
                     if (NameColor == Brushes.DarkRed) NameColor = Brushes.White;
                     Waching = true;
                     Error = null;
@@ -121,6 +133,20 @@ namespace OMineWatcher.MVVM.ViewModels
                     min -= delta * 0.1;
                     delta = max - min;
                     var average = HCheight * (curs.Average() - min) / delta;
+
+                    var minDT = hist.Min(h => h.Time);
+                    var maxDT = hist.Max(h => h.Time);
+                    var currDT = DateTime.Now;
+
+                    var lst = new List<double>();
+                    for (int i = 1; i < hist.Count; i++)
+                    {
+                        lst.Add((hist[i].Time - hist[i - 1].Time).TotalSeconds);
+                    }
+
+                    var TM = (currDT - maxDT).TotalMinutes;
+                    ChartGridLength = new GridLength(1440 - TM, GridUnitType.Star);
+                    EmptyGridLength = new GridLength(TM, GridUnitType.Star);
 
                     var CurrPoints = new List<Point>();
                     var RepPoints = new List<Point>();
@@ -293,6 +319,8 @@ namespace OMineWatcher.MVVM.ViewModels
         public double? AverageHashes { get; set; } = -50;
         public double HCwidth { get; set; } = 1000;
         public double HCheight { get; set; } = 100;
+        public GridLength ChartGridLength { get; set; } = new GridLength(1440, GridUnitType.Star);
+        public GridLength EmptyGridLength { get; set; } = new GridLength(0, GridUnitType.Star);
 
         //workers
         public List<string> WorkersNames { get; set; } = new List<string>();

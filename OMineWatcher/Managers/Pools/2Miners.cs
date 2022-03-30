@@ -148,7 +148,7 @@ namespace OMineWatcher.Managers.Pools
                     var Workers = xxx.WorkersRoot.Workers.Select(w => new WorkerStats
                     {
                         Name = w.Name,
-                        Rep = ReportedVisible ? w.rhr : null,
+                        Rep = GetValOrNull(ReportedVisible, w.rhr),
                         Curr = w.hr,
                         ShInvalid = w.sharesInvalid,
                         ShValid = w.sharesValid,
@@ -159,7 +159,7 @@ namespace OMineWatcher.Managers.Pools
                     var Current = new CurrStats
                     {
                         Curr = xxx.currentHashrate,
-                        Rep = ReportedVisible ? xxx.WorkersRoot.Workers.Sum(w => w.rhr) : null,
+                        Rep = GetValOrNull(ReportedVisible, xxx.WorkersRoot.Workers.Sum(w => w.rhr)),
                         ShInvalid = xxx.sharesInvalid,
                         ShValid = xxx.sharesValid,
                         ShStale = xxx.sharesStale,
@@ -169,18 +169,80 @@ namespace OMineWatcher.Managers.Pools
                         ActiveWorkers = xxx.workersOnline,
                         MinPayout = Convert.ToDouble(xxx.config.minPayout) / Divider
                     };
+                    xxx.rewards.Reverse();
                     var His = xxx.rewards.Select(st => new MiningStats
                     {
                         Curr = st.reward,
                         Rep = null,
                         Time = new DateTime(1970, 1, 1).
-                            AddMilliseconds(st.timestamp).AddHours(h)
+                            AddSeconds(st.timestamp).AddHours(h)
                     }).ToList();
-                    return (xxx.message, Current, His, Workers);
+
+                    DateTime Time;
+
+                    var ttt = His.Select(h => h.Time).ToList();
+
+                    if (((His[0].Time.Minute / 10) + 1) * 10 > 55)
+                    {
+                        var nt = His[0].Time.AddMinutes(10);
+                        Time = new DateTime(nt.Year, nt.Month, nt.Day, nt.Hour, 0, 0);
+                    }
+                    else
+                    {
+                        Time = new DateTime(His[0].Time.Year, His[0].Time.Month, His[0].Time.Day, His[0].Time.Hour, ((His[0].Time.Minute / 10) + 1) * 10, 0);
+                    }
+                    double Curr = 0;
+                    var Hist = new List<MiningStats>();
+                    foreach (var hs in His)
+                    {
+                        if ((Time - hs.Time).TotalMinutes > 0)
+                        {
+                            Curr += hs.Curr;
+                        }
+                        else
+                        {
+                            Hist.Add(new MiningStats 
+                            { 
+                                Time = Time,
+                                Curr = Curr
+                            });
+                            Curr = hs.Curr;
+                            Time = Time.AddMinutes(10);
+                        }
+                    }
+                    Hist.Add(new MiningStats
+                    {
+                        Time = Time,
+                        Curr = Curr
+                    });
+
+                    var n = DateTime.Now.AddDays(-1);
+                    Hist = Hist.Where(h => h.Time > n).ToList();
+                    var sdt = Hist[0].Time;
+                    for (int i = 1; i < Hist.Count; i++)
+                    {
+                        while (Hist[i].Time != sdt.AddMinutes(10))
+                        {
+                            Hist.Insert(i, new MiningStats
+                            {
+                                Curr = 0,
+                                Rep = 0,
+                                Time = Hist[i].Time.AddMinutes(-10),
+                            });
+                        }
+                        sdt = sdt.AddMinutes(10);
+                    }
+
+                    return (xxx.message, Current, Hist, Workers);
                 }
                 else return (xxx.message, null, null, null);
             }
             catch (Exception e) { return (e.Message, null, null, null); }
+        }
+        private double? GetValOrNull(bool condition, double value)
+        {
+            if (condition) return value;
+            else return null;
         }
         private WRoot GetWorkers(string message)
         {
@@ -244,7 +306,7 @@ namespace OMineWatcher.Managers.Pools
                 i--;
             }
             k = k + 2; j++;
-            string Workers = $"{{\"Workers\":[{new string(message.Take(k..j).ToArray())}]}}".Replace("\":{", "\",").Replace("},\"", "},{\"Name\":\"").Replace("\":[{\"", "\":[{\"Name\":\"").Replace("}}]", "}]");
+            string Workers = $"{{\"Workers\":[{new string(message.Take(j).Skip(k).ToArray())}]}}".Replace("\":{", "\",").Replace("},\"", "},{\"Name\":\"").Replace("\":[{\"", "\":[{\"Name\":\"").Replace("}}]", "}]");
             return JsonConvert.DeserializeObject<WRoot>(Workers);
         }
 

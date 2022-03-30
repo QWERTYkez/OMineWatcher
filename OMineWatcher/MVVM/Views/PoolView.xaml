@@ -266,54 +266,65 @@
                     Grid.Row="4"
                     Grid.ColumnSpan="10"
                     Height="120">
-                    <Viewbox Margin="5" Stretch="Fill">
-                        <Canvas
-                            x:Name="HistoryChart"
-                            Width="{Binding HCwidth}"
-                            Height="{Binding HCheight}"
-                            ClipToBounds="True"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Polyline
-                                Points="{Binding CurrentHashes}"
-                                Stroke="Cyan"
-                                StrokeThickness="{Binding Thickness}">
-                                <Polyline.Effect>
-                                    <DropShadowEffect
-                                        BlurRadius="20"
-                                        ShadowDepth="0"
-                                        Color="Cyan" />
-                                </Polyline.Effect>
-                            </Polyline>
-                            <Line
-                                Stroke="Orange"
-                                StrokeThickness="{Binding Thickness}"
-                                X1="0"
-                                X2="{Binding HCwidth}"
-                                Y1="{Binding AverageHashes}"
-                                Y2="{Binding AverageHashes}">
-                                <Line.Effect>
-                                    <DropShadowEffect
-                                        BlurRadius="20"
-                                        ShadowDepth="0"
-                                        Color="Orange" />
-                                </Line.Effect>
-                            </Line>
-                            <Polyline
-                                Points="{Binding ReportedHashes}"
-                                Stroke="Lime"
-                                StrokeThickness="{Binding Thickness}">
-                                <Polyline.Effect>
-                                    <DropShadowEffect
-                                        BlurRadius="20"
-                                        ShadowDepth="0"
-                                        Color="Lime" />
-                                </Polyline.Effect>
-                            </Polyline>
-                            <Canvas.RenderTransform>
-                                <ScaleTransform ScaleY="-1" />
-                            </Canvas.RenderTransform>
-                        </Canvas>
-                    </Viewbox>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding ChartGridLength}" />
+                            <ColumnDefinition Width="{Binding EmptyGridLength}" />
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Grid.Column="0" Stretch="Fill">
+                            <Canvas
+                                x:Name="HistoryChart"
+                                Width="{Binding HCwidth}"
+                                Height="{Binding HCheight}"
+                                ClipToBounds="True"
+                                RenderTransformOrigin="0.5,0.5">
+                                <Polyline
+                                    Points="{Binding CurrentHashes}"
+                                    Stroke="Cyan"
+                                    StrokeThickness="{Binding Thickness}">
+                                    <Polyline.Effect>
+                                        <DropShadowEffect
+                                            BlurRadius="20"
+                                            ShadowDepth="0"
+                                            Color="Cyan" />
+                                    </Polyline.Effect>
+                                </Polyline>
+                                <Line
+                                    Stroke="Orange"
+                                    StrokeThickness="{Binding Thickness}"
+                                    X1="0"
+                                    X2="{Binding HCwidth}"
+                                    Y1="{Binding AverageHashes}"
+                                    Y2="{Binding AverageHashes}">
+                                    <Line.Effect>
+                                        <DropShadowEffect
+                                            BlurRadius="20"
+                                            ShadowDepth="0"
+                                            Color="Orange" />
+                                    </Line.Effect>
+                                </Line>
+                                <Polyline
+                                    Points="{Binding ReportedHashes}"
+                                    Stroke="Lime"
+                                    StrokeThickness="{Binding Thickness}">
+                                    <Polyline.Effect>
+                                        <DropShadowEffect
+                                            BlurRadius="20"
+                                            ShadowDepth="0"
+                                            Color="Lime" />
+                                    </Polyline.Effect>
+                                </Polyline>
+                                <Canvas.RenderTransform>
+                                    <ScaleTransform ScaleY="-1" />
+                                </Canvas.RenderTransform>
+                            </Canvas>
+                        </Viewbox>
+                        <Grid
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Background="#79FF0000" />
+                    </Grid>
                 </Grid>
                 <Grid
                     x:Name="Shield"

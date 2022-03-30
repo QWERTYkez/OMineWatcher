@@ -120,8 +120,8 @@ namespace OMineWatcher.Managers.Pools
             WrongWallet = null;
             Monitoring = false;
         }
-        private (string status, CurrStats? СurrentStats, 
-            List<MiningStats> MiningHistory, 
+        private (string status, CurrStats? СurrentStats,
+            List<MiningStats> MiningHistory,
             List<WorkerStats> WorkersStats) GetStats()
         {
             try
@@ -148,7 +148,7 @@ namespace OMineWatcher.Managers.Pools
                     var Workers = xxx.data.workers.Select(w => new WorkerStats
                     {
                         Name = w.worker,
-                        Rep = ReportedVisible ? w.reportedHashrate : null,
+                        Rep = GetValOrNull(ReportedVisible, w.reportedHashrate),
                         Curr = w.currentHashrate,
                         ShInvalid = w.invalidShares,
                         ShValid = w.validShares,
@@ -158,7 +158,7 @@ namespace OMineWatcher.Managers.Pools
                     var Current = new CurrStats
                     {
                         Curr = xxx.data.currentStatistics.currentHashrate,
-                        Rep = ReportedVisible ? xxx.data.currentStatistics.reportedHashrate : null,
+                        Rep = GetValOrNull(ReportedVisible, xxx.data.currentStatistics.reportedHashrate),
                         ShInvalid = xxx.data.currentStatistics.invalidShares,
                         ShValid = xxx.data.currentStatistics.validShares,
                         ShStale = xxx.data.currentStatistics.staleShares,
@@ -171,15 +171,38 @@ namespace OMineWatcher.Managers.Pools
                     var His = xxx.data.statistics.Select(st => new MiningStats
                     {
                         Curr = st.currentHashrate,
-                        Rep = ReportedVisible ? st.reportedHashrate : null,
+                        Rep = GetValOrNull(ReportedVisible, st.reportedHashrate),
                         Time = new DateTime(1970, 1, 1).
                             AddSeconds(st.time).AddHours(h)
                     }).ToList();
+
+                    var n = DateTime.Now.AddDays(-1);
+                    His = His.Where(h => h.Time > n).ToList();
+                    var sdt = His[0].Time;
+                    for (int i = 1; i < His.Count; i++)
+                    {
+                        while (His[i].Time != sdt.AddMinutes(10))
+                        {
+                            His.Insert(i, new MiningStats
+                            {
+                                Curr = 0,
+                                Rep = 0,
+                                Time = His[i].Time.AddMinutes(-10),
+                            });
+                        }
+                        sdt = sdt.AddMinutes(10);
+                    }
+
                     return (xxx.status, Current, His, Workers);
                 }
                 else return (xxx.error, null, null, null);
             }
             catch (Exception e) { return (e.Message, null, null, null); }
+        }
+        private double? GetValOrNull(bool condition, double value)
+        {
+            if (condition) return value;
+            else return null;
         }
 
         #region JsonClasses
