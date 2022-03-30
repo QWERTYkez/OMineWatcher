@@ -107,7 +107,7 @@ namespace OMineWatcher.MVVM.ViewModels
                     if (hist.Count < 1)
                     {
                         ChartGridLength = new GridLength(0, GridUnitType.Star);
-                        EmptyGridLength = new GridLength(1440, GridUnitType.Star);
+                        EmptyGridLength = new GridLength(1, GridUnitType.Star);
                         return;
                     }
 
@@ -145,8 +145,16 @@ namespace OMineWatcher.MVVM.ViewModels
                     }
 
                     var TM = (currDT - maxDT).TotalMinutes;
-                    ChartGridLength = new GridLength(1440 - TM, GridUnitType.Star);
-                    EmptyGridLength = new GridLength(TM, GridUnitType.Star);
+                    if (TM < 10)
+                    {
+                        ChartGridLength = new GridLength(1, GridUnitType.Star);
+                        EmptyGridLength = new GridLength(0, GridUnitType.Star);
+                    }
+                    else
+                    {
+                        ChartGridLength = new GridLength(1440 - TM, GridUnitType.Star);
+                        EmptyGridLength = new GridLength(TM, GridUnitType.Star);
+                    }
 
                     var CurrPoints = new List<Point>();
                     var RepPoints = new List<Point>();
